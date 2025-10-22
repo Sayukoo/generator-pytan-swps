@@ -78,6 +78,13 @@
     }
 
     function draw() {
+      // Animacja przycisku Losuj
+      if (drawBtn) {
+        drawBtn.classList.remove('pulse');
+        // reflow dla ponownej animacji
+        void drawBtn.offsetWidth;
+        drawBtn.classList.add('pulse');
+      }
       const N = QUESTIONS.length;
       let a = randInt(1, N);
       let b;

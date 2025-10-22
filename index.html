@@ -1,26 +1,34 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pl">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>SWPS  Generator Losowych Pytań</title>
   <link rel="stylesheet" href="styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  
 </head>
 <body>
   <div class="app">
-    <h1>Losowanie pytań</h1>
+    <h1 class="app-title">Generator pytań SWPS</h1>
     <div class="cards">
       <div class="card">
-        <div class="num" id="numA">Losuj</div>
-        <div class="question" id="qA"></div>
+        <div class="num" id="numA"> ❔ </div>
+        <div class="question" id="qA">  </div>
       </div>
       <div class="card">
-        <div class="num" id="numB">Losuj</div>
+        <div class="num" id="numB">❔ </div>
         <div class="question" id="qB"></div>
       </div>
     </div>
-    <div class="buttons">
-      <button id="drawBtn">Losuj</button>
+
+    <div class="primary-actions">
+      <button id="drawBtn" class="primary">Losuj</button>
+    </div>
+
+    <div class="footer-actions">
       <button id="resetBtn">Reset</button>
       <button id="helpBtn">Instrukcja</button>
     </div>
@@ -28,14 +36,16 @@
 
   <dialog id="helpDialog">
     <h3>Instrukcja</h3>
-    <p> Kliknij <b>Losuj  </b>, by wylosować dwa numery z listy pytań.<br>
-    - Kliknij dowolną kartę, by wybrać pytanie.<br>
-     <b>Reset</b> czyści losowanie.<br>
-    Skróty: Spacja = Losuj, R = Reset.</p>
+    <p>
+      Kliknij <b>Losuj</b>, aby wylosować dwa numery z listy pytań.<br> <br>
+      Kliknij dowolną kartę, aby wybrać pytanie.<br> <br>
+      <b>Reset</b> czyści losowanie.<br> <br> 
+      Skróty: Spacja = Losuj, R = Reset.
+    </p>
     <button id="closeHelp">Zamknij</button>
   </dialog>
 
   <script src="script.js"></script>
-</body>
-</html>
+  </body>
+  </html>
 
