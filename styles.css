@@ -35,7 +35,7 @@
     h1 { margin: 0; }
     .app-title {
       font-weight: 900;
-      font-size: 58px;
+      font-size: 48px;
       letter-spacing: .2px;
       margin-top: 4px;
     }
@@ -62,7 +62,7 @@
       overflow: hidden;
     }
     .card:hover { transform: scale(1.03); border-color: #fff; }
-    .num { font-size: 72px; font-weight: 900; margin-bottom: 12px; }
+    .num { font-size: 92px; font-weight: 900; margin-bottom: 12px; }
     .question {
       font-size: 16px;
       color: var(--fg);
