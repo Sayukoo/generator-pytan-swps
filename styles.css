@@ -31,6 +31,7 @@
       text-align: center;
       justify-content: center; /* wszystko wyśrodkowane */
       gap: 18px;
+      padding-bottom: 72px; /* miejsce na przypiętą stopkę */
     }
     h1 { margin: 0; }
     .app-title {
@@ -86,6 +87,22 @@
       gap: 12px;
       margin-top: 4px; /* jeszcze bliżej do Losuj */
     }
+    .site-footer {
+      position: fixed;
+      left: 0; right: 0; bottom: 10px;
+      text-align: center;
+      font-size: 12px;
+      color: var(--muted);
+      opacity: .85;
+      z-index: 50;
+      pointer-events: auto;
+    }
+    .site-footer a {
+      color: var(--muted);
+      text-decoration: none;
+      border-bottom: 1px dotted rgba(255,255,255,0.35);
+    }
+    .site-footer a:hover { opacity: 1; border-bottom-color: rgba(255,255,255,0.6); }
     button {
       background: #fff;
       color: #000;
