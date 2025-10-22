@@ -108,8 +108,8 @@
     }
 
     function reset() {
-      numA.textContent = '–';
-      numB.textContent = '–';
+      numA.textContent = '?';
+      numB.textContent = '?';
       qA.textContent = '';
       qB.textContent = '';
     }
