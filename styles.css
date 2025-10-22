@@ -185,3 +185,19 @@
     .card.glow::after { animation: shine 2200ms ease-out forwards; }
     .card.pop { animation: popIn 1400ms cubic-bezier(.2,.8,.2,1); }
     .num.flip { animation: flipNum 1400ms cubic-bezier(.2,.8,.2,1); transform-origin: center top; }
+
+    /* Responsywność: telefony */
+    @media (max-width: 640px) {
+      body { padding: 12px; }
+      .app { min-height: 100svh; padding: 16px 14px; gap: 12px; }
+      .app-title { font-size: 28px; }
+      .cards { gap: 14px; margin-top: 2px; }
+      .card { min-width: 100%; height: 280px; padding: 18px 14px; }
+      .num { font-size: 56px; margin-bottom: 8px; }
+      .question { font-size: 14px; }
+      .primary-actions { margin-top: 4px; margin-bottom: 4px; width: 100%; }
+      .primary-actions .primary#drawBtn { width: 100%; min-width: 0; padding: 18px 16px; font-size: 26px; }
+      .footer-actions { width: 100%; gap: 8px; flex-wrap: wrap; }
+      .footer-actions button { flex: 1 1 180px; padding: 12px 14px; font-size: 14px; }
+      .site-footer { bottom: 6px; font-size: 11px; padding: 0 12px; }
+    }
