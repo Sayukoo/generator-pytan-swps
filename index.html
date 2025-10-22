@@ -1,0 +1,41 @@
+﻿<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SWPS  Generator Losowych Pytań</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app">
+    <h1>Losowanie pytań</h1>
+    <div class="cards">
+      <div class="card">
+        <div class="num" id="numA">Losuj</div>
+        <div class="question" id="qA"></div>
+      </div>
+      <div class="card">
+        <div class="num" id="numB">Losuj</div>
+        <div class="question" id="qB"></div>
+      </div>
+    </div>
+    <div class="buttons">
+      <button id="drawBtn">Losuj</button>
+      <button id="resetBtn">Reset</button>
+      <button id="helpBtn">Instrukcja</button>
+    </div>
+  </div>
+
+  <dialog id="helpDialog">
+    <h3>Instrukcja</h3>
+    <p> Kliknij <b>Losuj  </b>, by wylosować dwa numery z listy pytań.<br>
+    - Kliknij dowolną kartę, by wybrać pytanie.<br>
+     <b>Reset</b> czyści losowanie.<br>
+    Skróty: Spacja = Losuj, R = Reset.</p>
+    <button id="closeHelp">Zamknij</button>
+  </dialog>
+
+  <script src="script.js"></script>
+</body>
+</html>
+

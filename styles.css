@@ -1,0 +1,96 @@
+  :root {
+      --bg: #0a0a0a;
+      --fg: #ffffff;
+      --muted: #a0a0a0;
+      --panel: #111111;
+      --radius: 14px;
+      --shadow: 0 12px 30px rgba(0,0,0,.5);
+    }
+    body {
+      background: var(--bg);
+      color: var(--fg);
+      font-family: Inter, sans-serif;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      padding: 20px;
+    }
+    .app {
+      background: var(--panel);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 32px;
+      width: min(850px, 95vw);
+      height: auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+    h1 {
+      font-weight: 800;
+      font-size: 26px;
+      margin: 0;
+    }
+    .cards {
+      display: flex;
+      justify-content: center;
+      gap: 30px;
+      flex-wrap: wrap;
+      width: 100%;
+      margin-top: 20px;
+    }
+    .card {
+      flex: 1;
+      border: 1px solid #333;
+      border-radius: var(--radius);
+      background: #0d0d0d;
+      padding: 32px 20px;
+      display: grid;
+      place-items: center;
+      transition: transform .15s ease, border-color .15s ease;
+      min-width: 320px;
+    }
+    .card:hover { transform: scale(1.03); border-color: #fff; }
+    .num { font-size: 64px; font-weight: 900; margin-bottom: 16px; }
+    .question { font-size: 15px; color: var(--fg); line-height: 1.5; text-align: center; max-width: 50ch; }
+    .buttons {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      margin-top: 20px;
+    }
+    button {
+      background: #fff;
+      color: #000;
+      border: none;
+      border-radius: 8px;
+      padding: 12px 20px;
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 14px;
+    }
+    button:hover { background: #ddd; }
+    dialog {
+      position: fixed;
+      top: 50%; left: 50%; transform: translate(-50%, -50%);
+      background: #111;
+      border: none;
+      border-radius: 10px;
+      color: var(--fg);
+      padding: 30px;
+      width: 600px;
+      text-align: center;
+    }
+    dialog::backdrop { background: rgba(0,0,0,0.7); }
+    /* Animacje */
+    @keyframes popIn { 0% { opacity: 0; transform: translateY(8px) scale(.96);} 60% { opacity: 1; transform: translateY(-2px) scale(1.04);} 100% { opacity: 1; transform: translateY(0) scale(1);} }
+    @keyframes shine { 0% { transform: translateX(-150%);} 100% { transform: translateX(150%);} }
+    @keyframes flipNum { 0% { transform: rotateX(90deg); opacity: .2;} 100% { transform: rotateX(0); opacity: 1;} }
+    .card { position: relative; overflow: hidden; }
+    .card::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(120deg, transparent 0%, rgba(255,255,255,.06) 20%, transparent 40%); transform: translateX(-150%); }
+    .card.glow::after { animation: shine 900ms ease-out forwards; }
+    .card.pop { animation: popIn 420ms cubic-bezier(.2,.8,.2,1); }
+    .num.flip { animation: flipNum 380ms cubic-bezier(.2,.8,.2,1); transform-origin: center top; }
