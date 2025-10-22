@@ -129,8 +129,12 @@
       letter-spacing: .2px;
       animation: btnBreath 4.5s ease-in-out infinite; /* ciągła delikatna animacja */
     }
-    .primary-actions .primary#drawBtn:hover { transform: translateY(-1px) scale(1.03); box-shadow: 0 6px 16px rgba(0,0,0,0.28); }
-    .primary-actions .primary#drawBtn:active { transform: translateY(0) scale(0.99); }
+    .primary-actions .primary#drawBtn:hover { transform: translateY(-1px) scale(1.23); box-shadow: 0 6px 16px rgba(0,0,0,0.28); }
+    .primary-actions .primary#drawBtn:active {
+      transform: translateY(1px) scale(0.885);
+      box-shadow: 0 1px 6px rgba(0,0,0,0.28) inset, 0 2px 8px rgba(0,0,0,0.18);
+      filter: brightness(0.98);
+    }
     /* Połysk przejeżdżający przez przycisk */
     .primary-actions .primary#drawBtn::after {
       content: "";
@@ -155,6 +159,20 @@
     .primary-actions .primary#drawBtn:hover::before {
       box-shadow: 0 0 0 6px rgba(255,255,255,0.07);
     }
+    /* Ripple click efekt */
+    .primary-actions .primary#drawBtn .ripple {
+      position: absolute;
+      width: 16px;
+      height: 16px;
+      border-radius: 9999px;
+      background: radial-gradient(circle, rgba(0,0,0,0.18) 0%, rgba(0,0,0,0.14) 35%, rgba(0,0,0,0.0) 70%);
+      transform: translate(-50%, -50%) scale(0);
+      animation: rippleSpread 700ms ease-out forwards;
+      pointer-events: none;
+      mix-blend-mode: multiply;
+      opacity: .7;
+    }
+    @keyframes rippleSpread { 0% { transform: translate(-50%, -50%) scale(0); opacity: .55; } 70% { opacity: .25; } 100% { transform: translate(-50%, -50%) scale(22); opacity: 0; } }
     /* Puls po kliknięciu */
     .primary-actions .primary#drawBtn.pulse {
       animation: btnPulse 1400ms cubic-bezier(.2,.8,.2,1);

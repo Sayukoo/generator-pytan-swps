@@ -114,6 +114,22 @@
       qB.textContent = '';
     }
 
+    // Ripple effect on click + draw action
+    function addRipple(e) {
+      try {
+        const rect = drawBtn.getBoundingClientRect();
+        const x = (e.clientX ?? (e.touches && e.touches[0]?.clientX) ?? (rect.left + rect.width/2)) - rect.left;
+        const y = (e.clientY ?? (e.touches && e.touches[0]?.clientY) ?? (rect.top + rect.height/2)) - rect.top;
+        const r = document.createElement('span');
+        r.className = 'ripple';
+        r.style.left = x + 'px';
+        r.style.top = y + 'px';
+        drawBtn.appendChild(r);
+        r.addEventListener('animationend', () => r.remove());
+      } catch (_) { /* no-op */ }
+    }
+    drawBtn.addEventListener('click', (e) => { addRipple(e); });
+    drawBtn.addEventListener('touchstart', (e) => { addRipple(e); }, { passive: true });
     drawBtn.onclick = draw;
     resetBtn.onclick = reset;
     document.addEventListener('keydown', (e) => {
