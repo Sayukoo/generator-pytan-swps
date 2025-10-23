@@ -63,6 +63,99 @@
 
     const cardEls = document.querySelectorAll('.card');
     const numEls = [numA, numB];
+    const cardArray = Array.from(cardEls);
+
+    if (typeof window.createTimerManager !== 'function') {
+      throw new Error('Timer module is not loaded.');
+    }
+
+    const timer = window.createTimerManager({
+      drawBtn,
+      selectionDuration: 40,
+      answerDuration: 120,
+      onSelectionTimeout: handleSelectionTimeout,
+      onAnswerComplete: handleAnswerComplete,
+    });
+
+    function getCardQuestion(cardEl) {
+      return cardEl.querySelector('.question')?.textContent?.trim();
+    }
+
+    function clearSelectionStyles() {
+      cardArray.forEach((card) => {
+        card.classList.remove('selected', 'dimmed', 'auto-picked');
+      });
+    }
+
+    function setCardsIdle(isIdle) {
+      cardArray.forEach((card) => {
+        card.classList.toggle('idle', isIdle);
+      });
+    }
+
+    function applySelectionStyles(cardEl, { autoPicked = false } = {}) {
+      cardArray.forEach((card) => {
+        card.classList.remove('idle');
+        if (card === cardEl) {
+          card.classList.add('selected');
+          if (autoPicked) {
+            card.classList.add('auto-picked');
+          } else {
+            card.classList.remove('auto-picked');
+          }
+          card.classList.remove('dimmed');
+        } else {
+          card.classList.remove('selected', 'auto-picked');
+          card.classList.add('dimmed');
+        }
+      });
+    }
+
+    function handleAnswerStart(cardEl, { autoPicked = false, force = false } = {}) {
+      if (!cardEl || timer.isAnswerActive()) {
+        return;
+      }
+      if (!force && !timer.isSelectionActive()) {
+        return;
+      }
+      if (!timer.startAnswer()) {
+        return;
+      }
+      setCardsIdle(false);
+      applySelectionStyles(cardEl, { autoPicked });
+    }
+
+    function handleSelectionTimeout() {
+      if (timer.isAnswerActive()) {
+        return;
+      }
+      const availableCards = cardArray.filter((card) => getCardQuestion(card));
+      if (availableCards.length === 0) {
+        return;
+      }
+      const choiceIndex = Math.floor(Math.random() * availableCards.length);
+      const chosenCard = availableCards[choiceIndex];
+      handleAnswerStart(chosenCard, { autoPicked: true, force: true });
+    }
+
+    function handleAnswerComplete() {
+      // Możesz dodać dodatkowe efekty po zakończeniu odliczania, jeśli zajdzie potrzeba.
+    }
+
+    cardArray.forEach((cardEl) => {
+      cardEl.addEventListener('click', () => {
+        if (timer.isAnswerActive()) {
+          return;
+        }
+        if (!timer.isSelectionActive()) {
+          return;
+        }
+        if (!getCardQuestion(cardEl)) {
+          return;
+        }
+        handleAnswerStart(cardEl);
+      });
+    });
 
     function randInt(min, max) {
       const range = max - min + 1;
@@ -78,6 +171,8 @@
     }
 
     function draw() {
+      clearSelectionStyles();
+      setCardsIdle(false);
       // Animacja przycisku Losuj
       if (drawBtn) {
         drawBtn.classList.remove('pulse');
@@ -105,6 +200,7 @@
       numB.textContent = b;
       qA.textContent = QUESTIONS[a - 1];
       qB.textContent = QUESTIONS[b - 1];
+      timer.startSelection();
     }
 
     function reset() {
@@ -112,6 +208,9 @@
       numB.textContent = '?';
       qA.textContent = '';
       qB.textContent = '';
+      timer.resetAll();
+      clearSelectionStyles();
+      setCardsIdle(true);
     }
 
     // Ripple effect on click + draw action
@@ -135,9 +234,13 @@
     document.addEventListener('keydown', (e) => {
       if (e.code === 'Space') {
         e.preventDefault();
-        draw();
+        if (!timer.isAnswerActive()) {
+          draw();
+        }
       }
       if (e.key && e.key.toLowerCase() === 'r') {
         reset();
       }
     });
+
+    reset();
