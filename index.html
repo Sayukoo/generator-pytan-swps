@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pl">
 <head>
   <meta charset="utf-8" />
@@ -85,9 +85,7 @@
     <h1 class="visually-hidden">Generator losowych pytań SWPS</h1>
     <nav class="app-nav" aria-label="Nawigacja główna">
       <div class="app-nav__brand">
-        <span class="app-nav__badge" aria-hidden="true">
-          <span class="app-nav__badge-glow"></span>
-        </span>
+        <span class="app-nav__badge" aria-hidden="true"></span>
         <div class="app-nav__text">
           <span class="app-nav__title">Generator pytań SWPS</span>
         </div>
@@ -134,12 +132,13 @@
 
   <dialog id="helpDialog">
     <h3>Instrukcja</h3>
-    <p>
-      Kliknij <b>Losuj</b>, aby wylosować dwa numery z listy pytań.<br /><br />
-      Kliknij dowolną kartę, aby wybrać pytanie.<br /><br />
-      <b>Reset</b> czyści losowanie.<br /><br />
-      Skróty klawiszowe: Spacja = Losuj, R = Reset.
-    </p>
+    <ol class="help-list">
+      <li>Naciśnij <b>Losuj</b>, aby dobrać dwa nowe pytania z puli widocznej w panelu filtrów.</li>
+      <li>Kliknij kartę z pytaniem, aby oznaczyć je jako opanowane albo wrócić na listę do przećwiczenia.</li>
+      <li>Przyciśnij <b>Reset</b>, kiedy chcesz wyczyścić aktualne losowanie i liczniki postępu.</li>
+      <li>Rozwiń menu filtrów w prawym górnym rogu, aby zawęzić losowanie do wybranych tagów lub statusów.</li>
+    </ol>
+    <p>Przycisk <kbd>Spacja</kbd> losuje kolejną parę pytań, a <kbd>R</kbd> natychmiast resetuje widok.</p>
     <button id="closeHelp" type="button">Zamknij</button>
   </dialog>
 
