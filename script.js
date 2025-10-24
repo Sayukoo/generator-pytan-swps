@@ -110,11 +110,6 @@
     return `rgba(${r}, ${g}, ${b}, ${Math.max(0, Math.min(1, alpha))})`;
   }
 
-  function getReadableTextColor({ r, g, b }) {
-    const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
-    return luminance > 0.62 ? '#131313' : '#f9f9f9';
-  }
-
   function getTagVariants(tag) {
     const rgb = hexToRgb(TAG_COLOR_MAP[tag] ?? DEFAULT_TAG_COLOR) ?? hexToRgb(DEFAULT_TAG_COLOR);
     if (!rgb) {
@@ -132,7 +127,7 @@
       soft: rgbaToString(rgb, 0.22),
       accent: rgbaToString(rgb, 0.28),
       subtle: rgbaToString(rgb, 0.12),
-      text: getReadableTextColor(rgb),
+      text: '#f9f9f9',
       onDark: rgbToString(rgb),
     };
   }
@@ -335,7 +330,7 @@
       const variants = getTagVariants(primaryTag);
       item.style.setProperty('--tag-color', variants.soft);
       item.style.setProperty('--tag-color-strong', variants.strong);
-      item.style.setProperty('--mastery-text-color', variants.onDark);
+      item.style.setProperty('--mastery-text-color', variants.text);
       item.title = text.textContent;
 
       item.appendChild(num);
