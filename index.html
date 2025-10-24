@@ -3,24 +3,96 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>SWPS  Generator Losowych Pytań</title>
+  <title>SWPS · Generator losowych pytań</title>
   <link rel="stylesheet" href="styles.css" />
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-  
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
 </head>
 <body>
+  <button
+    id="menuToggle"
+    class="menu-toggle"
+    type="button"
+    aria-label="Otwórz menu filtrów"
+    aria-expanded="false"
+    aria-controls="menuPanel"
+  >
+    <span class="menu-icon">
+      <span></span>
+      <span></span>
+      <span></span>
+    </span>
+  </button>
+  <div id="menuBackdrop" class="menu-backdrop" aria-hidden="true"></div>
+  <aside id="menuPanel" class="menu-panel" aria-hidden="true" aria-labelledby="menuToggle">
+    <div class="menu-panel__inner">
+      <header class="menu-panel__header">
+        <h2>Filtry losowania</h2>
+        <button id="menuClose" class="menu-close" type="button" aria-label="Zamknij menu filtrów">
+          <span></span>
+          <span></span>
+        </button>
+      </header>
+      <section class="filter-section">
+        <h3>Uwzględnij w losowaniu</h3>
+        <label class="filter-toggle">
+          <input type="checkbox" id="filterIncludeUnmastered" checked />
+          <span class="toggle-indicator"></span>
+          <span class="filter-label">Pytania nieopanowane</span>
+        </label>
+        <label class="filter-toggle">
+          <input type="checkbox" id="filterIncludeMastered" checked />
+          <span class="toggle-indicator"></span>
+          <span class="filter-label">Pytania oznaczone jako opanowane</span>
+        </label>
+      </section>
+      <section class="filter-section">
+        <div class="filter-section__title-row">
+          <h3>Tagi tematyczne</h3>
+          <button id="filterClear" type="button" class="filter-clear">Wyczyść</button>
+        </div>
+        <div id="filterTagList" class="filter-tag-list" role="group" aria-label="Filtruj po tagach"></div>
+      </section>
+      <section class="filter-section mastery-section">
+        <div class="mastery-section__header">
+          <h3>Status pytań</h3>
+          <span class="mastery-section__hint">Kliknij na pytanie, aby przełączyć status</span>
+        </div>
+        <div class="mastery-section__lists" id="masteryOverview">
+          <div class="mastery-group" data-group="unmastered">
+            <button class="mastery-group__header" type="button" aria-expanded="true">
+              <span class="mastery-group__title">Do przećwiczenia</span>
+              <span id="countUnmastered" class="mastery-count">0</span>
+              <span class="mastery-group__icon" aria-hidden="true"></span>
+            </button>
+            <ul id="listUnmastered" class="mastery-list" data-type="unmastered"></ul>
+          </div>
+          <div class="mastery-group" data-group="mastered">
+            <button class="mastery-group__header" type="button" aria-expanded="true">
+              <span class="mastery-group__title">Opanowane</span>
+              <span id="countMastered" class="mastery-count">0</span>
+              <span class="mastery-group__icon" aria-hidden="true"></span>
+            </button>
+            <ul id="listMastered" class="mastery-list" data-type="mastered"></ul>
+          </div>
+        </div>
+      </section>
+    </div>
+  </aside>
+
   <div class="app">
     <h1 class="app-title">Generator pytań SWPS</h1>
     <div class="cards">
-      <div class="card">
-        <div class="num" id="numA"> ? </div>
-        <div class="question" id="qA">  </div>
+      <div class="card" data-slot="A">
+        <div class="num" id="numA">?</div>
+        <div class="question" id="qA"></div>
+        <div class="card-tags"></div>
       </div>
-      <div class="card">
-        <div class="num" id="numB"> ? </div>
+      <div class="card" data-slot="B">
+        <div class="num" id="numB">?</div>
         <div class="question" id="qB"></div>
+        <div class="card-tags"></div>
       </div>
     </div>
 
@@ -29,11 +101,12 @@
     </div>
 
     <div class="footer-actions">
-      <button id="resetBtn">Reset</button>
-      <button id="helpBtn">Instrukcja</button>
+      <button id="resetBtn" type="button">Reset</button>
+      <button id="helpBtn" type="button">Instrukcja</button>
     </div>
+
     <footer class="site-footer">
-      Projekt i realizacja: Kacper Kulesza • 
+      Projekt i realizacja: Kacper Kulesza ·
       <a href="mailto:kackul17@gmail.com">kackul17@gmail.com</a>
     </footer>
   </div>
@@ -41,15 +114,18 @@
   <dialog id="helpDialog">
     <h3>Instrukcja</h3>
     <p>
-      Kliknij <b>Losuj</b>, aby wylosować dwa numery z listy pytań.<br> <br>
-      Kliknij dowolną kartę, aby wybrać pytanie.<br> <br>
-      <b>Reset</b> czyści losowanie.<br> <br> 
-      Skróty: Spacja = Losuj, R = Reset.
+      Kliknij <b>Losuj</b>, aby wylosować dwa numery z listy pytań.<br /><br />
+      Kliknij dowolną kartę, aby wybrać pytanie.<br /><br />
+      <b>Reset</b> czyści losowanie.<br /><br />
+      Skróty klawiszowe: Spacja = Losuj, R = Reset.
     </p>
-    <button id="closeHelp">Zamknij</button>
+    <button id="closeHelp" type="button">Zamknij</button>
   </dialog>
 
+  <script src="mastery.js"></script>
   <script src="timer.js"></script>
+  <script src="questions.js"></script>
+  <script src="filters.js"></script>
   <script src="script.js"></script>
-  </body>
-  </html>
+</body>
+</html>
