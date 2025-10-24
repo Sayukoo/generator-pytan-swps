@@ -82,7 +82,28 @@
   </aside>
 
   <div class="app">
-    <h1 class="app-title">Generator pytań SWPS</h1>
+    <h1 class="visually-hidden">Generator losowych pytań SWPS</h1>
+    <nav class="app-nav" aria-label="Nawigacja główna">
+      <div class="app-nav__brand">
+        <span class="app-nav__badge" aria-hidden="true">
+          <span class="app-nav__badge-glow"></span>
+        </span>
+        <div class="app-nav__text">
+          <span class="app-nav__title">Generator pytań SWPS</span>
+        </div>
+      </div>
+      <div class="app-nav__actions">
+        <span class="app-nav__pill" aria-live="polite">
+          <span class="app-nav__pill-dot" aria-hidden="true"></span>
+          Przerobione pytania:
+          <span class="app-nav__pill-count">
+            <span id="navMasteredCount">0</span>
+            <span aria-hidden="true">/</span>
+            <span id="navTotalCount">0</span>
+          </span>
+        </span>
+      </div>
+    </nav>
     <div class="cards">
       <div class="card" data-slot="A">
         <div class="num" id="numA">?</div>

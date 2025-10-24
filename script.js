@@ -38,11 +38,16 @@
   const listMasteredEl = document.getElementById('listMastered');
   const countUnmasteredEl = document.getElementById('countUnmastered');
   const countMasteredEl = document.getElementById('countMastered');
+  const navMasteredCountEl = document.getElementById('navMasteredCount');
+  const navTotalCountEl = document.getElementById('navTotalCount');
 
   if (!drawBtn || !resetBtn || !helpBtn || !helpDialog || !closeHelpBtn) {
     throw new Error('Nie udało się zainicjalizować elementów interfejsu.');
   }
 
+  if (navTotalCountEl) {
+    navTotalCountEl.textContent = String(QUESTIONS.length);
+  }
   const cardSlots = Array.from(document.querySelectorAll('.card')).map((cardEl) => {
     const slot = {
       cardEl,
@@ -382,6 +387,9 @@
     }
     if (countMasteredEl) {
       countMasteredEl.textContent = String(masteredIndices.length);
+    }
+    if (navMasteredCountEl) {
+      navMasteredCountEl.textContent = String(masteredIndices.length);
     }
   }
 
