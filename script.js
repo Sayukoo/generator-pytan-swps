@@ -597,49 +597,42 @@
   }
 
   function draw() {
-    if (timer.isAnswerActive()) {
+    if (timer.isAnswerActive() || cardEls.some(card => card.classList.contains('is-flipping'))) {
       return;
     }
+
     const [firstIndex, secondIndex] = selectQuestionPair();
     if (firstIndex === null && secondIndex === null) {
       updateDrawAvailability();
       renderMasteryOverview();
       return;
     }
+
     clearSelectionStyles();
     setCardsIdle(false);
 
-    if (drawBtn) {
-      drawBtn.classList.remove('pulse');
-      void drawBtn.offsetWidth;
-      drawBtn.classList.add('pulse');
-    }
-
     cardEls.forEach((card) => {
-      card.classList.remove('pop', 'glow');
-      void card.offsetWidth;
-      card.classList.add('pop', 'glow');
+      card.classList.add('is-flipping');
     });
 
-    [numA, numB].forEach((numEl) => {
-      if (!numEl) {
-        return;
+    // Change questions halfway through the flip
+    setTimeout(() => {
+      if (cardSlots[0]) {
+        applyQuestionToSlot(cardSlots[0], firstIndex);
       }
-      numEl.classList.remove('flip');
-      void numEl.offsetWidth;
-      numEl.classList.add('flip');
-    });
+      if (cardSlots[1]) {
+        applyQuestionToSlot(cardSlots[1], secondIndex);
+      }
 
-    if (cardSlots[0]) {
-      applyQuestionToSlot(cardSlots[0], firstIndex);
-    }
-    if (cardSlots[1]) {
-      applyQuestionToSlot(cardSlots[1], secondIndex);
-    }
+      // Flip back
+      cardEls.forEach((card) => {
+        card.classList.remove('is-flipping');
+      });
 
-    timer.startSelection();
-    updateDrawAvailability();
-    renderMasteryOverview();
+      timer.startSelection();
+      updateDrawAvailability();
+      renderMasteryOverview();
+    }, 300); // Half of the 0.6s transition
   }
 
   function reset() {

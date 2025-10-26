@@ -10,20 +10,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
 </head>
 <body>
-  <button
-    id="menuToggle"
-    class="menu-toggle"
-    type="button"
-    aria-label="Otwórz menu filtrów"
-    aria-expanded="false"
-    aria-controls="menuPanel"
-  >
-    <span class="menu-icon">
-      <span></span>
-      <span></span>
-      <span></span>
-    </span>
-  </button>
   <div id="menuBackdrop" class="menu-backdrop" aria-hidden="true"></div>
   <aside id="menuPanel" class="menu-panel" aria-hidden="true" aria-labelledby="menuToggle">
     <div class="menu-panel__inner">
@@ -82,36 +68,36 @@
   </aside>
 
   <div class="app">
-    <h1 class="visually-hidden">Generator losowych pytań SWPS</h1>
-    <nav class="app-nav" aria-label="Nawigacja główna">
-      <div class="app-nav__brand">
-        <span class="app-nav__badge" aria-hidden="true"></span>
-        <div class="app-nav__text">
-          <span class="app-nav__title">Generator pytań SWPS</span>
+    <header class="app-header" aria-label="Główny nagłówek">
+      <h1 class="app-header__title">Generator pytań SWPS</h1>
+      <div class="app-header__actions">
+        <div class="app-header__progress" aria-live="polite">
+          <span class="app-header__progress-label">Opanowane:</span>
+          <span id="masteryProgress" class="app-header__progress-value">0%</span>
+        </div>
+        <button id="menuToggle" class="menu-toggle" type="button" aria-label="Otwórz menu filtrów" aria-expanded="false" aria-controls="menuPanel">
+          <span class="menu-icon">
+            <span></span>
+            <span></span>
+            <span></span>
+          </span>
+        </button>
+      </div>
+    </header>
+    <div class="cards">
+      <div class="card-container">
+        <div class="card" data-slot="A">
+          <div class="num" id="numA">?</div>
+          <div class="question" id="qA"></div>
+          <div class="card-tags"></div>
         </div>
       </div>
-      <div class="app-nav__actions">
-        <span class="app-nav__pill" aria-live="polite">
-          <span class="app-nav__pill-dot" aria-hidden="true"></span>
-          Przerobione pytania:
-          <span class="app-nav__pill-count">
-            <span id="navMasteredCount">0</span>
-            <span aria-hidden="true">/</span>
-            <span id="navTotalCount">0</span>
-          </span>
-        </span>
-      </div>
-    </nav>
-    <div class="cards">
-      <div class="card" data-slot="A">
-        <div class="num" id="numA">?</div>
-        <div class="question" id="qA"></div>
-        <div class="card-tags"></div>
-      </div>
-      <div class="card" data-slot="B">
-        <div class="num" id="numB">?</div>
-        <div class="question" id="qB"></div>
-        <div class="card-tags"></div>
+      <div class="card-container">
+        <div class="card" data-slot="B">
+          <div class="num" id="numB">?</div>
+          <div class="question" id="qB"></div>
+          <div class="card-tags"></div>
+        </div>
       </div>
     </div>
 
