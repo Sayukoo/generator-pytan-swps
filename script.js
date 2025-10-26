@@ -614,7 +614,6 @@
       renderMasteryOverview();
       return;
     }
-.
     clearSelectionStyles();
     setCardsIdle(false);
 
