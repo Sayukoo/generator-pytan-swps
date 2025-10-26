@@ -1,10 +1,12 @@
-(function () {
+(async function () {
   'use strict';
 
-  const { QUESTIONS, masteryManager, createTimerManager, createFilterMenu } = window;
+  const { loadQuestions, masteryManager, createTimerManager, createFilterMenu } = window;
 
-  if (!Array.isArray(QUESTIONS) || QUESTIONS.length === 0) {
-    throw new Error('Brak danych pytań. Upewnij się, że questions.js został załadowany przed script.js.');
+  if (typeof loadQuestions !== 'function') {
+    throw new Error(
+      'Brak funkcji loadQuestions. Upewnij się, że questions.js został załadowany przed script.js.',
+    );
   }
   if (!masteryManager || typeof masteryManager.isMastered !== 'function') {
     throw new Error('Moduł masteryManager nie jest dostępny.');
@@ -14,6 +16,12 @@
   }
   if (typeof createFilterMenu !== 'function') {
     throw new Error('Filter menu module is not loaded.');
+  }
+
+  const QUESTIONS = await loadQuestions();
+  if (!Array.isArray(QUESTIONS) || QUESTIONS.length === 0) {
+    console.error('Nie udało się załadować pytań lub lista pytań jest pusta.');
+    return;
   }
 
   const mastery = masteryManager;
@@ -606,6 +614,7 @@
       renderMasteryOverview();
       return;
     }
+.
     clearSelectionStyles();
     setCardsIdle(false);
 
