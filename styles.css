@@ -1,13 +1,13 @@
 :root {
-  --bg: #000000;
+  --bg: #0a0a0a;
   --fg: #ffffff;
   --muted: #a0a0a0;
   --panel: #111111;
   --radius: 14px;
   --shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
-  --accent: #ffffff;
-  --accent-muted: rgba(255, 255, 255, 0.22);
-  --border: rgba(255, 255, 255, 0.1);
+  --accent: #2ecc71;
+  --accent-muted: rgba(46, 204, 113, 0.22);
+  --border: rgba(255, 255, 255, 0.08);
 }
 
 *,
@@ -46,6 +46,9 @@ a:hover {
 }
 
 .menu-toggle {
+  position: fixed;
+  top: 24px;
+  right: 24px;
   width: 48px;
   height: 48px;
   border-radius: 14px;
@@ -55,6 +58,7 @@ a:hover {
   display: flex;
   align-items: center;
   justify-content: center;
+  z-index: 120;
   cursor: pointer;
   transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
 }
@@ -527,11 +531,15 @@ body.menu-open .menu-icon span:nth-child(3) {
   border-radius: 0;
   padding: 32px;
   width: min(960px, 95vw);
+  min-height: calc(100vh - 96px);
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
+  justify-content: center;
   gap: 24px;
+  padding-bottom: 84px;
+  position: relative;
 }
 
 .visually-hidden {
@@ -545,7 +553,7 @@ body.menu-open .menu-icon span:nth-child(3) {
   border: 0;
 }
 
-.app-header {
+.app-nav {
   width: 100%;
   display: flex;
   align-items: center;
@@ -553,43 +561,123 @@ body.menu-open .menu-icon span:nth-child(3) {
   gap: 24px;
   padding: 22px 28px;
   border-radius: 20px;
-  border: 1px solid var(--border);
-  background: var(--panel);
-  box-shadow: var(--shadow);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: linear-gradient(145deg, rgba(20, 20, 20, 0.94), rgba(10, 10, 10, 0.88));
+  position: relative;
+  overflow: hidden;
+  text-align: left;
+  box-shadow: 0 26px 50px rgba(0, 0, 0, 0.45);
 }
 
-.app-header__title {
-  font-size: 24px;
-  font-weight: 800;
+.app-nav::before {
+  content: '';
+  position: absolute;
+  inset: -60% -10%;
+  background: conic-gradient(from 140deg, rgba(46, 204, 113, 0.32), rgba(255, 255, 255, 0.08), transparent 68%);
+  filter: blur(80px);
+  opacity: 0.6;
+  transform: rotate(8deg);
+}
+
+.app-nav__brand,
+.app-nav__actions {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.app-nav__badge {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
+}
+
+.app-nav__text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: none;
+}
+
+.app-nav__title {
+  font-size: 30px;
+  font-weight: 850;
   letter-spacing: 0.05em;
   text-transform: uppercase;
-  color: var(--fg);
-  margin: 0;
+  color: rgba(255, 255, 255, 0.92);
 }
 
-.app-header__actions {
-  display: flex;
-  align-items: center;
-  gap: 16px;
+.app-nav__actions {
+  margin-left: auto;
 }
 
-.app-header__progress {
-  display: flex;
+.app-nav__pill {
+  display: inline-flex;
   align-items: center;
   gap: 10px;
-  color: var(--muted);
-  font-size: 14px;
-  letter-spacing: 0.08em;
+  padding: 12px 22px;
+  border-radius: 999px;
+  border: 1px solid rgba(46, 204, 113, 0.45);
+  background: linear-gradient(135deg, rgba(46, 204, 113, 0.18), rgba(46, 204, 113, 0.06));
+  color: rgba(255, 255, 255, 0.88);
+  letter-spacing: 0.10em;
+  font-size: 12px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 0 0 1px rgba(46, 204, 113, 0.22) inset, 0 22px 32px rgba(46, 204, 113, 0.18);
 }
 
-.app-header__progress-value {
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-  color: var(--fg);
-  background: var(--accent-muted);
-  padding: 6px 12px;
+.app-nav__pill::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(120deg, rgba(255, 255, 255, 0.16), transparent 40%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.app-nav__pill:hover::after {
+  opacity: 1;
+}
+
+.app-nav__pill-dot {
+  width: 10px;
+  height: 10px;
   border-radius: 999px;
-  border: 1px solid var(--border);
+  background: var(--accent);
+  box-shadow: 0 0 0 6px rgba(46, 204, 113, 0.18);
+}
+
+.app-nav__pill-count {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  font-variant-numeric: tabular-nums;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.app-nav__pill-count span {
+  display: inline-block;
+}
+
+.app-nav__pill:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.4);
+  outline-offset: 4px;
+}
+
+.app-nav__brand {
+  gap: 16px;
 }
 
 .app-title {
@@ -607,11 +695,19 @@ body.menu-open .menu-icon span:nth-child(3) {
   width: 100%;
 }
 
-.card {
+.card-container {
+  perspective: 1000px;
   flex: 1;
   min-width: 320px;
   max-width: 440px;
   height: 450px;
+}
+
+.card {
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transition: transform 0.6s;
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: var(--radius);
   background: #0d0d0d;
@@ -705,6 +801,10 @@ body.menu-open .menu-icon span:nth-child(3) {
 
 .card.mastered .num {
   color: #a3f7c0;
+}
+
+.card.is-flipping {
+  transform: rotateY(180deg);
 }
 
 .card .num {

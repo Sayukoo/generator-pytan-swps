@@ -38,11 +38,15 @@
   const listMasteredEl = document.getElementById('listMastered');
   const countUnmasteredEl = document.getElementById('countUnmastered');
   const countMasteredEl = document.getElementById('countMastered');
-  const masteryProgressEl = document.getElementById('masteryProgress');
-
+  const navMasteredCountEl = document.getElementById('navMasteredCount');
+  const navTotalCountEl = document.getElementById('navTotalCount');
 
   if (!drawBtn || !resetBtn || !helpBtn || !helpDialog || !closeHelpBtn) {
     throw new Error('Nie udało się zainicjalizować elementów interfejsu.');
+  }
+
+  if (navTotalCountEl) {
+    navTotalCountEl.textContent = String(QUESTIONS.length);
   }
   const cardSlots = Array.from(document.querySelectorAll('.card')).map((cardEl) => {
     const slot = {
@@ -384,11 +388,8 @@
     if (countMasteredEl) {
       countMasteredEl.textContent = String(masteredIndices.length);
     }
-    if (masteryProgressEl) {
-      const totalQuestions = QUESTIONS.length;
-      const masteredCount = masteredIndices.length;
-      const percentage = totalQuestions > 0 ? Math.round((masteredCount / totalQuestions) * 100) : 0;
-      masteryProgressEl.textContent = `${percentage}%`;
+    if (navMasteredCountEl) {
+      navMasteredCountEl.textContent = String(masteredIndices.length);
     }
   }
 
@@ -596,49 +597,42 @@
   }
 
   function draw() {
-    if (timer.isAnswerActive()) {
+    if (timer.isAnswerActive() || cardEls.some(card => card.classList.contains('is-flipping'))) {
       return;
     }
+
     const [firstIndex, secondIndex] = selectQuestionPair();
     if (firstIndex === null && secondIndex === null) {
       updateDrawAvailability();
       renderMasteryOverview();
       return;
     }
+
     clearSelectionStyles();
     setCardsIdle(false);
 
-    if (drawBtn) {
-      drawBtn.classList.remove('pulse');
-      void drawBtn.offsetWidth;
-      drawBtn.classList.add('pulse');
-    }
-
     cardEls.forEach((card) => {
-      card.classList.remove('pop', 'glow');
-      void card.offsetWidth;
-      card.classList.add('pop', 'glow');
+      card.classList.add('is-flipping');
     });
 
-    [numA, numB].forEach((numEl) => {
-      if (!numEl) {
-        return;
+    // Change questions halfway through the flip
+    setTimeout(() => {
+      if (cardSlots[0]) {
+        applyQuestionToSlot(cardSlots[0], firstIndex);
       }
-      numEl.classList.remove('flip');
-      void numEl.offsetWidth;
-      numEl.classList.add('flip');
-    });
+      if (cardSlots[1]) {
+        applyQuestionToSlot(cardSlots[1], secondIndex);
+      }
 
-    if (cardSlots[0]) {
-      applyQuestionToSlot(cardSlots[0], firstIndex);
-    }
-    if (cardSlots[1]) {
-      applyQuestionToSlot(cardSlots[1], secondIndex);
-    }
+      // Flip back
+      cardEls.forEach((card) => {
+        card.classList.remove('is-flipping');
+      });
 
-    timer.startSelection();
-    updateDrawAvailability();
-    renderMasteryOverview();
+      timer.startSelection();
+      updateDrawAvailability();
+      renderMasteryOverview();
+    }, 300); // Half of the 0.6s transition
   }
 
   function reset() {
