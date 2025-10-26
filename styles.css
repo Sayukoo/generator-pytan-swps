@@ -46,9 +46,6 @@ a:hover {
 }
 
 .menu-toggle {
-  position: fixed;
-  top: 24px;
-  right: 24px;
   width: 48px;
   height: 48px;
   border-radius: 14px;
@@ -58,7 +55,6 @@ a:hover {
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 120;
   cursor: pointer;
   transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
 }
@@ -536,7 +532,6 @@ body.menu-open .menu-icon span:nth-child(3) {
   align-items: center;
   text-align: center;
   gap: 24px;
-  padding-top: 120px; /* Add padding to prevent content from being hidden by the sticky header */
 }
 
 .visually-hidden {
@@ -551,21 +546,16 @@ body.menu-open .menu-icon span:nth-child(3) {
 }
 
 .app-header {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
   width: 100%;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 24px;
   padding: 22px 28px;
-  background: rgba(0, 0, 0, 0.8);
-  backdrop-filter: blur(10px);
-  border-bottom: 1px solid var(--border);
-  z-index: 100;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  background: var(--panel);
+  box-shadow: var(--shadow);
 }
 
 .app-header__title {
@@ -575,6 +565,12 @@ body.menu-open .menu-icon span:nth-child(3) {
   text-transform: uppercase;
   color: var(--fg);
   margin: 0;
+}
+
+.app-header__actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
 }
 
 .app-header__progress {
@@ -1122,20 +1118,24 @@ dialog button:hover {
   .app {
     min-height: 100svh;
     padding: 20px 14px 68px;
-    padding-top: 100px;
     gap: 16px;
   }
 
-  .app-header {
+  .app-nav {
     flex-direction: column;
     align-items: flex-start;
     gap: 16px;
     padding: 18px 18px;
   }
 
-  .app-header__progress {
+  .app-nav__actions {
     width: 100%;
-    justify-content: space-between;
+    margin-left: 0;
+  }
+
+  .app-nav__pill {
+    width: 100%;
+    justify-content: center;
   }
 
   .cards {
