@@ -1,5 +1,5 @@
 (function (global) {
-  const STORAGE_KEY = 'swps-mastered-questions.v1';
+  const STORAGE_KEY = 'swps-mastered-questions.v2';
 
   function sanitizeIndex(index) {
     if (typeof index === 'number' && Number.isInteger(index) && index >= 0) {

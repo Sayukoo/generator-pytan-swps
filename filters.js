@@ -27,6 +27,7 @@
     tagListEl,
     clearButton,
     tags = [],
+    tagColors = {},
   } = {}) {
     if (!toggleEl || !panelEl || !tagListEl) {
       throw new Error('Brak wymaganych elementów do utworzenia menu filtrów.');
@@ -121,11 +122,15 @@
           .map((tag) => (typeof tag === 'string' ? tag.trim() : ''))
           .filter((tag) => tag.length > 0),
       ),
-    ).sort((a, b) => a.localeCompare(b, 'pl', { sensitivity: 'accent' }));
+    );
 
     uniqueTags.forEach((tag, index) => {
       const option = document.createElement('label');
       option.className = 'filter-tag-option';
+      const color = typeof tagColors[tag] === 'string' ? tagColors[tag] : '';
+      if (color) {
+        option.style.setProperty('--tag-dot-color', color);
+      }
       const input = document.createElement('input');
       input.type = 'checkbox';
       const id = `filter-tag-${slugify(tag, `tag-${index}`)}-${index}`;
@@ -141,12 +146,16 @@
       });
       const faux = document.createElement('span');
       faux.className = 'checkbox-indicator';
+      const dot = document.createElement('span');
+      dot.className = 'tag-dot';
+      dot.setAttribute('aria-hidden', 'true');
       const labelText = document.createElement('span');
       labelText.className = 'label-text';
       labelText.textContent = tag;
 
       option.appendChild(input);
       option.appendChild(faux);
+      option.appendChild(dot);
       option.appendChild(labelText);
       tagListEl.appendChild(option);
     });

@@ -1,13 +1,16 @@
 :root {
-  --bg: #0a0a0a;
-  --fg: #ffffff;
-  --muted: #a0a0a0;
-  --panel: #111111;
-  --radius: 14px;
-  --shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
-  --accent: #2ecc71;
-  --accent-muted: rgba(46, 204, 113, 0.22);
-  --border: rgba(255, 255, 255, 0.08);
+  --bg: #08090c;
+  --bg-elevated: #111318;
+  --fg: #f4f5f7;
+  --muted: #9aa3b2;
+  --panel: #13151a;
+  --radius: 16px;
+  --shadow: 0 16px 40px rgba(0, 0, 0, 0.55);
+  --accent: #5eead4;
+  --accent-muted: rgba(94, 234, 212, 0.18);
+  --border: rgba(255, 255, 255, 0.09);
+  --font-sans: 'DM Sans', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-display: 'Instrument Serif', Georgia, 'Times New Roman', serif;
 }
 
 *,
@@ -17,9 +20,13 @@
 }
 
 body {
-  background: var(--bg);
+  background:
+    radial-gradient(ellipse 80% 50% at 20% -10%, rgba(94, 234, 212, 0.12), transparent 55%),
+    radial-gradient(ellipse 60% 40% at 90% 10%, rgba(108, 92, 231, 0.14), transparent 50%),
+    radial-gradient(ellipse 50% 35% at 50% 100%, rgba(231, 76, 60, 0.08), transparent 55%),
+    var(--bg);
   color: var(--fg);
-  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: var(--font-sans);
   margin: 0;
   min-height: 100vh;
   display: flex;
@@ -302,13 +309,22 @@ body.menu-open .menu-icon span:nth-child(3) {
   position: relative;
   display: inline-flex;
   align-items: center;
-  gap: 10px;
-  padding: 8px 14px;
+  gap: 8px;
+  padding: 8px 14px 8px 10px;
   border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.04);
   cursor: pointer;
   transition: border-color 0.2s ease, background 0.2s ease, transform 0.2s ease;
+}
+
+.tag-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--tag-dot-color, rgba(255, 255, 255, 0.35));
+  flex-shrink: 0;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--tag-dot-color, rgba(255, 255, 255, 0.2)) 30%, transparent);
 }
 
 .filter-tag-option:hover {
@@ -501,8 +517,8 @@ body.menu-open .menu-icon span:nth-child(3) {
 }
 
 .mastery-item.is-active {
-  border-color: var(--tag-color-strong, rgba(46, 204, 113, 0.45));
-  background: var(--tag-color, rgba(46, 204, 113, 0.18));
+  border-color: var(--tag-color-strong, rgba(94, 234, 212, 0.45));
+  background: var(--tag-color, rgba(94, 234, 212, 0.18));
 }
 
 .mastery-item.is-current {
@@ -512,8 +528,8 @@ body.menu-open .menu-icon span:nth-child(3) {
 }
 
 .mastery-item.is-active.is-current {
-  border-color: var(--tag-color-strong, rgba(46, 204, 113, 0.65));
-  background: color-mix(in srgb, var(--tag-color, rgba(46, 204, 113, 0.32)) 70%, #ffffff0d 30%);
+  border-color: var(--tag-color-strong, rgba(94, 234, 212, 0.65));
+  background: color-mix(in srgb, var(--tag-color, rgba(94, 234, 212, 0.32)) 70%, #ffffff0d 30%);
 }
 
 .mastery-item--empty {
@@ -560,22 +576,23 @@ body.menu-open .menu-icon span:nth-child(3) {
   justify-content: space-between;
   gap: 24px;
   padding: 22px 28px;
-  border-radius: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: linear-gradient(145deg, rgba(20, 20, 20, 0.94), rgba(10, 10, 10, 0.88));
+  border-radius: 22px;
+  border: 1px solid var(--border);
+  background: linear-gradient(145deg, rgba(22, 24, 30, 0.95), rgba(12, 13, 17, 0.92));
   position: relative;
   overflow: hidden;
   text-align: left;
-  box-shadow: 0 26px 50px rgba(0, 0, 0, 0.45);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(12px);
 }
 
 .app-nav::before {
   content: '';
   position: absolute;
   inset: -60% -10%;
-  background: conic-gradient(from 140deg, rgba(46, 204, 113, 0.32), rgba(255, 255, 255, 0.08), transparent 68%);
+  background: conic-gradient(from 140deg, rgba(94, 234, 212, 0.28), rgba(108, 92, 231, 0.12), transparent 68%);
   filter: blur(80px);
-  opacity: 0.6;
+  opacity: 0.55;
   transform: rotate(8deg);
 }
 
@@ -591,29 +608,45 @@ body.menu-open .menu-icon span:nth-child(3) {
 .app-nav__badge {
   width: 48px;
   height: 48px;
-  border-radius: 50%;
-  background: #ffffff;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #5eead4, #6c5ce7);
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
+  box-shadow: 0 8px 20px rgba(94, 234, 212, 0.25);
+  position: relative;
+}
+
+.app-nav__badge::after {
+  content: 'S';
+  font-family: var(--font-display);
+  font-size: 26px;
+  font-weight: 400;
+  color: #0c0d11;
+  line-height: 1;
 }
 
 .app-nav__text {
   display: flex;
   flex-direction: column;
-  gap: 2px;
-  font-weight: 600;
-  letter-spacing: 0.02em;
+  gap: 4px;
+}
+
+.app-nav__subtitle {
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: var(--muted);
   text-transform: none;
 }
 
 .app-nav__title {
-  font-size: 30px;
-  font-weight: 850;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.92);
+  font-family: var(--font-display);
+  font-size: clamp(26px, 4vw, 34px);
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  text-transform: none;
+  color: rgba(255, 255, 255, 0.95);
 }
 
 .app-nav__actions {
@@ -626,14 +659,14 @@ body.menu-open .menu-icon span:nth-child(3) {
   gap: 10px;
   padding: 12px 22px;
   border-radius: 999px;
-  border: 1px solid rgba(46, 204, 113, 0.45);
-  background: linear-gradient(135deg, rgba(46, 204, 113, 0.18), rgba(46, 204, 113, 0.06));
+  border: 1px solid rgba(94, 234, 212, 0.35);
+  background: linear-gradient(135deg, rgba(94, 234, 212, 0.14), rgba(108, 92, 231, 0.08));
   color: rgba(255, 255, 255, 0.88);
-  letter-spacing: 0.10em;
+  letter-spacing: 0.08em;
   font-size: 12px;
   position: relative;
   overflow: hidden;
-  box-shadow: 0 0 0 1px rgba(46, 204, 113, 0.22) inset, 0 22px 32px rgba(46, 204, 113, 0.18);
+  box-shadow: 0 0 0 1px rgba(94, 234, 212, 0.15) inset, 0 18px 28px rgba(94, 234, 212, 0.1);
 }
 
 .app-nav__pill::after {
@@ -654,7 +687,7 @@ body.menu-open .menu-icon span:nth-child(3) {
   height: 10px;
   border-radius: 999px;
   background: var(--accent);
-  box-shadow: 0 0 0 6px rgba(46, 204, 113, 0.18);
+  box-shadow: 0 0 0 6px rgba(94, 234, 212, 0.15);
 }
 
 .app-nav__pill-count {
@@ -698,11 +731,12 @@ body.menu-open .menu-icon span:nth-child(3) {
 .card {
   flex: 1;
   min-width: 320px;
-  max-width: 440px;
-  height: 450px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  max-width: 460px;
+  min-height: 480px;
+  height: auto;
+  border: 1px solid var(--border);
   border-radius: var(--radius);
-  background: #0d0d0d;
+  background: linear-gradient(165deg, rgba(20, 22, 28, 0.98) 0%, rgba(13, 14, 18, 0.99) 100%);
   padding: 28px 24px 26px;
   display: flex;
   flex-direction: column;
@@ -712,6 +746,7 @@ body.menu-open .menu-icon span:nth-child(3) {
   overflow: hidden;
   cursor: pointer;
   transition: transform 0.22s ease, border-color 0.22s ease, box-shadow 0.28s ease, filter 0.28s ease, opacity 0.28s ease, background 0.32s ease;
+  backdrop-filter: blur(8px);
 }
 
 .card::after {
@@ -787,12 +822,12 @@ body.menu-open .menu-icon span:nth-child(3) {
 }
 
 .card.mastered {
-  border-color: rgba(46, 204, 113, 0.5);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(46, 204, 113, 0.25) inset;
+  border-color: rgba(94, 234, 212, 0.45);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(94, 234, 212, 0.2) inset;
 }
 
 .card.mastered .num {
-  color: #a3f7c0;
+  color: #99f6e4;
 }
 
 .card .num {
@@ -803,18 +838,20 @@ body.menu-open .menu-icon span:nth-child(3) {
 }
 
 .card .question {
-  font-size: 16px;
-  line-height: 1.6;
-  color: rgba(255, 255, 255, 0.88);
+  font-size: 15px;
+  line-height: 1.65;
+  color: rgba(255, 255, 255, 0.9);
   margin: 0;
   flex: 1;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
   text-align: center;
-  padding: 0 6px;
+  padding: 4px 4px 0;
   width: 100%;
   overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.15) transparent;
 }
 
 .card .card-tags {
@@ -834,18 +871,14 @@ body.menu-open .menu-icon span:nth-child(3) {
 .tag-pill {
   padding: 6px 12px;
   border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
   background: var(--tag-color, rgba(255, 255, 255, 0.08));
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  font-size: 12px;
-  letter-spacing: 0.12em;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.82);
-}
-
-.tag-pill {
-  border-color: var(--tag-color-strong, rgba(255, 255, 255, 0.22));
-  background: var(--tag-color, rgba(255, 255, 255, 0.08));
   color: var(--tag-color-text, rgba(255, 255, 255, 0.9));
+  border-color: var(--tag-color-strong, rgba(255, 255, 255, 0.22));
 }
 
 .primary-actions {
@@ -855,19 +888,20 @@ body.menu-open .menu-icon span:nth-child(3) {
 }
 
 .primary-actions .primary {
-  font-size: 30px;
-  padding: 12px 52px;
-  border-radius: 16px;
+  font-size: 28px;
+  padding: 14px 56px;
+  border-radius: 18px;
   position: relative;
   isolation: isolate;
   min-width: 320px;
-  background: #ffffff;
-  color: #121212;
-  border: 1px solid rgba(0, 0, 0, 0.15);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.22);
+  background: linear-gradient(135deg, #f4f5f7 0%, #e8eaef 100%);
+  color: #0c0d11;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28), 0 0 0 1px rgba(255, 255, 255, 0.5) inset;
   transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
-  letter-spacing: 0.2px;
-  font-weight: 800;
+  letter-spacing: 0.02em;
+  font-weight: 700;
+  font-family: var(--font-sans);
   cursor: pointer;
   animation: btnBreath 4.5s ease-in-out infinite;
 }
@@ -1121,11 +1155,11 @@ dialog button:hover {
   0%,
   100% {
     transform: scale(1);
-    box-shadow: 0 0 0 6px rgba(46, 204, 113, 0.18);
+    box-shadow: 0 0 0 6px rgba(94, 234, 212, 0.15);
   }
   50% {
     transform: scale(1.35);
-    box-shadow: 0 0 0 10px rgba(46, 204, 113, 0.08);
+    box-shadow: 0 0 0 10px rgba(94, 234, 212, 0.06);
   }
 }
 
@@ -1232,7 +1266,8 @@ dialog button:hover {
 
   .card {
     min-width: 100%;
-    height: 320px;
+    min-height: 360px;
+    height: auto;
     padding: 22px 16px;
   }
 

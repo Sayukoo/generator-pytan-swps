@@ -61,20 +61,41 @@
 
   const DEFAULT_TAG_COLOR = '#7f8c8d';
   const TAG_COLOR_MAP = {
-    'Biologiczne podstawy zachowania': '#27ae60',
-    'Kliniczna / Emocji i motywacji': '#e67e22',
+    'Psychologia ogólna': '#1abc9c',
+    'Psychologia społeczna': '#e74c3c',
+    'Emocje i motywacje': '#e67e22',
+    'Psychologia rozwojowa': '#16a085',
+    Psychopatologia: '#c0392b',
     'Psychologia osobowości': '#9b59b6',
     'Psychologia poznawcza': '#2980b9',
-    'Metodologia i statystyka': '#f1c40f',
-    'Psychologia społeczna': '#e74c3c',
-    Psychopatologia: '#c0392b',
-    'Psychologia rozwoju': '#16a085',
-    Psychometria: '#8e44ad',
     'Psychologia różnic indywidualnych': '#3498db',
-    'Diagnoza psychologiczna': '#2c3e50',
     Etyka: '#d35400',
+    Diagnoza: '#2c3e50',
+    'Metodologia, psychometria, statystyka': '#f1c40f',
+    'Psychologia kliniczna': '#e84393',
+    'Psychologia zdrowia': '#00b894',
+    'Praca i organizacja': '#6c5ce7',
+    'Psychologia edukacji': '#fdcb6e',
     ...(typeof window.TAG_COLORS === 'object' && window.TAG_COLORS !== null ? window.TAG_COLORS : {}),
   };
+
+  const TAG_ORDER = [
+    'Psychologia ogólna',
+    'Psychologia społeczna',
+    'Emocje i motywacje',
+    'Psychologia rozwojowa',
+    Psychopatologia,
+    'Psychologia osobowości',
+    'Psychologia poznawcza',
+    'Psychologia różnic indywidualnych',
+    Etyka,
+    Diagnoza,
+    'Metodologia, psychometria, statystyka',
+    'Psychologia kliniczna',
+    'Psychologia zdrowia',
+    'Praca i organizacja',
+    'Psychologia edukacji',
+  ];
 
   function normalizeHex(hex) {
     if (typeof hex !== 'string') {
@@ -208,7 +229,15 @@
         }
       });
     });
-    return Array.from(tagSet).sort((a, b) => a.localeCompare(b, 'pl', { sensitivity: 'accent' }));
+    const orderIndex = new Map(TAG_ORDER.map((tag, index) => [tag, index]));
+    return Array.from(tagSet).sort((a, b) => {
+      const orderA = orderIndex.has(a) ? orderIndex.get(a) : Number.MAX_SAFE_INTEGER;
+      const orderB = orderIndex.has(b) ? orderIndex.get(b) : Number.MAX_SAFE_INTEGER;
+      if (orderA !== orderB) {
+        return orderA - orderB;
+      }
+      return a.localeCompare(b, 'pl', { sensitivity: 'accent' });
+    });
   }
 
   const filterMenu = createFilterMenu({
@@ -221,6 +250,7 @@
     tagListEl: tagsContainer,
     clearButton: clearFiltersBtn,
     tags: getUniqueTags(QUESTIONS),
+    tagColors: TAG_COLOR_MAP,
   });
 
   const timer = createTimerManager({

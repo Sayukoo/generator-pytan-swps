@@ -3,204 +3,304 @@
 
   const RAW_QUESTIONS = [
     {
-      text: 'Omów dwa rodzaje zaburzeń mowy i porównaj ich mózgowe podłoże.',
-      tags: ['Biologiczne podstawy zachowania'],
+      text: 'Dlaczego psychologia humanistyczna została nazwana „trzecią drogą” w psychologii? Omów jej założenia w kontekście innych koncepcji człowieka.',
+      tags: ['Psychologia ogólna'],
     },
     {
-      text: 'Omów mózgowe podłoże przynajmniej dwóch rodzajów pamięci i wskaż jego rolę w powstawaniu deficytów w działaniu omówionych rodzajów pamięci.',
-      tags: ['Biologiczne podstawy zachowania'],
+      text: 'Czy Freud był rewolucjonistą w psychologii? Przedstaw założenia oraz proces rozwoju psychodynamicznej koncepcji człowieka.',
+      tags: ['Psychologia ogólna'],
     },
     {
-      text: 'Omów neurobiologiczne podłoże powstawania reakcji emocjonalnych.',
-      tags: ['Biologiczne podstawy zachowania'],
+      text: 'Skąd wziął się pomysł na myślenie o człowieku jako o sumie odruchów? Omów podstawy filozoficzne i metodologiczne behawioryzmu.',
+      tags: ['Psychologia ogólna'],
     },
     {
-      text: 'Omów neurobiologiczne mechanizmu snu oraz znaczenie snu w psychologicznym funkcjonowaniu człowieka.',
-      tags: ['Biologiczne podstawy zachowania'],
+      text: 'Omów w jaki sposób badania realizowane na zwierzętach mogą wzbogacać wiedzę psychologiczną — uwzględniając perspektywę metodologiczną oraz etyczną.',
+      tags: ['Psychologia ogólna'],
     },
     {
-      text: 'Omów wielowymiarowy model empatii Marka H. Davisa i wskaż zalety i wady tego modelu w porównaniu z modelem jednowymiarowym.',
-      tags: ['Kliniczna / Emocji i motywacji'],
+      text: 'Dlaczego psychologia porzuciła ideę „czarnej skrzynki”? Przedstaw powody i przebieg rewolucji poznawczej w psychologii.',
+      tags: ['Psychologia ogólna'],
     },
     {
-      text: 'Porównaj motywację braku i motywację wzrostu zgodnie z koncepcją Abrahama Maslowa i przedstaw przykłady zachowań wynikających z tych dwóch motywacji.',
-      tags: ['Kliniczna / Emocji i motywacji'],
-    },
-    {
-      text: 'Omów transakcyjną teorię stresu Richarda S. Lazarusa i Susan Folkman oraz wskaż ograniczenia tej teorii.',
-      tags: ['Kliniczna / Emocji i motywacji'],
-    },
-    {
-      text: 'Omów i porównaj dwie wybrane współczesne koncepcje motywacji.',
-      tags: ['Kliniczna / Emocji i motywacji'],
-    },
-    {
-      text: 'Jak przebiega rozwój osobowości? Omów i porównaj rozwój osobowości w oparciu o dwie wybrane teorie psychologiczne.',
-      tags: ['Psychologia osobowości'],
-    },
-    {
-      text: 'Porównaj własności reprezentacji JA opisywane w koncepcjach psychodynamicznych, humanistycznych i społeczno-poznawczych.',
-      tags: ['Psychologia osobowości'],
-    },
-    {
-      text: 'Omów rolę autonarracji w zachowaniach jednostki.',
-      tags: ['Psychologia osobowości'],
-    },
-    {
-      text: 'Opisz i porównaj dwa wybrane zjawiska zniekształcające pamięć autobiograficzną.',
-      tags: ['Psychologia osobowości'],
-    },
-    {
-      text: 'Wymień podstawowe różnice, jakie występują między modelami wczesnej i późnej selekcji uwagowej.',
-      tags: ['Psychologia poznawcza'],
-    },
-    {
-      text: 'Na podstawie wybranej teorii omów, w jaki sposób tworzone są pojęcia umysłowe i jak są wykorzystywane w procesie rozpoznawania obiektów.',
-      tags: ['Psychologia poznawcza'],
-    },
-    {
-      text: 'Jaką rolę w procesie wnioskowania i podejmowania decyzji odgrywają heurystyki? Omów na przykładzie dwóch wybranych heurystyk.',
-      tags: ['Psychologia poznawcza'],
-    },
-    {
-      text: 'Porównując eksperyment więzienny Philipa Zimbardo oraz eksperymenty Stanleya Milgrama, wskaż, który z nich spełnia kryteria badania w schemacie eksperymentalnym oraz jakie to ma znaczenie dla wyciąganych wniosków.',
-      tags: ['Metodologia i statystyka', 'Psychologia społeczna'],
-    },
-    {
-      text: 'Na wybranym przykładzie wyjaśnij, od czego zależy chęć udzielania pomocy, odwołując się do czynników sytuacyjnych, poznawczych, emocjonalnych i osobowościowych wskazywanych przez teorie i badania psychologiczne.',
+      text: 'W jaki sposób tworzy się poczucie tożsamości grupowej? Przedstaw i oceń konsekwencje tożsamości grupowej.',
       tags: ['Psychologia społeczna'],
     },
     {
-      text: 'W oparciu o teorię tożsamości społecznej Henriego Tajfela i Johna Turnera opisz związek między poczuciem własnej wartości a przynależnością grupową. Podaj przykład zastosowania tej teorii do rozumienia współczesnych zjawisk społecznych.',
+      text: 'Przeanalizuj relację wybranej techniki autoprezentacji do postulatu „bądź sobą”.',
       tags: ['Psychologia społeczna'],
     },
     {
-      text: 'Wymień pięć technik wpływu społecznego. Wybierz jedną technikę wpływu społecznego i wskaż eksperyment, który weryfikował jej istnienie lub skuteczność; omów tę technikę, mechanizm jej działania oraz wskaż przykład z życia społecznego, który ją ilustruje.',
+      text: 'Porównaj wybrane dwie koncepcje agresywności i omów empiryczne przesłanki wskazujące na wyższą trafność jednej z nich.',
       tags: ['Psychologia społeczna'],
     },
     {
-      text: 'Wymień główne objawy depresji zgodnie z DSM-5. Czy objawy depresji u dzieci różnią się od objawów depresji u dorosłych? Jeżeli tak, omów różnice.',
+      text: 'Czy istnieje prawdziwy („egzogenny”) altruizm? Skonfrontuj koncepcje teoretyczne i badania empiryczne wskazujące na jego istnienie i nieistnienie.',
+      tags: ['Psychologia społeczna'],
+    },
+    {
+      text: 'Socjalizacja i posłuszeństwo: co zrobić, aby dzieci były „grzeczne”, a gdy dorosną — nie zawsze posłuszne?',
+      tags: ['Psychologia społeczna'],
+    },
+    {
+      text: 'Porównaj dwie klasyczne teorie tłumaczące proces powstawania emocji. Krytycznie odnieś się do założeń obu teorii i wskaż, jakie współczesne teorie były nimi inspirowane.',
+      tags: ['Emocje i motywacje'],
+    },
+    {
+      text: 'Czy twarz jest dobrym źródłem informacji o przeżywanych stanach emocjonalnych? Uzasadnij swoją odpowiedź. Odnieś się do teorii i przykładowych badań.',
+      tags: ['Emocje i motywacje'],
+    },
+    {
+      text: 'Czy możemy mówić o zachowaniach ludzi motywowanych homeostatycznie? Uzasadnij swoją odpowiedź podając argumenty i przykłady.',
+      tags: ['Emocje i motywacje'],
+    },
+    {
+      text: 'Czy motywacja zewnętrzna obniża motywację wewnętrzną? Wytłumacz odnosząc się do przykładów i badań.',
+      tags: ['Emocje i motywacje'],
+    },
+    {
+      text: 'Porównaj dwie wybrane teorie samoregulacji. Krytycznie odnieś się do założeń obu teorii korzystając z dowodów empirycznych i przykładów.',
+      tags: ['Emocje i motywacje'],
+    },
+    {
+      text: 'Dlaczego przywiązanie jest ważne? Zdefiniuj przywiązanie, omów jego rozwój i przeanalizuj jego znaczenie w funkcjonowaniu człowieka.',
+      tags: ['Psychologia rozwojowa'],
+    },
+    {
+      text: 'Natura czy środowisko? Wyjaśnij wkład obu tych czynników na kształtowanie wybranego aspektu rozwoju człowieka.',
+      tags: ['Psychologia rozwojowa'],
+    },
+    {
+      text: 'Wyjaśnij znaczenie wczesnego dzieciństwa w kształtowaniu człowieka na podstawie dwóch wybranych teorii i przykładów badań z zakresu psychologii rozwoju.',
+      tags: ['Psychologia rozwojowa'],
+    },
+    {
+      text: 'Przeanalizuj specyfikę wybranego aspektu rozwoju (motorycznego, poznawczego lub językowego), jego etapy, charakterystyki i różne podejścia teoretyczne, które wyjaśniają wybrany proces.',
+      tags: ['Psychologia rozwojowa'],
+    },
+    {
+      text: 'Przeanalizuj wybrany okres rozwoju człowieka (od rozwoju prenatalnego do starości) pod kątem jego specyfiki i zmian rozwojowych, które w nim zachodzą, a także znaczenia tych zmian, powołując się na wybrane teorie i badania.',
+      tags: ['Psychologia rozwojowa'],
+    },
+    {
+      text: 'Podaj definicję i wyjaśnij mechanizm uzależnienia na podstawie wybranej teorii. Porównaj na wybranych przykładach (co najmniej dwóch) uzależnienia chemiczne i behawioralne.',
       tags: ['Psychopatologia'],
     },
     {
-      text: 'Wymień główne czynniki psychospołeczne, które mogą być predyktorami uzależnienia od substancji psychoaktywnych, np. od alkoholu. Omów minimum trzy.',
+      text: 'Wskaż różnice pomiędzy naturalnym procesem starzenia się a otępieniem. Omów ich wpływ na zmiany w zakresie funkcji poznawczych.',
       tags: ['Psychopatologia'],
     },
     {
-      text: 'Scharakteryzuj zaburzenia parafilne. Wymień rodzaje parafilii opisane w DSM-5 oraz omów objawy czterech z nich.',
+      text: 'Depresja, epizod depresyjny, zaburzenia depresyjne — krytycznie przeanalizuj różne postacie depresji.',
       tags: ['Psychopatologia'],
     },
     {
-      text: 'Jakie są główne różnice kliniczne pomiędzy osobami z anoreksją a osobami z bulimią? Wskaż, na czym polegają różnice w efektywności leczenia tych zaburzeń.',
+      text: 'Podobieństwa i różnice w zaburzeniach lękowych — porównaj dwa wybrane rodzaje zaburzeń lękowych odwołując się do ich psychopatologii, klasyfikacji i leczenia.',
       tags: ['Psychopatologia'],
     },
     {
-      text: 'Wyjaśnij, na czym polega efekt interakcji w badaniach psychologicznych i w jaki sposób się go analizuje. Posłuż się przykładem badania, w którym ten efekt wystąpił.',
-      tags: ['Metodologia i statystyka'],
+      text: 'Porównaj adaptacyjny przebieg żałoby. Omów mechanizmy psychologiczne odpowiedzialne za ich wystąpienie.',
+      tags: ['Psychopatologia'],
     },
     {
-      text: 'Omów, jakie są zalety i wady badań w planie z powtarzanym pomiarem. Wskaż przynajmniej trzy efekty kolejności (carry-over effect) i zilustruj zagadnienie przykładem badania.',
-      tags: ['Metodologia i statystyka'],
+      text: 'Porównaj dwie wybrane koncepcje (teorie) osobowości w zakresie procesu kształtowania osobowości.',
+      tags: ['Psychologia osobowości'],
     },
     {
-      text: 'Na przykładzie statystyki eta kwadrat omów miary siły efektu oraz rolę tych miar w badaniach naukowych i praktyce.',
-      tags: ['Metodologia i statystyka'],
+      text: 'Podaj przykład wybranego zachowania i przeanalizuj je w odniesieniu do motywów związanych z Ja.',
+      tags: ['Psychologia osobowości'],
     },
     {
-      text: 'Jakie są zalety i wady stosowania poziomu istotności statystycznej jako jedynego kryterium wnioskowania statystycznego?',
-      tags: ['Metodologia i statystyka'],
+      text: 'Jakie są wady i zalety teorii cechowych? Omów to zagadnienie na przykładzie wybranej koncepcji osobowości.',
+      tags: ['Psychologia osobowości'],
     },
     {
-      text: 'Omów co najmniej dwie teorie wyjaśniające rozwój człowieka w obszarze poznawczym i społecznym. Podaj przykłady zastosowania tych teorii w praktyce (np. profilaktyka, edukacja, doradztwo).',
-      tags: ['Psychologia rozwoju'],
+      text: 'Podaj przykład wybranego zachowania i przeanalizuj je w odniesieniu do koncepcji wzajemnego determinizmu osobowości, środowiska i zachowania postulowanej w ramach teorii społecznego uczenia się autorstwa Alberta Bandury.',
+      tags: ['Psychologia osobowości'],
     },
     {
-      text: 'Jakie są najważniejsze zadania rozwojowe na poszczególnych etapach życia (od niemowlęctwa do późnej dorosłości)? Wyjaśnij, jakie czynniki sprzyjają pozytywnej realizacji tych zadań.',
-      tags: ['Psychologia rozwoju'],
+      text: 'Omów związki osobowości ze zdrowiem. Wskaż i przeanalizuj mechanizmy tych związków odwołując się do co najmniej jednej teorii, która je opisuje i wyjaśnia.',
+      tags: ['Psychologia osobowości'],
     },
     {
-      text: 'Sformułuj problem badawczy dotyczący rozwoju społecznego dzieci w wieku przedszkolnym i wczesnoszkolnym oraz zaproponuj sposób empirycznej weryfikacji tego problemu, odwołując się do metodologii badań w psychologii rozwoju.',
-      tags: ['Metodologia i statystyka', 'Psychologia rozwoju'],
+      text: 'Opierając się na mechanizmach psychologicznych oraz wynikach badań, omów w jaki sposób możemy wykorzystać wiedzę o procesach poznawczych w wybranym obszarze praktyki psychologicznej (np. edukacji, biznesie).',
+      tags: ['Psychologia poznawcza'],
     },
     {
-      text: 'Przedstaw przykłady interwencji uwzględniających specyfikę rozwoju człowieka, które mogą wspierać zdrowie i dobrostan ludzi na różnych etapach życia. Omów mechanizm działania tych interwencji.',
-      tags: ['Psychologia rozwoju'],
+      text: 'Wyjaśnij czym jest pamięć robocza i jakie ma znaczenie dla funkcjonowania człowieka w różnych sytuacjach życiowych. Omów przynajmniej trzy przykłady.',
+      tags: ['Psychologia poznawcza'],
     },
     {
-      text: 'Wyjaśnij, na czym polega kryzys tożsamości w okresie adolescencji i jakie znaczenie dla dalszego rozwoju ma jego negatywne rozwiązanie.',
-      tags: ['Psychologia rozwoju'],
+      text: 'Kiedy warto kierować się intuicją? Omów problem odwołując się do wybranych koncepcji psychologicznych.',
+      tags: ['Psychologia poznawcza'],
     },
     {
-      text: 'Jakimi metodami można badać rzetelność testu psychologicznego? Omów i porównaj dwie metody.',
-      tags: ['Psychometria'],
+      text: 'Omów najważniejsze heurystyki decyzyjne (minimum 3). Przeanalizuj ich wady i zalety.',
+      tags: ['Psychologia poznawcza'],
     },
     {
-      text: 'Omów i porównaj metody badania trafności teoretycznej testu psychologicznego.',
-      tags: ['Psychometria'],
+      text: 'Dokonaj analizy podstawowych funkcji uwagi w kontekście ich użycia w życiu codziennym.',
+      tags: ['Psychologia poznawcza'],
     },
     {
-      text: 'Od czego zależy moc dyskryminacyjna pytań w teście psychologicznym?',
-      tags: ['Psychometria'],
-    },
-    {
-      text: 'Wyjaśnij różnice pomiędzy indukcyjną a dedukcyjną strategią konstruowania testu psychologicznego.',
-      tags: ['Psychometria'],
-    },
-    {
-      text: 'Jaki jest związek między cechami osobowości i temperamentu a psychopatologią oraz chorobami somatycznymi? Omów na podstawie wybranych cech.',
+      text: 'Przeanalizuj relacje między inteligencją płynną i skrystalizowaną odwołując się do teorii i metod diagnozy psychologicznej.',
       tags: ['Psychologia różnic indywidualnych'],
     },
     {
-      text: 'Czym jest temperament według Regulacyjnej Teorii Temperamentu Jana Strelaua? Wyjaśnij, dlaczego nie należy utożsamiać go z osobowością.',
+      text: 'Przeanalizuj związki temperamentu ze stresem odwołując się do wybranej teorii temperamentu. Wskaż co najmniej dwa mechanizmy psychologiczne odpowiedzialne za te związki.',
       tags: ['Psychologia różnic indywidualnych'],
     },
     {
-      text: 'Przedstaw i porównaj koncepcję inteligencji emocjonalnej rozumianej jako zdolność oraz koncepcję inteligencji emocjonalnej rozumianej jako cecha osobowości. Omów narzędzia stosowane do pomiaru w obu podejściach.',
+      text: 'Omów związki temperamentu z psychopatologią. Wskaż i przeanalizuj mechanizmy tych związków odwołując się do co najmniej jednego modelu interakcji temperamentu i środowiska.',
       tags: ['Psychologia różnic indywidualnych'],
     },
     {
-      text: 'Wymień kategorie wykorzystywane w psychologii do opisu różnic indywidualnych. Omów ich status i specyfikę, a także przywołaj przykłady teorii je wykorzystujących.',
+      text: 'Czy psychologii potrzebne jest pojęcie stylu poznawczego? Uzasadnij odpowiedź, odwołując się do min. trzech opisanych w literaturze stylów poznawczych.',
       tags: ['Psychologia różnic indywidualnych'],
     },
     {
-      text: 'Wybierz jeden z aspektów różnic indywidualnych i omów jego rolę w osiągnięciach akademickich. Przedstaw przykłady badań ilustrujących omawiane zależności.',
+      text: 'Dokonaj krytycznej analizy istniejących teorii wglądu (minimum dwóch). Czy / jak można zwiększyć prawdopodobieństwo osiągnięcia wglądu?',
       tags: ['Psychologia różnic indywidualnych'],
     },
     {
-      text: 'Wymień i porównaj główne metody diagnozowania w psychologii.',
-      tags: ['Diagnoza psychologiczna'],
-    },
-    {
-      text: 'Wymień, omów i porównaj trzy modele diagnozy psychologicznej.',
-      tags: ['Diagnoza psychologiczna'],
-    },
-    {
-      text: 'Na czym polega efekt Barnuma i jakie może mieć konsekwencje dla diagnozy psychologicznej?',
-      tags: ['Diagnoza psychologiczna'],
-    },
-    {
-      text: 'Czym jest kontrakt psychologiczny i jakie znaczenie ma zawieranie kontraktu na badanie diagnostyczne?',
-      tags: ['Diagnoza psychologiczna'],
-    },
-    {
-      text: 'Opisz, podając nazwy aktów prawnych, w jaki sposób regulowana jest w polskim prawie kwestia tajemnicy zawodowej psychologa.',
+      text: 'Społeczny i prawny obowiązek denuncjacji: czym jest i z jakimi konfliktami etycznymi może się wiązać? Proszę podać przykłady konfliktów etycznych i potencjalne rozwiązania.',
       tags: ['Etyka'],
     },
     {
-      text: 'Omów etyczne ograniczenia swobody psychologicznych badań naukowych z udziałem ludzi. Wyjaśnij regulacje prawne badań behawioralnych w Polsce oraz przedstaw istotne elementy świadomego i dobrowolnego uczestnictwa w badaniu naukowym.',
+      text: 'Czy psycholog powinien zawsze być lojalny wobec instytucji, w której pracuje? Proszę podać przykłady konfliktów etycznych występujących w relacji psycholog–instytucja.',
       tags: ['Etyka'],
     },
     {
-      text: 'Omów pięć wartości ogólnych w etyce zawodu psychologa według Amerykańskiego Towarzystwa Psychologicznego (2017) i porównaj je z zasadami ogólnymi Polskiego Towarzystwa Psychologicznego (2018). Podaj przykłady dobrej i złej praktyki zawodowej ilustrujące każdą z wartości.',
+      text: 'Dlaczego psycholog powinien opierać swoją praktykę na bazie ugruntowanej wiedzy naukowej? Podaj przykłady diagnozy, terapii i innych usług psychologicznych opartych i nieopartych na wiedzy naukowej.',
       tags: ['Etyka'],
     },
     {
-      text: 'Omów najważniejsze zagrożenia dla jakości psychologicznej praktyki zawodowej wobec klienta należącego do mniejszości.',
+      text: 'Przestrzeganie zasad świadomej zgody na usługi psychologiczne i tajemnicy zawodowej w sytuacji pracy z dziećmi. Proszę podać przykłady konfliktów etycznych i potencjalne rozwiązania.',
       tags: ['Etyka'],
     },
     {
-      text: 'Omów, czym jest i kiedy jest stosowana instrukcja maskująca w badaniach psychologicznych. Jakie są etyczne powinności badacza stosującego taką instrukcję?',
+      text: 'Wskaż i opisz przynajmniej jedno badanie psychologiczne, które współcześnie nie mogłoby zostać przeprowadzone ze względów etycznych i na tym przykładzie omów zmianę standardów etycznych w psychologii.',
       tags: ['Etyka'],
+    },
+    {
+      text: 'Jakie dane z wywiadu i obserwacji powinny stanowić przesłankę do wykonania testu inteligencji? Jakich narzędzi użyjesz? Kiedy użyjesz testów słownych, kiedy bezsłownych, a kiedy uznasz że powinno się zmierzyć poziom inteligencji globalnej?',
+      tags: ['Diagnoza'],
+    },
+    {
+      text: 'Jakie błędy po stronie diagnosty mogą negatywnie wpłynąć na proces diagnozy depresji i jakie mogą być konsekwencje?',
+      tags: ['Diagnoza'],
+    },
+    {
+      text: 'Interpretację których podskal testów osobowości wykorzystasz w diagnozie pacjenta z zaburzeniem lękowym albo osobowością unikającą? Jakich innych narzędzi (poza testami osobowości) możesz użyć do oceny poziomu lęku?',
+      tags: ['Diagnoza'],
+    },
+    {
+      text: 'W jakim kontekście sytuacyjnym / klinicznym należy zastosować testy / skale mierzące inteligencję płynną? Wyjaśnij dlaczego wybierasz do potwierdzenia lub falsyfikacji hipotezy diagnostycznej ten rodzaj testów / skal.',
+      tags: ['Diagnoza'],
+    },
+    {
+      text: 'Który z testów osobowości daje możliwość interpretacji parami? Jakie obszary psychopatologii charakteryzują te pary, do jakich procesów psychologicznych się one odnoszą, jakie problemy behawioralne mogą z nich wynikać?',
+      tags: ['Diagnoza'],
+    },
+    {
+      text: 'Zaproponuj dwa proste badania psychologiczne: jedno o charakterze korelacyjnym i jedno eksperymentalnym. Na tej podstawie przedyskutuj różnice między tymi metodami oraz wskaż ich zalety i ograniczenia.',
+      tags: ['Metodologia, psychometria, statystyka'],
+    },
+    {
+      text: 'Dlaczego przy wykonywaniu testów statystycznych ważne jest obliczanie wielkości (siły) efektu, a nie ograniczanie się wyłącznie do określenia czy wynik jest istotny bądź nieistotny? Uzasadnij odwołując się do przykładów badań psychologicznych.',
+      tags: ['Metodologia, psychometria, statystyka'],
+    },
+    {
+      text: 'Zaproponuj plan prostego badania eksperymentalnego i na jego podstawie omów etapy wnioskowania statystycznego w modelu testowania istotności statystycznej hipotezy zerowej.',
+      tags: ['Metodologia, psychometria, statystyka'],
+    },
+    {
+      text: 'W jaki sposób wiedza zgromadzona w wyniku prowadzenia eksperymentalnych badań psychologicznych może znaleźć zastosowanie w codziennych sytuacjach? Uzasadnij, omawiając przykłady aplikacji wyników badań eksperymentalnych.',
+      tags: ['Metodologia, psychometria, statystyka'],
+    },
+    {
+      text: 'Zaproponuj plan prostych badań korelacyjnych, w którym zmienne wyrażone są kolejno na poziomie nominalnym, porządkowym oraz ilościowym. W jaki sposób pomiar zmiennej na określonym poziomie determinuje wybór testu statystycznego?',
+      tags: ['Metodologia, psychometria, statystyka'],
+    },
+    {
+      text: 'Jakie badania powinien wykonać autor testu, jeśli chce wykazać, że przygotowane przez niego narzędzie jest trafne? Omów przynajmniej dwa przykłady takich badań odnoszących się do różnych aspektów trafności.',
+      tags: ['Metodologia, psychometria, statystyka'],
+    },
+    {
+      text: 'Jakie badania powinien wykonać autor testu, jeśli chce wykazać, że przygotowane przez niego narzędzie jest rzetelne? Omów przynajmniej dwa przykłady takich badań odnoszących się do różnych aspektów rzetelności.',
+      tags: ['Metodologia, psychometria, statystyka'],
+    },
+    {
+      text: 'Porównaj test psychologiczny oparty na normach i test psychologiczny oparty na kryterium. Wskaż najważniejsze podobieństwa i różnice w walidacji i stosowaniu testu, odwołując się do konkretnych przykładów psychologicznych.',
+      tags: ['Metodologia, psychometria, statystyka'],
+    },
+    {
+      text: 'Testy właściwości poznawczych a testy właściwości afektywnych. Porównaj te dwa rodzaje testów odwołując się do konkretnych przykładów narzędzi.',
+      tags: ['Metodologia, psychometria, statystyka'],
+    },
+    {
+      text: 'Dlaczego przy diagnozie z wykorzystaniem testów psychologicznych ważne jest posługiwanie się przedziałami ufności dla wyniku otrzymanego, a nie wynikiem wyrażonym punktowo? Omów na przykładzie konkretnego narzędzia.',
+      tags: ['Metodologia, psychometria, statystyka'],
+    },
+    {
+      text: 'Omów 3 cechy paradygmatu poznawczo-behawioralnego, które w największym stopniu różnią go od innych paradygmatów w psychologii klinicznej. Uzasadnij swój wybór.',
+      tags: ['Psychologia kliniczna'],
+    },
+    {
+      text: 'Wyobraź sobie, że pracujesz na młodzieżowym oddziale psychiatrycznym — omów jak powinna wyglądać praca psychologa prowadzona zgodnie z założeniami praktyki opartej na dowodach z badań empirycznych.',
+      tags: ['Psychologia kliniczna'],
+    },
+    {
+      text: 'Wskaż jaki typ pomocy jest najbardziej adekwatny dla pacjentki z opisu niżej. Uzasadnij swój wybór.',
+      tags: ['Psychologia kliniczna'],
+    },
+    {
+      text: 'Przeanalizuj fizjologiczną i psychologiczną odpowiedź na stres. Zaproponuj rekomendacje dla klientów, pomagające im ograniczyć wymienione fizjologiczne i psychologiczne konsekwencje stresu.',
+      tags: ['Psychologia zdrowia'],
+    },
+    {
+      text: 'Przeanalizuj jak wiek, płeć, klasa społeczna i przynależność do mniejszości etnicznej wpływają na zdrowie. Omów jak można wykorzystać tę wiedzę planując konsultację psychologiczną.',
+      tags: ['Psychologia zdrowia'],
+    },
+    {
+      text: 'Omów cele i założenia strategicznego zarządzania zasobami ludzkimi. Wskaż na rolę psychologa w realizacji tego podejścia podając co najmniej 3 przykłady pozytywnych konsekwencji dla funkcjonowania organizacji i pracowników w niej zatrudnionych. Uzasadnij swoją odpowiedź.',
+      tags: ['Praca i organizacja'],
+    },
+    {
+      text: 'W jaki sposób, wykorzystując wiedzę na temat segmentacji klientów za pomocą czynników demograficznych, psychograficznych i behawioralnych, można zapewnić skuteczność akcji promocyjnych i reklam?',
+      tags: ['Praca i organizacja'],
+    },
+    {
+      text: 'Jakie znaczenie dla funkcjonowania organizacji ma jej kultura organizacyjna i klimat organizacyjny?',
+      tags: ['Praca i organizacja'],
+    },
+    {
+      text: 'Na jakie negatywne zjawiska w pracy narażone są współczesne organizacje? Omów przynajmniej dwa z nich odwołując się do teorii i badań empirycznych.',
+      tags: ['Praca i organizacja'],
+    },
+    {
+      text: 'Omów podobieństwa i różnice między tradycyjnymi a nowoczesnymi koncepcjami marketingowymi.',
+      tags: ['Praca i organizacja'],
+    },
+    {
+      text: 'W jaki sposób odmienności i zaburzenia rozwojowe ucznia przekładają się na jego zdolność uczestniczenia w procesie edukacyjnym? Wyjaśnij na wybranym przykładzie odwołując się do mechanizmów psychologicznych i badań empirycznych, a także zaproponuj rozwiązania w celu zapewnienia takiemu uczniowi wsparcia.',
+      tags: ['Psychologia edukacji'],
+    },
+    {
+      text: 'Co badania psychologiczne wnoszą do edukacji? Przeanalizuj wkład psychologii do lepszego rozumienia i planowania procesu edukacyjnego na wybranych przykładach badań psychologicznych, wyjaśniając ich zastosowanie w praktyce edukacyjnej.',
+      tags: ['Psychologia edukacji'],
+    },
+    {
+      text: 'Jak wiedza na temat procesu uczenia się może być wykorzystywana, by bardziej efektywnie uczyć siebie i innych? Zilustruj co najmniej dwoma przykładami badań, wskazując w jaki sposób ich wnioski mogą być wykorzystywane w praktyce.',
+      tags: ['Psychologia edukacji'],
+    },
+    {
+      text: 'Dlaczego psycholog potrzebny jest w szkole? Przeanalizuj w jaki sposób wiedza, umiejętności i narzędzia psychologiczne wykorzystywane są w procesie edukacji i wychowania uczniów, wskaż również rolę psychologa w polepszaniu sytuacji uczniów.',
+      tags: ['Psychologia edukacji'],
+    },
+    {
+      text: 'Dlaczego edukacja jest ważna? Pomijając nabycie konkretnych umiejętności czy wiedzy, wskaż korzyści psychologiczne i poznawcze z udziału w procesie edukacyjnym, wspierając swoje argumenty wynikami badań empirycznych.',
+      tags: ['Psychologia edukacji'],
     },
   ];
 
