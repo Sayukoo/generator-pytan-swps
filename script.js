@@ -61,7 +61,6 @@
 
   const DEFAULT_TAG_COLOR = '#7f8c8d';
   const TAG_COLOR_MAP = {
-    'Psychologia ogólna': '#1abc9c',
     'Psychologia społeczna': '#e74c3c',
     'Emocje i motywacje': '#e67e22',
     'Psychologia rozwojowa': '#16a085',
@@ -80,16 +79,15 @@
   };
 
   const TAG_ORDER = [
-    'Psychologia ogólna',
     'Psychologia społeczna',
     'Emocje i motywacje',
     'Psychologia rozwojowa',
-    Psychopatologia,
+    'Psychopatologia',
     'Psychologia osobowości',
     'Psychologia poznawcza',
     'Psychologia różnic indywidualnych',
-    Etyka,
-    Diagnoza,
+    'Etyka',
+    'Diagnoza',
     'Metodologia, psychometria, statystyka',
     'Psychologia kliniczna',
     'Psychologia zdrowia',

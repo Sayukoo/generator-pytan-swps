@@ -3,31 +3,31 @@
 
   const RAW_QUESTIONS = [
     {
-      text: 'Dlaczego psychologia humanistyczna została nazwana „trzecią drogą” w psychologii? Omów jej założenia w kontekście innych koncepcji człowieka.',
-      tags: ['Psychologia ogólna'],
+      text: 'Dlaczego psychologia humanistyczna została nazwana "trzecią drogą" w psychologii? Omów jej założenia w kontekście innych koncepcji człowieka.',
+      tags: [],
     },
     {
       text: 'Czy Freud był rewolucjonistą w psychologii? Przedstaw założenia oraz proces rozwoju psychodynamicznej koncepcji człowieka.',
-      tags: ['Psychologia ogólna'],
+      tags: [],
     },
     {
       text: 'Skąd wziął się pomysł na myślenie o człowieku jako o sumie odruchów? Omów podstawy filozoficzne i metodologiczne behawioryzmu.',
-      tags: ['Psychologia ogólna'],
+      tags: [],
     },
     {
-      text: 'Omów w jaki sposób badania realizowane na zwierzętach mogą wzbogacać wiedzę psychologiczną — uwzględniając perspektywę metodologiczną oraz etyczną.',
-      tags: ['Psychologia ogólna'],
+      text: 'Omów w jaki sposób badania realizowane na zwierzętach mogą wzbogacać wiedzę psychologiczną - uwzględniając perspektywę metodologiczną oraz etyczną.',
+      tags: [],
     },
     {
-      text: 'Dlaczego psychologia porzuciła ideę „czarnej skrzynki”? Przedstaw powody i przebieg rewolucji poznawczej w psychologii.',
-      tags: ['Psychologia ogólna'],
+      text: 'Dlaczego psychologia porzuciła ideę "czarnej skrzynki"? Przedstaw powody i przebieg rewolucji poznawczej w psychologii.',
+      tags: [],
     },
     {
       text: 'W jaki sposób tworzy się poczucie tożsamości grupowej? Przedstaw i oceń konsekwencje tożsamości grupowej.',
       tags: ['Psychologia społeczna'],
     },
     {
-      text: 'Przeanalizuj relację wybranej techniki autoprezentacji do postulatu „bądź sobą”.',
+      text: 'Przeanalizuj relację wybranej techniki autoprezentacji do postulatu "bądź sobą".',
       tags: ['Psychologia społeczna'],
     },
     {
@@ -35,11 +35,11 @@
       tags: ['Psychologia społeczna'],
     },
     {
-      text: 'Czy istnieje prawdziwy („egzogenny”) altruizm? Skonfrontuj koncepcje teoretyczne i badania empiryczne wskazujące na jego istnienie i nieistnienie.',
+      text: 'Czy istnieje prawdziwy ("egzogenny") altruizm? Skonfrontuj koncepcje teoretyczne i badania empiryczne wskazujące na jego istnienie i nieistnienie.',
       tags: ['Psychologia społeczna'],
     },
     {
-      text: 'Socjalizacja i posłuszeństwo: co zrobić, aby dzieci były „grzeczne”, a gdy dorosną — nie zawsze posłuszne?',
+      text: 'Socjalizacja i posłuszeństwo: co zrobić, aby dzieci były "grzeczne", a gdy dorosną - nie zawsze posłuszne?',
       tags: ['Psychologia społeczna'],
     },
     {
@@ -91,11 +91,11 @@
       tags: ['Psychopatologia'],
     },
     {
-      text: 'Depresja, epizod depresyjny, zaburzenia depresyjne — krytycznie przeanalizuj różne postacie depresji.',
+      text: 'Depresja, epizod depresyjny, zaburzenia depresyjne - krytycznie przeanalizuj różne postacie depresji.',
       tags: ['Psychopatologia'],
     },
     {
-      text: 'Podobieństwa i różnice w zaburzeniach lękowych — porównaj dwa wybrane rodzaje zaburzeń lękowych odwołując się do ich psychopatologii, klasyfikacji i leczenia.',
+      text: 'Podobieństwa i różnice w zaburzeniach lękowych - porównaj dwa wybrane rodzaje zaburzeń lękowych odwołując się do ich psychopatologii, klasyfikacji i leczenia.',
       tags: ['Psychopatologia'],
     },
     {
@@ -159,7 +159,7 @@
       tags: ['Psychologia różnic indywidualnych'],
     },
     {
-      text: 'Dokonaj krytycznej analizy istniejących teorii wglądu (minimum dwóch). Czy / jak można zwiększyć prawdopodobieństwo osiągnięcia wglądu?',
+      text: 'Dokonaj krytycznej analizy istniejących teorii wglądu (minimum dwóch). Czy/ jak można zwiększyć prawdopodobieństwo osiągnięcia wglądu?',
       tags: ['Psychologia różnic indywidualnych'],
     },
     {
@@ -167,7 +167,7 @@
       tags: ['Etyka'],
     },
     {
-      text: 'Czy psycholog powinien zawsze być lojalny wobec instytucji, w której pracuje? Proszę podać przykłady konfliktów etycznych występujących w relacji psycholog–instytucja.',
+      text: 'Czy psycholog powinien zawsze być lojalny wobec instytucji, w której pracuje? Proszę podać przykłady konfliktów etycznych występujących w relacji psycholog-instytucja.',
       tags: ['Etyka'],
     },
     {
@@ -195,7 +195,7 @@
       tags: ['Diagnoza'],
     },
     {
-      text: 'W jakim kontekście sytuacyjnym / klinicznym należy zastosować testy / skale mierzące inteligencję płynną? Wyjaśnij dlaczego wybierasz do potwierdzenia lub falsyfikacji hipotezy diagnostycznej ten rodzaj testów / skal.',
+      text: 'W jakim kontekście sytuacyjnym/ klinicznym należy zastosować testy/ skale mierzące inteligencję płynną? Wyjaśnij dlaczego wybierasz do potwierdzenia lub falsyfikacji hipotezy diagnostycznej ten rodzaj testów/skal.',
       tags: ['Diagnoza'],
     },
     {
@@ -247,7 +247,7 @@
       tags: ['Psychologia kliniczna'],
     },
     {
-      text: 'Wyobraź sobie, że pracujesz na młodzieżowym oddziale psychiatrycznym — omów jak powinna wyglądać praca psychologa prowadzona zgodnie z założeniami praktyki opartej na dowodach z badań empirycznych.',
+      text: 'Wyobraź sobie, że pracujesz na młodzieżowym oddziale psychiatrycznym, omów jak powinna wyglądać praca psychologa prowadzona zgodnie z założeniami praktyki opartej na dowodach z badań empirycznych.',
       tags: ['Psychologia kliniczna'],
     },
     {
@@ -259,7 +259,7 @@
       tags: ['Psychologia zdrowia'],
     },
     {
-      text: 'Przeanalizuj jak wiek, płeć, klasa społeczna i przynależność do mniejszości etnicznej wpływają na zdrowie. Omów jak można wykorzystać tę wiedzę planując konsultację psychologiczną.',
+      text: 'Przeanalizuj jak wiek, płeć, klasa społeczna i przynależność do mniejszości etnicznej wpływają na zdrowie. Omów jak można wykorzystać tą wiedzę planując konsultację psychologiczną.',
       tags: ['Psychologia zdrowia'],
     },
     {
