@@ -1,7 +1,7 @@
 (function (global) {
   'use strict';
 
-  const RAW_QUESTIONS = [
+  const SWPS_QUESTIONS = [
     {
       text: 'Dlaczego psychologia humanistyczna została nazwana "trzecią drogą" w psychologii? Omów jej założenia w kontekście innych koncepcji człowieka.',
       tags: [],
@@ -304,6 +304,42 @@
     },
   ];
 
+  const UWR_QUESTIONS = [
+    { text: 'Podstawowe założenia przyjmowane w nauce - różnica między wiedzą naukową a potoczną', tags: ['Zestaw egzaminacyjny'] },
+    { text: 'Procesy i mechanizmy samoregulacji - znaczenie dla dobrostanu i przystosowania człowieka', tags: ['Zestaw egzaminacyjny'] },
+    { text: 'Rola stereotypów w spostrzeganiu i funkcjonowaniu społecznym', tags: ['Zestaw egzaminacyjny'] },
+    { text: 'Wpływ społeczny - przykłady, wyznaczniki, korzyści i zagrożenia', tags: ['Zestaw egzaminacyjny'] },
+    { text: 'Sytuacyjne i dyspozycyjne wyznaczniki stresu i radzenia sobie', tags: ['Zestaw egzaminacyjny'] },
+    { text: 'Stres traumatyczny - charakterystyka zjawiska i jego konsekwencji', tags: ['Zestaw egzaminacyjny'] },
+    { text: 'Emocje a motywacja - zależności, kierunek oddziaływań i wpływ na zachowanie', tags: ['Zestaw egzaminacyjny'] },
+    { text: 'Adaptacyjna funkcja emocji na przykładzie dwóch wybranych emocji podstawowych', tags: ['Zestaw egzaminacyjny'] },
+    { text: 'Sytuacja prawna dotycząca zawodu psychologa w Polsce', tags: ['Zestaw egzaminacyjny'] },
+    { text: 'Podstawowe zasady etyczne w diagnozie, pomocy psychologicznej i badaniach naukowych według Kodeksu Etycznego Psychologa (2018)', tags: ['Zestaw egzaminacyjny'] },
+    { text: 'Główne zagadnienia psychologii osobowości - struktura, rozwój i funkcje na przykładzie wybranych teorii', tags: ['Zestaw egzaminacyjny'] },
+    { text: 'Aktualność różnych teorii osobowości - ich przydatność i praktyczne zastosowanie w rozumieniu kondycji i problemów człowieka współczesnego', tags: ['Zestaw egzaminacyjny'] },
+    { text: 'Rola motywatorów i czynników higieny w przejawianiu zachowań obywatelskich i kontrproduktywnych w organizacji', tags: ['Zestaw egzaminacyjny'] },
+    { text: 'Styl wychowania w rodzinie i jego rola w powstawaniu zaburzeń we współżyciu społecznym u dzieci', tags: ['Zestaw egzaminacyjny'] },
+    { text: 'Niepowodzenia dzieci w nauce szkolnej - przyczyny i przeciwdziałanie niepowodzeniom szkolnym', tags: ['Zestaw egzaminacyjny'] },
+    { text: 'Przebieg procesu badawczego w psychologii', tags: ['Zestaw egzaminacyjny'] },
+    { text: 'Różnica między testami a innymi metodami diagnozy i ich znaczenie w pracy psychologa diagnosty', tags: ['Zestaw egzaminacyjny'] },
+    { text: 'Kryteria dobroci testu - jaką wiedzę z nich czerpie psycholog', tags: ['Zestaw egzaminacyjny'] },
+    { text: 'Wybrany kwestionariusz osobowości lub skala inteligencji - budowa testu, przedmiot pomiaru, możliwości aplikacyjne i ograniczenia', tags: ['Zestaw egzaminacyjny'] },
+    { text: 'Procesy i mechanizmy funkcjonowania poznawczego człowieka - omów dwa wybrane i ich znaczenie w pracy psychologa', tags: ['Zestaw egzaminacyjny'] },
+    { text: 'Systemowe ujęcie rodziny - konsekwencje dla rozumienia i pracy z rodziną', tags: ['Zestaw egzaminacyjny'] },
+    { text: 'Rola kryzysów psychicznych w ciągu życia', tags: ['Zestaw egzaminacyjny'] },
+    { text: 'Geny, rodzice, rówieśnicy – proporcje wpływów w przebiegu rozwoju człowieka', tags: ['Zestaw egzaminacyjny'] },
+    { text: 'Znaczenie temperamentu dla regulacji funkcjonowania i przystosowania człowieka', tags: ['Zestaw egzaminacyjny'] },
+    { text: 'Różnice indywidualne warunkujące adaptację psychologiczną', tags: ['Zestaw egzaminacyjny'] },
+    { text: 'Wybrane klasyczne koncepcje psychologiczne człowieka oraz ich implikacje dla współczesnej psychologii', tags: ['Zestaw egzaminacyjny'] },
+    { text: 'Zaburzenia osobowości - istota i kryteria rozpoznawania oraz wybrane przykłady', tags: ['Zestaw egzaminacyjny'] },
+    { text: 'Najważniejsze czynniki biologiczne, psychologiczne i społeczne sprzyjające rozwojowi problemów i zaburzeń funkcjonowania człowieka', tags: ['Zestaw egzaminacyjny'] },
+    { text: 'Nurty współczesnej psychoterapii - główne założenia i porównanie wybranych', tags: ['Zestaw egzaminacyjny'] },
+    { text: 'Profesjonalna i nieprofesjonalna pomoc psychologiczna - charakterystyka, różnice, przykłady', tags: ['Zestaw egzaminacyjny'] },
+  ];
+
+  const activeBank = global.localStorage?.getItem('active_bank') || 'swps';
+  const RAW_QUESTIONS = activeBank === 'uwr' ? UWR_QUESTIONS : SWPS_QUESTIONS;
+
   const QUESTIONS = RAW_QUESTIONS.map((entry) => ({
     text: typeof entry.text === 'string' ? entry.text.trim() : '',
     tags: Array.isArray(entry.tags)
@@ -314,4 +350,5 @@
   }));
 
   global.QUESTIONS = QUESTIONS;
+  global.ACTIVE_BANK = activeBank;
 })(window);

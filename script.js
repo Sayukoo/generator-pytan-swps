@@ -40,6 +40,9 @@
   const countMasteredEl = document.getElementById('countMastered');
   const navMasteredCountEl = document.getElementById('navMasteredCount');
   const navTotalCountEl = document.getElementById('navTotalCount');
+  const navSubtitleEl = document.getElementById('navSubtitle');
+  const tabSwpsBtn = document.getElementById('tab-swps');
+  const tabUwrBtn = document.getElementById('tab-uwr');
 
   if (!drawBtn || !resetBtn || !helpBtn || !helpDialog || !closeHelpBtn) {
     throw new Error('Nie udało się zainicjalizować elementów interfejsu.');
@@ -48,6 +51,35 @@
   if (navTotalCountEl) {
     navTotalCountEl.textContent = String(QUESTIONS.length);
   }
+  if (navSubtitleEl) {
+    navSubtitleEl.textContent = `${QUESTIONS.length} pytań egzaminacyjnych`;
+  }
+
+  const activeBank = window.ACTIVE_BANK || 'swps';
+  if (tabSwpsBtn && tabUwrBtn) {
+    if (activeBank === 'uwr') {
+      tabUwrBtn.setAttribute('aria-selected', 'true');
+      tabUwrBtn.classList.add('is-active');
+    } else {
+      tabSwpsBtn.setAttribute('aria-selected', 'true');
+      tabSwpsBtn.classList.add('is-active');
+    }
+
+    tabSwpsBtn.addEventListener('click', () => {
+      if (activeBank !== 'swps') {
+        window.localStorage.setItem('active_bank', 'swps');
+        window.location.reload();
+      }
+    });
+
+    tabUwrBtn.addEventListener('click', () => {
+      if (activeBank !== 'uwr') {
+        window.localStorage.setItem('active_bank', 'uwr');
+        window.location.reload();
+      }
+    });
+  }
+
   const cardSlots = Array.from(document.querySelectorAll('.card')).map((cardEl) => {
     const slot = {
       cardEl,
@@ -75,6 +107,7 @@
     'Psychologia zdrowia': '#00b894',
     'Praca i organizacja': '#6c5ce7',
     'Psychologia edukacji': '#fdcb6e',
+    'Zestaw egzaminacyjny': '#10ac84',
     ...(typeof window.TAG_COLORS === 'object' && window.TAG_COLORS !== null ? window.TAG_COLORS : {}),
   };
 

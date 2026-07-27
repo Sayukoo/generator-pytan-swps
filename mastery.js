@@ -1,5 +1,6 @@
 (function (global) {
-  const STORAGE_KEY = 'swps-mastered-questions.v3';
+  const activeBank = global.localStorage?.getItem('active_bank') || 'swps';
+  const STORAGE_KEY = activeBank === 'uwr' ? 'uwr-mastered-questions.v1' : 'swps-mastered-questions.v3';
 
   function sanitizeIndex(index) {
     if (typeof index === 'number' && Number.isInteger(index) && index >= 0) {
@@ -118,6 +119,7 @@
   }
 
   global.masteryManager = {
+    getActiveBank: () => activeBank,
     isMastered,
     setMastered,
     toggleMastered,
