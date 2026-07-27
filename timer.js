@@ -1,6 +1,12 @@
   (function (global) {
     const DRAW_LABEL = 'Losuj';
 
+    /**
+     * Formatuje czas w sekundach do postaci łańcucha mm:ss.
+     *
+     * @param {number} totalSeconds - Łączny czas w sekundach.
+     * @returns {string} Sformatowany czas.
+     */
     function formatTime(totalSeconds) {
       const minutes = Math.floor(totalSeconds / 60)
         .toString()
@@ -11,6 +17,19 @@
       return `${minutes}:${seconds}`;
     }
 
+    /**
+     * Tworzy i zarządza systemem odliczania czasu (wybór pytania, odpowiedź).
+     * Modyfikuje etykiety na przycisku losowania i obsługuje wywołania zwrotne (callbacks)
+     * w przypadku upłynięcia czasu.
+     *
+     * @param {Object} options - Ustawienia dla menedżera.
+     * @param {HTMLElement} options.drawBtn - Element przycisku do wyświetlania czasu.
+     * @param {number} [options.selectionDuration=40] - Czas na dokonanie wyboru (w sekundach).
+     * @param {number} [options.answerDuration=120] - Czas na odpowiedź (w sekundach).
+     * @param {function(): void} [options.onSelectionTimeout] - Callback po upływie czasu wyboru.
+     * @param {function(): void} [options.onAnswerComplete] - Callback po upływie czasu odpowiedzi.
+     * @returns {Object} Obiekt z metodami API kontrolującymi menedżera.
+     */
     function createTimerManager({
       drawBtn,
       selectionDuration = 40,

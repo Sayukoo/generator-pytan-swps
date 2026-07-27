@@ -1,6 +1,14 @@
 (function (global) {
   'use strict';
 
+  /**
+   * Konwertuje ciąg znaków na "slug" w formacie przyjaznym dla URL (małe litery, bez znaków diakrytycznych,
+   * spacje i znaki specjalne zamienione na myślniki).
+   *
+   * @param {string} text - Tekst do przekształcenia.
+   * @param {string} fallback - Wartość awaryjna, używana w przypadku gdy otrzymany tekst jest pusty lub niepoprawny.
+   * @returns {string} Sformatowany "slug" lub wartość awaryjna.
+   */
   function slugify(text, fallback) {
     if (typeof text !== 'string' || text.trim() === '') {
       return fallback;
@@ -13,10 +21,33 @@
       .replace(/^-+|-+$/g, '') || fallback;
   }
 
+  /**
+   * Zapewnia, że przekazana wartość jest tablicą. Jeśli nią nie jest, zwraca pustą tablicę.
+   *
+   * @param {any} value - Wartość do sprawdzenia.
+   * @returns {Array} Przekazana tablica lub nowa pusta tablica.
+   */
   function toArray(value) {
     return Array.isArray(value) ? value : [];
   }
 
+  /**
+   * Inicjalizuje i zarządza menu filtrów. Odpowiada za renderowanie tagów,
+   * obsługę zdarzeń (kliknięcia, klawisze) oraz rozgłaszanie zmian stanu.
+   *
+   * @param {Object} options - Obiekt z elementami DOM i danymi konfiguracyjnymi.
+   * @param {HTMLElement} options.toggleEl - Element przełączający menu.
+   * @param {HTMLElement} options.closeEl - Element zamykający menu.
+   * @param {HTMLElement} options.panelEl - Główny kontener panelu menu.
+   * @param {HTMLElement} options.backdropEl - Element tła (backdrop) za menu.
+   * @param {HTMLInputElement} options.includeMasteredEl - Checkbox dla pytań opanowanych.
+   * @param {HTMLInputElement} options.includeUnmasteredEl - Checkbox dla pytań nieopanowanych.
+   * @param {HTMLElement} options.tagListEl - Kontener na renderowane tagi.
+   * @param {HTMLElement} options.clearButton - Przycisk resetowania filtrów.
+   * @param {Array<string>} options.tags - Lista wszystkich unikalnych tagów.
+   * @param {Object<string, string>} options.tagColors - Mapa przypisująca kolory do tagów.
+   * @returns {Object} Obiekt z metodami API kontrolującymi menu.
+   */
   function createFilterMenu({
     toggleEl,
     closeEl,
