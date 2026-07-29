@@ -504,6 +504,12 @@ a:hover {
   flex: 1;
   min-height: 0;
   border-bottom: 0;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  overflow-x: visible;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.12) transparent;
 }
 
 .sidebar__head {
@@ -592,16 +598,12 @@ a:hover {
   list-style: none;
   margin: 0;
   padding: 4px;
-  overflow-y: auto;
-  overflow-x: visible;
+  /* Zmieniamy ukrywanie uciętego tooltipa: wyłączamy przewijanie ukrywające box */
+  overflow: visible;
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(36px, 1fr));
   gap: 8px;
   align-content: start;
-  flex: 1;
-  min-height: 0;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(255, 255, 255, 0.12) transparent;
 }
 
 .question-item {
@@ -675,10 +677,7 @@ a:hover {
 
 /* Tooltip (dymek) dla tekstu pytania */
 .question-item__text {
-  position: absolute;
-  top: 50%;
-  right: calc(100% + 12px);
-  transform: translateY(-50%) scale(0.95);
+  position: fixed;
   opacity: 0;
   visibility: hidden;
   width: max-content;
@@ -690,12 +689,13 @@ a:hover {
   font-size: 13px;
   line-height: 1.4;
   box-shadow: 0 4px 16px rgba(0,0,0,0.4);
-  transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s;
   pointer-events: none;
-  z-index: 100;
+  z-index: 9999;
   text-align: left;
   word-wrap: break-word;
   white-space: normal;
+  transform-origin: right center;
+  transition: opacity 0.2s ease, transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), visibility 0.2s;
 }
 
 /* Strzałka dymku */
@@ -710,11 +710,9 @@ a:hover {
   border-color: transparent transparent transparent #fff;
 }
 
-.question-item:hover .question-item__text,
-.question-item:focus-within .question-item__text {
+.global-tooltip.visible {
   opacity: 1;
   visibility: visible;
-  transform: translateY(-50%) scale(1);
 }
 
 /* ——— Footer / dialog ——— */

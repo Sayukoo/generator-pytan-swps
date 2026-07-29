@@ -645,21 +645,46 @@
         item.classList.add('is-current');
       }
 
-      const numText = document.createElement('span');
+            const numText = document.createElement('span');
       numText.className = 'question-item__num';
       numText.textContent = String(idx + 1).padStart(2, '0');
 
-      // Use div for the tooltip to avoid nesting buttons
-      const tooltip = document.createElement('div');
-      tooltip.className = 'question-item__text';
-      tooltip.textContent = entry.text;
+      item.dataset.text = entry.text;
+
+      item.addEventListener('mouseenter', () => {
+        let tooltip = document.getElementById('global-tooltip');
+        if (!tooltip) {
+          tooltip = document.createElement('div');
+          tooltip.id = 'global-tooltip';
+          tooltip.className = 'question-item__text global-tooltip';
+          document.body.appendChild(tooltip);
+        }
+        tooltip.textContent = item.dataset.text;
+
+        const rect = item.getBoundingClientRect();
+        tooltip.style.top = `${rect.top + rect.height / 2}px`;
+        tooltip.style.left = `${rect.left - 12}px`;
+        tooltip.style.transform = `translate(-100%, -50%) scale(1)`;
+        tooltip.classList.add('visible');
+      });
+
+      item.addEventListener('mouseleave', () => {
+        const tooltip = document.getElementById('global-tooltip');
+        if (tooltip) {
+          tooltip.style.transform = `translate(-100%, -50%) scale(0.95)`;
+          tooltip.classList.remove('visible');
+        }
+      });
 
       item.title = 'Pokaż na ekranie i zacznij odpowiadać (Kliknij PPM by oznaczyć jako opanowane)';
       item.addEventListener('click', () => {
         showQuestionOnStage(idx, { startTimer: true });
+        const tooltip = document.getElementById('global-tooltip');
+        if (tooltip) {
+            tooltip.classList.remove('visible');
+        }
       });
 
-      // Right click to toggle mastery since left click is now taking over
       item.addEventListener('contextmenu', (e) => {
         e.preventDefault();
         mastery.toggleMastered(idx);
@@ -673,7 +698,6 @@
       }
 
       item.appendChild(numText);
-      item.appendChild(tooltip);
       questionListEl.appendChild(item);
     });
 
