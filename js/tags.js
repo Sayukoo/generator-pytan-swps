@@ -1,6 +1,8 @@
 (function (global) {
   'use strict';
-const DEFAULT_TAG_COLOR = '#7f8c8d';
+
+  /** @const {string} DEFAULT_TAG_COLOR - Fallback color for missing tag configurations. */
+  const DEFAULT_TAG_COLOR = '#7f8c8d';
   const TAG_COLOR_MAP = {
     'Psychologia społeczna': '#e74c3c',
     'Emocje i motywacje': '#e67e22',
@@ -55,6 +57,11 @@ const DEFAULT_TAG_COLOR = '#7f8c8d';
     'Psychoterapia i pomoc'
   ];
 
+  /**
+   * Normalizes a hex color string, removing '#' and expanding 3-digit shorthand.
+   * @param {string} hex - The hex string to normalize.
+   * @returns {string|null} The normalized 6-character hex string, or null if invalid.
+   */
   function normalizeHex(hex) {
     if (typeof hex !== 'string') {
       return null;
@@ -69,6 +76,11 @@ const DEFAULT_TAG_COLOR = '#7f8c8d';
     return null;
   }
 
+  /**
+   * Converts a hex color string to an RGB object.
+   * @param {string} hex - The hex color string.
+   * @returns {{r: number, g: number, b: number}|null} RGB values, or null if invalid.
+   */
   function hexToRgb(hex) {
     const value = normalizeHex(hex);
     if (!value) {
@@ -83,6 +95,11 @@ const DEFAULT_TAG_COLOR = '#7f8c8d';
     return { r, g, b };
   }
 
+  /**
+   * Generates a palette of CSS color variants for a given tag.
+   * @param {string} tag - The tag name.
+   * @returns {Object} An object containing 'strong', 'soft', 'onDark', and 'text' color variants.
+   */
   function getTagVariants(tag) {
     const rgb = hexToRgb(TAG_COLOR_MAP[tag] ?? DEFAULT_TAG_COLOR) ?? { r: 127, g: 140, b: 141 };
     return {
@@ -93,6 +110,11 @@ const DEFAULT_TAG_COLOR = '#7f8c8d';
     };
   }
 
+  /**
+   * Extracts and sorts unique tags from a dataset based on TAG_ORDER.
+   * @param {Array<Object>} data - The dataset of questions containing tags.
+   * @returns {Array<string>} An array of sorted unique tag strings.
+   */
   function getUniqueTags(data) {
     const tagSet = new Set();
     data.forEach((item) => {

@@ -37,6 +37,7 @@
   const cardsRoot = document.getElementById('cardsRoot');
   const numA = document.getElementById('numA');
   const numB = document.getElementById('numB');
+  const customTimerInput = document.getElementById('customTimerInput');
 
   if (!drawBtn || !resetBtn || !helpBtn || !helpDialog || !closeHelpBtn) {
     throw new Error('Nie udało się zainicjalizować elementów interfejsu.');
@@ -120,6 +121,18 @@
     timer.setDurations({ answerDuration: 180 });
   }
 
+  if (customTimerInput) {
+    customTimerInput.addEventListener('change', (e) => {
+      const val = parseInt(e.target.value, 10);
+      if (!Number.isNaN(val) && val > 0) {
+        timer.setDurations({ answerDuration: val });
+      } else {
+        // Reset to defaults if empty/invalid
+        timer.setDurations({ answerDuration: isUwr ? 180 : 120 });
+      }
+    });
+  }
+
   mastery.subscribe(() => {
     refreshAllMasteryStates();
     updateDrawAvailability();
@@ -137,12 +150,19 @@
   const cardEls = cardSlots.map((slot) => slot.cardEl);
   const slotByCard = new Map(cardSlots.map((slot) => [slot.cardEl, slot]));
 
+  /**
+   * Clears selection, auto-picked, and dimmed styles from all card elements.
+   */
   function clearSelectionStyles() {
     cardEls.forEach((card) => {
       card.classList.remove('selected', 'dimmed', 'auto-picked');
     });
   }
 
+  /**
+   * Toggles the idle state for all visible cards.
+   * @param {boolean} isIdle - True to set cards to idle, false otherwise.
+   */
   function setCardsIdle(isIdle) {
     cardEls.forEach((card) => {
       if (!card.hidden) {
@@ -151,6 +171,12 @@
     });
   }
 
+  /**
+   * Applies selection styling to a chosen card and dims the others.
+   * @param {HTMLElement} cardEl - The card element that was selected.
+   * @param {Object} [options] - Options for selection.
+   * @param {boolean} [options.autoPicked=false] - Whether the card was picked automatically by timeout.
+   */
   function applySelectionStyles(cardEl, { autoPicked = false } = {}) {
     cardEls.forEach((card) => {
       if (card.hidden) {
@@ -167,6 +193,10 @@
     });
   }
 
+  /**
+   * Refreshes the visual mastery state of a single card slot.
+   * @param {Object} slot - The card slot object containing references.
+   */
   function refreshCardMasteryState(slot) {
     if (!slot?.cardEl) {
       return;
@@ -182,6 +212,9 @@
     }
   }
 
+  /**
+   * Refreshes the mastery states across all card slots and updates the navigation count.
+   */
   function refreshAllMasteryStates() {
     cardSlots.forEach((slot) => refreshCardMasteryState(slot));
     const masteredCount = mastery.getAll().size;
@@ -190,6 +223,11 @@
     }
   }
 
+  /**
+   * Renders tag pills inside a container element.
+   * @param {HTMLElement} tagsEl - The DOM container for tags.
+   * @param {Array<string>} tags - An array of tag names to render.
+   */
   function renderTags(tagsEl, tags) {
     if (!tagsEl) {
       return;
@@ -215,6 +253,10 @@
     });
   }
 
+  /**
+   * Applies a pop and glow animation to a card slot.
+   * @param {Object} slot - The card slot object to animate.
+   */
   function animateCard(slot) {
     if (!slot?.cardEl || slot.cardEl.hidden) {
       return;
@@ -229,6 +271,11 @@
     }
   }
 
+  /**
+   * Populates a card slot with a specific question's data based on index.
+   * @param {Object} slot - The card slot to update.
+   * @param {number|null} questionIndex - The index of the question, or null to clear.
+   */
   function applyQuestionToSlot(slot, questionIndex) {
     if (!slot) {
       return;
@@ -272,6 +319,13 @@
     refreshCardMasteryState(slot);
   }
 
+  /**
+   * Handles the logic for when a user (or timeout) selects a card to answer.
+   * @param {HTMLElement} cardEl - The card element selected.
+   * @param {Object} [options] - Start options.
+   * @param {boolean} [options.autoPicked=false] - True if automatically picked.
+   * @param {boolean} [options.force=false] - True to force answer phase despite timer state.
+   */
   function handleAnswerStart(cardEl, { autoPicked = false, force = false } = {}) {
     if (!cardEl || timer.isAnswerActive()) {
       return;
@@ -290,6 +344,9 @@
     applySelectionStyles(cardEl, { autoPicked });
   }
 
+  /**
+   * Automatically selects a card when the selection timer runs out (for paired mode).
+   */
   function handleSelectionTimeout() {
     if (timer.isAnswerActive() || timer.isSelectionActive()) {
       return;
@@ -318,6 +375,12 @@
     });
   });
 
+  /**
+   * Generates a cryptographically secure random integer between min and max inclusive.
+   * @param {number} min - The minimum integer.
+   * @param {number} max - The maximum integer.
+   * @returns {number} The random integer.
+   */
   function randInt(min, max) {
     const range = max - min + 1;
     if (range <= 0) {
@@ -334,6 +397,11 @@
     return min + (value % range);
   }
 
+  /**
+   * Picks a random item from an array pool.
+   * @param {Array} pool - The pool of items.
+   * @returns {*} A random item, or null if pool is empty.
+   */
   function pickRandomIndex(pool) {
     if (!Array.isArray(pool) || pool.length === 0) {
       return null;
@@ -341,6 +409,10 @@
     return pool[randInt(0, pool.length - 1)] ?? null;
   }
 
+  /**
+   * Retrieves indices of questions that match the current filter state.
+   * @returns {Array<number>} An array of valid candidate indices.
+   */
   function getCandidateIndices() {
     const state = filterMenu.getState();
     const hideMastered = Boolean(state.hideMastered);
@@ -365,6 +437,10 @@
     return matches;
   }
 
+  /**
+   * Selects two random questions for the paired draw mode, prioritizing unmastered questions.
+   * @returns {Array<number|null>} A pair of question indices.
+   */
   function selectQuestionPair() {
     const candidates = getCandidateIndices();
     if (candidates.length === 0) {
@@ -386,6 +462,10 @@
     return [firstIndex, pickRandomIndex(secondPool)];
   }
 
+  /**
+   * Selects a single random question for the single draw mode, prioritizing unmastered questions.
+   * @returns {number|null} The chosen question index.
+   */
   function selectSingleQuestion() {
     const candidates = getCandidateIndices();
     if (candidates.length === 0) {
@@ -397,6 +477,10 @@
     return pickRandomIndex(pool);
   }
 
+  /**
+   * Updates the UI state of the draw button based on candidate availability.
+   * @returns {boolean} True if there are candidates available, false otherwise.
+   */
   function updateDrawAvailability() {
     const candidates = getCandidateIndices();
     const hasCandidates = candidates.length > 0;
@@ -412,6 +496,12 @@
     return hasCandidates;
   }
 
+  /**
+   * Displays a specific question on the stage and optionally starts the answer timer.
+   * @param {number} index - The index of the question to show.
+   * @param {Object} [options] - Display options.
+   * @param {boolean} [options.startTimer=false] - True to start the timer immediately.
+   */
   function showQuestionOnStage(index, { startTimer = false } = {}) {
     if (typeof index !== 'number' || index < 0 || index >= QUESTIONS.length) {
       return;
@@ -442,6 +532,9 @@
     updateDrawAvailability();
   }
 
+  /**
+   * Performs a draw action, pulling one or two questions based on the active mode.
+   */
   function draw() {
     if (timer.isAnswerActive()) {
       return;
@@ -498,6 +591,9 @@
     renderQuestionList();
   }
 
+  /**
+   * Resets the stage back to the idle state and clears timers.
+   */
   function reset() {
     cardSlots.forEach((slot) => applyQuestionToSlot(slot, null));
     timer.resetAll();
@@ -507,6 +603,9 @@
     renderQuestionList();
   }
 
+  /**
+   * Renders the interactive sidebar list of questions based on active filters.
+   */
   function renderQuestionList() {
     if (!questionListEl) {
       return;
@@ -587,6 +686,10 @@
     refreshAllMasteryStates();
   }
 
+  /**
+   * Adds a ripple visual effect to the draw button upon clicking.
+   * @param {Event} e - The click or touch event.
+   */
   function addRipple(e) {
     try {
       const rect = drawBtn.getBoundingClientRect();

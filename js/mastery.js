@@ -2,6 +2,11 @@
   const activeBank = global.localStorage?.getItem('active_bank') || 'swps';
   const STORAGE_KEY = activeBank === 'uwr' ? 'uwr-mastered-questions.v1' : 'swps-mastered-questions.v3';
 
+  /**
+   * Sanitizes and parses an index value to ensure it is a valid non-negative integer.
+   * @param {number|string} index - The index to sanitize.
+   * @returns {number|null} The sanitized integer index, or null if invalid.
+   */
   function sanitizeIndex(index) {
     if (typeof index === 'number' && Number.isInteger(index) && index >= 0) {
       return index;
@@ -15,6 +20,10 @@
     return null;
   }
 
+  /**
+   * Retrieves the current set of mastered questions from localStorage.
+   * @returns {Set<number>} A Set containing the indices of mastered questions.
+   */
   function loadMastered() {
     try {
       const raw = global.localStorage?.getItem(STORAGE_KEY);
@@ -35,6 +44,10 @@
     }
   }
 
+  /**
+   * Saves the current set of mastered questions to localStorage.
+   * @param {Set<number>} set - The Set of mastered question indices to save.
+   */
   function persist(set) {
     try {
       const payload = JSON.stringify(Array.from(set.values()));
@@ -47,6 +60,9 @@
   const listeners = new Set();
   let masteredSet = loadMastered();
 
+  /**
+   * Notifies all subscribed listeners with a snapshot of the current state.
+   */
   function emit() {
     const snapshot = new Set(masteredSet);
     listeners.forEach((listener) => {
@@ -58,6 +74,12 @@
     });
   }
 
+  /**
+   * Sets the mastery status of a specific question index.
+   * @param {number|string} index - The index of the question.
+   * @param {boolean} flag - True to mark as mastered, false to unmark.
+   * @returns {boolean} The new mastery status of the question.
+   */
   function setMastered(index, flag) {
     const cleanIndex = sanitizeIndex(index);
     if (cleanIndex === null) {
@@ -78,6 +100,11 @@
     return nextFlag;
   }
 
+  /**
+   * Toggles the mastery status of a specific question index.
+   * @param {number|string} index - The index of the question.
+   * @returns {boolean} The new mastery status of the question.
+   */
   function toggleMastered(index) {
     const cleanIndex = sanitizeIndex(index);
     if (cleanIndex === null) {
@@ -87,6 +114,11 @@
     return setMastered(cleanIndex, shouldBeMastered);
   }
 
+  /**
+   * Checks if a given question is marked as mastered.
+   * @param {number|string} index - The index of the question.
+   * @returns {boolean} True if the question is mastered.
+   */
   function isMastered(index) {
     const cleanIndex = sanitizeIndex(index);
     if (cleanIndex === null) {
@@ -95,10 +127,17 @@
     return masteredSet.has(cleanIndex);
   }
 
+  /**
+   * Returns a copy of the entire set of mastered question indices.
+   * @returns {Set<number>} The mastered question indices.
+   */
   function getAll() {
     return new Set(masteredSet);
   }
 
+  /**
+   * Clears all mastered questions and persists the empty state.
+   */
   function clearAll() {
     if (masteredSet.size === 0) {
       return;
@@ -108,6 +147,11 @@
     emit();
   }
 
+  /**
+   * Subscribes a listener function to mastery state changes.
+   * @param {Function} listener - The callback to execute on changes.
+   * @returns {Function} An unsubscribe function to remove the listener.
+   */
   function subscribe(listener) {
     if (typeof listener !== 'function') {
       return () => {};

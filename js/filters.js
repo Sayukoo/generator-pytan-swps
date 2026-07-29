@@ -1,6 +1,12 @@
 (function (global) {
   'use strict';
 
+  /**
+   * Converts a string to a URL-friendly slug.
+   * @param {string} text - The text to slugify.
+   * @param {string} fallback - The fallback string if the text is empty or invalid.
+   * @returns {string} The slugified text.
+   */
   function slugify(text, fallback) {
     if (typeof text !== 'string' || text.trim() === '') {
       return fallback;
@@ -13,6 +19,16 @@
       .replace(/^-+|-+$/g, '') || fallback;
   }
 
+  /**
+   * Creates a filter menu controller that manages state and UI for question filtering.
+   * @param {Object} options - Configuration options for the filter menu.
+   * @param {HTMLElement} options.tagListEl - The DOM element to render tags into.
+   * @param {HTMLElement} options.clearButton - The button used to clear filters.
+   * @param {HTMLInputElement} options.hideMasteredEl - The checkbox to toggle hiding mastered items.
+   * @param {Array<string>} options.tags - The list of tags to display.
+   * @param {Object} options.tagColors - A mapping of tag names to color strings.
+   * @returns {Object} The filter menu interface.
+   */
   function createFilterMenu({
     tagListEl,
     clearButton,

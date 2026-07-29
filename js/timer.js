@@ -3,6 +3,11 @@
 
   const DRAW_LABEL = 'Losuj';
 
+  /**
+   * Formats total seconds into a MM:SS string representation.
+   * @param {number} totalSeconds - The total seconds to format.
+   * @returns {string} The formatted time string.
+   */
   function formatTime(totalSeconds) {
     const minutes = Math.floor(totalSeconds / 60)
       .toString()
@@ -13,6 +18,16 @@
     return `${minutes}:${seconds}`;
   }
 
+  /**
+   * Creates a timer manager instance for handling selection and answer phases.
+   * @param {Object} options - Configuration options.
+   * @param {HTMLElement} options.drawBtn - The draw button element to update.
+   * @param {number} [options.selectionDuration=40] - Duration in seconds for the selection phase.
+   * @param {number} [options.answerDuration=120] - Duration in seconds for the answer phase.
+   * @param {Function} [options.onSelectionTimeout] - Callback executed when selection times out.
+   * @param {Function} [options.onAnswerComplete] - Callback executed when answer times out.
+   * @returns {Object} The timer manager interface.
+   */
   function createTimerManager({
     drawBtn,
     selectionDuration = 40,
