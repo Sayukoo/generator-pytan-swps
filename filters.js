@@ -13,39 +13,27 @@
       .replace(/^-+|-+$/g, '') || fallback;
   }
 
-  function toArray(value) {
-    return Array.isArray(value) ? value : [];
-  }
-
   function createFilterMenu({
-    toggleEl,
-    closeEl,
-    panelEl,
-    backdropEl,
-    includeMasteredEl,
-    includeUnmasteredEl,
     tagListEl,
     clearButton,
+    hideMasteredEl,
     tags = [],
     tagColors = {},
   } = {}) {
-    if (!toggleEl || !panelEl || !tagListEl) {
-      throw new Error('Brak wymaganych elementów do utworzenia menu filtrów.');
+    if (!tagListEl) {
+      throw new Error('Brak kontenera tagów.');
     }
 
     const state = {
-      includeMastered: includeMasteredEl ? Boolean(includeMasteredEl.checked) : true,
-      includeUnmastered: includeUnmasteredEl ? Boolean(includeUnmasteredEl.checked) : true,
+      hideMastered: hideMasteredEl ? Boolean(hideMasteredEl.checked) : false,
       selectedTags: new Set(),
     };
 
     const listeners = new Set();
-    let isOpen = false;
 
     function emit() {
       const snapshot = {
-        includeMastered: state.includeMastered,
-        includeUnmastered: state.includeUnmastered,
+        hideMastered: state.hideMastered,
         selectedTags: new Set(state.selectedTags),
       };
       listeners.forEach((listener) => {
@@ -57,68 +45,9 @@
       });
     }
 
-    function ensureBodyClass(flag) {
-      if (flag) {
-        document.body.classList.add('menu-open');
-      } else {
-        document.body.classList.remove('menu-open');
-      }
-    }
-
-    function setMenuOpen(flag) {
-      if (isOpen === flag) {
-        return;
-      }
-      isOpen = flag;
-      toggleEl.setAttribute('aria-expanded', String(flag));
-      panelEl.classList.toggle('is-open', flag);
-      panelEl.setAttribute('aria-hidden', String(!flag));
-      if (backdropEl) {
-        backdropEl.classList.toggle('is-open', flag);
-      }
-      ensureBodyClass(flag);
-      if (flag) {
-        const firstInteractive = panelEl.querySelector('input, button, select, textarea, [tabindex]:not([tabindex="-1"])');
-        if (firstInteractive) {
-          firstInteractive.focus({ preventScroll: true });
-        }
-        document.addEventListener('keydown', handleKeydown);
-      } else {
-        document.removeEventListener('keydown', handleKeydown);
-        toggleEl.focus({ preventScroll: true });
-      }
-    }
-
-    function toggleMenu() {
-      setMenuOpen(!isOpen);
-    }
-
-    function closeMenu() {
-      setMenuOpen(false);
-    }
-
-    function handleKeydown(event) {
-      if (event.key === 'Escape') {
-        event.preventDefault();
-        closeMenu();
-      }
-    }
-
-    toggleEl.addEventListener('click', toggleMenu);
-    if (closeEl) {
-      closeEl.addEventListener('click', closeMenu);
-    }
-    if (backdropEl) {
-      backdropEl.addEventListener('click', closeMenu);
-    }
-
-    panelEl.addEventListener('click', (event) => {
-      event.stopPropagation();
-    });
-
     const uniqueTags = Array.from(
       new Set(
-        toArray(tags)
+        (Array.isArray(tags) ? tags : [])
           .map((tag) => (typeof tag === 'string' ? tag.trim() : ''))
           .filter((tag) => tag.length > 0),
       ),
@@ -126,15 +55,15 @@
 
     uniqueTags.forEach((tag, index) => {
       const option = document.createElement('label');
-      option.className = 'filter-tag-option';
+      option.className = 'tag-chip';
       const color = typeof tagColors[tag] === 'string' ? tagColors[tag] : '';
       if (color) {
         option.style.setProperty('--tag-dot-color', color);
       }
+
       const input = document.createElement('input');
       input.type = 'checkbox';
-      const id = `filter-tag-${slugify(tag, `tag-${index}`)}-${index}`;
-      input.id = id;
+      input.id = `filter-tag-${slugify(tag, `tag-${index}`)}-${index}`;
       input.value = tag;
       input.addEventListener('change', () => {
         if (input.checked) {
@@ -144,31 +73,24 @@
         }
         emit();
       });
-      const faux = document.createElement('span');
-      faux.className = 'checkbox-indicator';
+
       const dot = document.createElement('span');
       dot.className = 'tag-dot';
       dot.setAttribute('aria-hidden', 'true');
+
       const labelText = document.createElement('span');
-      labelText.className = 'label-text';
+      labelText.className = 'tag-chip__label';
       labelText.textContent = tag;
 
       option.appendChild(input);
-      option.appendChild(faux);
       option.appendChild(dot);
       option.appendChild(labelText);
       tagListEl.appendChild(option);
     });
 
-    if (includeMasteredEl) {
-      includeMasteredEl.addEventListener('change', () => {
-        state.includeMastered = Boolean(includeMasteredEl.checked);
-        emit();
-      });
-    }
-    if (includeUnmasteredEl) {
-      includeUnmasteredEl.addEventListener('change', () => {
-        state.includeUnmastered = Boolean(includeUnmasteredEl.checked);
+    if (hideMasteredEl) {
+      hideMasteredEl.addEventListener('change', () => {
+        state.hideMastered = Boolean(hideMasteredEl.checked);
         emit();
       });
     }
@@ -176,17 +98,12 @@
     if (clearButton) {
       clearButton.addEventListener('click', () => {
         state.selectedTags.clear();
-        const inputs = tagListEl.querySelectorAll('input[type="checkbox"]');
-        inputs.forEach((checkbox) => {
+        tagListEl.querySelectorAll('input[type="checkbox"]').forEach((checkbox) => {
           checkbox.checked = false;
         });
-        if (includeMasteredEl) {
-          includeMasteredEl.checked = true;
-          state.includeMastered = true;
-        }
-        if (includeUnmasteredEl) {
-          includeUnmasteredEl.checked = true;
-          state.includeUnmastered = true;
+        if (hideMasteredEl) {
+          hideMasteredEl.checked = false;
+          state.hideMastered = false;
         }
         emit();
       });
@@ -194,8 +111,7 @@
 
     function getState() {
       return {
-        includeMastered: state.includeMastered,
-        includeUnmastered: state.includeUnmastered,
+        hideMastered: state.hideMastered,
         selectedTags: new Set(state.selectedTags),
       };
     }
@@ -212,10 +128,6 @@
     }
 
     return {
-      open: () => setMenuOpen(true),
-      close: () => setMenuOpen(false),
-      toggle: toggleMenu,
-      isOpen: () => isOpen,
       getState,
       subscribe,
     };

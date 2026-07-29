@@ -351,4 +351,6 @@
 
   global.QUESTIONS = QUESTIONS;
   global.ACTIVE_BANK = activeBank;
+  global.SWPS_QUESTIONS = SWPS_QUESTIONS;
+  global.UWR_QUESTIONS = UWR_QUESTIONS;
 })(window);

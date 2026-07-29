@@ -1,10 +1,10 @@
 (function () {
   'use strict';
 
-  const { QUESTIONS, masteryManager, createTimerManager, createFilterMenu } = window;
+  const { QUESTIONS, masteryManager, createTimerManager, createFilterMenu, ACTIVE_BANK } = window;
 
   if (!Array.isArray(QUESTIONS) || QUESTIONS.length === 0) {
-    throw new Error('Brak danych pytań. Upewnij się, że questions.js został załadowany przed script.js.');
+    throw new Error('Brak danych pytań.');
   }
   if (!masteryManager || typeof masteryManager.isMastered !== 'function') {
     throw new Error('Moduł masteryManager nie jest dostępny.');
@@ -16,33 +16,27 @@
     throw new Error('Filter menu module is not loaded.');
   }
 
-  const mastery = masteryManager;
+  const activeBank = ACTIVE_BANK || 'swps';
+  const isUwr = activeBank === 'uwr';
 
-  const numA = document.getElementById('numA');
-  const numB = document.getElementById('numB');
+  const mastery = masteryManager;
   const drawBtn = document.getElementById('drawBtn');
   const resetBtn = document.getElementById('resetBtn');
   const helpBtn = document.getElementById('helpBtn');
   const helpDialog = document.getElementById('helpDialog');
   const closeHelpBtn = document.getElementById('closeHelp');
-  const menuToggle = document.getElementById('menuToggle');
-  const menuClose = document.getElementById('menuClose');
-  const menuPanel = document.getElementById('menuPanel');
-  const menuBackdrop = document.getElementById('menuBackdrop');
-  const includeMasteredEl = document.getElementById('filterIncludeMastered');
-  const includeUnmasteredEl = document.getElementById('filterIncludeUnmastered');
   const tagsContainer = document.getElementById('filterTagList');
   const clearFiltersBtn = document.getElementById('filterClear');
-  const masteryOverviewEl = document.getElementById('masteryOverview');
-  const listUnmasteredEl = document.getElementById('listUnmastered');
-  const listMasteredEl = document.getElementById('listMastered');
-  const countUnmasteredEl = document.getElementById('countUnmastered');
-  const countMasteredEl = document.getElementById('countMastered');
+  const hideMasteredEl = document.getElementById('filterHideMastered');
+  const questionListEl = document.getElementById('questionList');
   const navMasteredCountEl = document.getElementById('navMasteredCount');
   const navTotalCountEl = document.getElementById('navTotalCount');
   const navSubtitleEl = document.getElementById('navSubtitle');
   const tabSwpsBtn = document.getElementById('tab-swps');
   const tabUwrBtn = document.getElementById('tab-uwr');
+  const cardsRoot = document.getElementById('cardsRoot');
+  const numA = document.getElementById('numA');
+  const numB = document.getElementById('numB');
 
   if (!drawBtn || !resetBtn || !helpBtn || !helpDialog || !closeHelpBtn) {
     throw new Error('Nie udało się zainicjalizować elementów interfejsu.');
@@ -52,28 +46,30 @@
     navTotalCountEl.textContent = String(QUESTIONS.length);
   }
   if (navSubtitleEl) {
-    navSubtitleEl.textContent = `${QUESTIONS.length} pytań egzaminacyjnych`;
+    navSubtitleEl.textContent = isUwr
+      ? `${QUESTIONS.length} pytań · timer 3 min`
+      : `${QUESTIONS.length} pytań egzaminacyjnych`;
   }
 
-  const activeBank = window.ACTIVE_BANK || 'swps';
+  if (cardsRoot) {
+    cardsRoot.dataset.mode = isUwr ? 'single' : 'pair';
+  }
+
   if (tabSwpsBtn && tabUwrBtn) {
-    if (activeBank === 'uwr') {
-      tabUwrBtn.setAttribute('aria-selected', 'true');
-      tabUwrBtn.classList.add('is-active');
-    } else {
-      tabSwpsBtn.setAttribute('aria-selected', 'true');
-      tabSwpsBtn.classList.add('is-active');
-    }
+    tabSwpsBtn.setAttribute('aria-selected', String(!isUwr));
+    tabUwrBtn.setAttribute('aria-selected', String(isUwr));
+    tabSwpsBtn.classList.toggle('is-active', !isUwr);
+    tabUwrBtn.classList.toggle('is-active', isUwr);
 
     tabSwpsBtn.addEventListener('click', () => {
-      if (activeBank !== 'swps') {
+      if (isUwr) {
         window.localStorage.setItem('active_bank', 'swps');
         window.location.reload();
       }
     });
 
     tabUwrBtn.addEventListener('click', () => {
-      if (activeBank !== 'uwr') {
+      if (!isUwr) {
         window.localStorage.setItem('active_bank', 'uwr');
         window.location.reload();
       }
@@ -86,10 +82,23 @@
       numEl: cardEl.querySelector('.num'),
       questionEl: cardEl.querySelector('.question'),
       tagsEl: cardEl.querySelector('.card-tags'),
+      masteryBtn: cardEl.querySelector('.card-mastery'),
       questionIndex: null,
     };
+    if (slot.masteryBtn) {
+      slot.masteryBtn.addEventListener('click', (event) => {
+        event.stopPropagation();
+        if (typeof slot.questionIndex === 'number') {
+          mastery.toggleMastered(slot.questionIndex);
+        }
+      });
+    }
     return slot;
   });
+
+  if (isUwr && cardSlots[1]) {
+    cardSlots[1].cardEl.hidden = true;
+  }
 
   const DEFAULT_TAG_COLOR = '#7f8c8d';
   const TAG_COLOR_MAP = {
@@ -107,8 +116,7 @@
     'Psychologia zdrowia': '#00b894',
     'Praca i organizacja': '#6c5ce7',
     'Psychologia edukacji': '#fdcb6e',
-    'Zestaw egzaminacyjny': '#10ac84',
-    ...(typeof window.TAG_COLORS === 'object' && window.TAG_COLORS !== null ? window.TAG_COLORS : {}),
+    'Zestaw egzaminacyjny': '#5eead4',
   };
 
   const TAG_ORDER = [
@@ -126,6 +134,7 @@
     'Psychologia zdrowia',
     'Praca i organizacja',
     'Psychologia edukacji',
+    'Zestaw egzaminacyjny',
   ];
 
   function normalizeHex(hex) {
@@ -134,10 +143,7 @@
     }
     const trimmed = hex.trim().replace(/^#/, '');
     if (trimmed.length === 3) {
-      return trimmed
-        .split('')
-        .map((ch) => ch + ch)
-        .join('');
+      return trimmed.split('').map((ch) => ch + ch).join('');
     }
     if (trimmed.length === 6) {
       return trimmed;
@@ -159,104 +165,22 @@
     return { r, g, b };
   }
 
-  function rgbToString({ r, g, b }) {
-    return `rgb(${r}, ${g}, ${b})`;
-  }
-
-  function rgbaToString({ r, g, b }, alpha) {
-    return `rgba(${r}, ${g}, ${b}, ${Math.max(0, Math.min(1, alpha))})`;
-  }
-
   function getTagVariants(tag) {
-    const rgb = hexToRgb(TAG_COLOR_MAP[tag] ?? DEFAULT_TAG_COLOR) ?? hexToRgb(DEFAULT_TAG_COLOR);
-    if (!rgb) {
-      return {
-        strong: '#7f8c8d',
-        soft: 'rgba(127, 140, 141, 0.22)',
-        accent: 'rgba(127, 140, 141, 0.28)',
-        subtle: 'rgba(127, 140, 141, 0.12)',
-        text: '#f9f9f9',
-        onDark: '#bdc3c7',
-      };
-    }
+    const rgb = hexToRgb(TAG_COLOR_MAP[tag] ?? DEFAULT_TAG_COLOR) ?? { r: 127, g: 140, b: 141 };
     return {
-      strong: rgbToString(rgb),
-      soft: rgbaToString(rgb, 0.22),
-      accent: rgbaToString(rgb, 0.28),
-      subtle: rgbaToString(rgb, 0.12),
+      strong: `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`,
+      soft: `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.2)`,
+      onDark: `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`,
       text: '#f9f9f9',
-      onDark: rgbToString(rgb),
     };
   }
-  if (cardSlots.length === 0) {
-    throw new Error('Brak kart w interfejsie.');
-  }
-
-  const cardEls = cardSlots.map((slot) => slot.cardEl);
-  const slotByCard = new Map(cardSlots.map((slot) => [slot.cardEl, slot]));
-  const masteryGroups = masteryOverviewEl
-    ? Array.from(masteryOverviewEl.querySelectorAll('.mastery-group'))
-    : [];
-
-  masteryGroups.forEach((groupEl) => {
-    if (!groupEl.dataset.collapsed) {
-      groupEl.dataset.collapsed = 'false';
-    }
-    const headerBtn = groupEl.querySelector('.mastery-group__header');
-    if (headerBtn) {
-      headerBtn.setAttribute('aria-expanded', groupEl.dataset.collapsed !== 'true' ? 'true' : 'false');
-    }
-    const listEl = groupEl.querySelector('.mastery-list');
-    if (listEl) {
-      listEl.setAttribute('aria-hidden', groupEl.dataset.collapsed === 'true' ? 'true' : 'false');
-    }
-  });
-
-  if (masteryOverviewEl) {
-    masteryOverviewEl.addEventListener('click', (event) => {
-      const headerBtn = event.target.closest('.mastery-group__header');
-      if (headerBtn) {
-        const groupEl = headerBtn.closest('.mastery-group');
-        if (groupEl) {
-          const isCollapsed = groupEl.dataset.collapsed === 'true';
-          const next = !isCollapsed;
-          groupEl.dataset.collapsed = next ? 'true' : 'false';
-          headerBtn.setAttribute('aria-expanded', String(!next));
-          const listEl = groupEl.querySelector('.mastery-list');
-          if (listEl) {
-            listEl.setAttribute('aria-hidden', next ? 'true' : 'false');
-          }
-        }
-        return;
-      }
-      const target = event.target.closest('.mastery-item');
-      if (!target || target.classList.contains('mastery-item--empty')) {
-        return;
-      }
-      const index = Number.parseInt(target.dataset.index, 10);
-      if (Number.isInteger(index)) {
-        mastery.toggleMastered(index);
-      }
-    });
-  }
-
-  helpBtn.addEventListener('click', () => {
-    helpDialog.showModal();
-  });
-  closeHelpBtn.addEventListener('click', () => {
-    helpDialog.close();
-  });
 
   function getUniqueTags(data) {
     const tagSet = new Set();
     data.forEach((item) => {
-      if (!item || !Array.isArray(item.tags)) {
-        return;
-      }
-      item.tags.forEach((tag) => {
-        const trimmed = typeof tag === 'string' ? tag.trim() : '';
-        if (trimmed) {
-          tagSet.add(trimmed);
+      (item?.tags || []).forEach((tag) => {
+        if (typeof tag === 'string' && tag.trim()) {
+          tagSet.add(tag.trim());
         }
       });
     });
@@ -272,45 +196,41 @@
   }
 
   const filterMenu = createFilterMenu({
-    toggleEl: menuToggle,
-    closeEl: menuClose,
-    panelEl: menuPanel,
-    backdropEl: menuBackdrop,
-    includeMasteredEl,
-    includeUnmasteredEl,
     tagListEl: tagsContainer,
     clearButton: clearFiltersBtn,
+    hideMasteredEl,
     tags: getUniqueTags(QUESTIONS),
     tagColors: TAG_COLOR_MAP,
   });
 
   const timer = createTimerManager({
     drawBtn,
-    selectionDuration: 40,
-    answerDuration: 120,
+    selectionDuration: isUwr ? 1 : 40,
+    answerDuration: isUwr ? 180 : 120,
     onSelectionTimeout: handleSelectionTimeout,
-    onAnswerComplete: handleAnswerComplete,
+    onAnswerComplete: () => {},
   });
+
+  if (isUwr) {
+    timer.setDurations({ answerDuration: 180 });
+  }
 
   mastery.subscribe(() => {
     refreshAllMasteryStates();
     updateDrawAvailability();
-    renderMasteryOverview();
+    renderQuestionList();
   });
 
   filterMenu.subscribe(() => {
     updateDrawAvailability();
-    renderMasteryOverview();
+    renderQuestionList();
   });
 
-  function getCardQuestion(cardEl) {
-    const slot = slotByCard.get(cardEl);
-    if (!slot || typeof slot.questionIndex !== 'number') {
-      return '';
-    }
-    const entry = QUESTIONS[slot.questionIndex];
-    return entry && typeof entry.text === 'string' ? entry.text : '';
-  }
+  helpBtn.addEventListener('click', () => helpDialog.showModal());
+  closeHelpBtn.addEventListener('click', () => helpDialog.close());
+
+  const cardEls = cardSlots.map((slot) => slot.cardEl);
+  const slotByCard = new Map(cardSlots.map((slot) => [slot.cardEl, slot]));
 
   function clearSelectionStyles() {
     cardEls.forEach((card) => {
@@ -320,12 +240,17 @@
 
   function setCardsIdle(isIdle) {
     cardEls.forEach((card) => {
-      card.classList.toggle('idle', isIdle);
+      if (!card.hidden) {
+        card.classList.toggle('idle', isIdle);
+      }
     });
   }
 
   function applySelectionStyles(cardEl, { autoPicked = false } = {}) {
     cardEls.forEach((card) => {
+      if (card.hidden) {
+        return;
+      }
       if (card === cardEl) {
         card.classList.add('selected');
         card.classList.toggle('auto-picked', autoPicked);
@@ -338,119 +263,25 @@
   }
 
   function refreshCardMasteryState(slot) {
-    if (!slot || !slot.cardEl) {
+    if (!slot?.cardEl) {
       return;
     }
     const hasQuestion = typeof slot.questionIndex === 'number';
     const isMastered = hasQuestion && mastery.isMastered(slot.questionIndex);
     slot.cardEl.classList.toggle('has-question', hasQuestion);
     slot.cardEl.classList.toggle('mastered', Boolean(isMastered));
-    if (slot.toggleBtn) {
-      slot.toggleBtn.disabled = !hasQuestion;
-      slot.toggleBtn.textContent = hasQuestion
-        ? (isMastered ? 'Przywróć do losowania' : 'Oznacz jako opanowane')
-        : 'Oznacz jako opanowane';
-      slot.toggleBtn.setAttribute('aria-pressed', String(Boolean(isMastered)));
+    if (slot.masteryBtn) {
+      slot.masteryBtn.hidden = !hasQuestion;
+      slot.masteryBtn.textContent = isMastered ? 'Przywróć' : 'Opanowane';
+      slot.masteryBtn.setAttribute('aria-pressed', String(Boolean(isMastered)));
     }
   }
 
   function refreshAllMasteryStates() {
     cardSlots.forEach((slot) => refreshCardMasteryState(slot));
-  }
-
-  function updateMasteryList(targetEl, indices, activeSet, currentSet) {
-    if (!targetEl) {
-      return;
-    }
-    targetEl.innerHTML = '';
-    if (!Array.isArray(indices) || indices.length === 0) {
-      const empty = document.createElement('li');
-      empty.className = 'mastery-item mastery-item--empty';
-      empty.textContent = 'Brak pytań';
-      targetEl.appendChild(empty);
-      return;
-    }
-    indices.forEach((idx) => {
-      const entry = QUESTIONS[idx];
-      const item = document.createElement('li');
-      item.className = 'mastery-item';
-      if (activeSet.has(idx)) {
-        item.classList.add('is-active');
-      }
-      if (currentSet.has(idx)) {
-        item.classList.add('is-current');
-      }
-      item.dataset.index = String(idx);
-
-      const num = document.createElement('span');
-      num.className = 'mastery-item__num';
-      num.textContent = String(idx + 1).padStart(2, '0');
-
-      const text = document.createElement('span');
-      text.className = 'mastery-item__text';
-      text.textContent = entry && typeof entry.text === 'string' ? entry.text : '';
-
-      const primaryTag = Array.isArray(entry?.tags) && entry.tags.length > 0
-        ? entry.tags[0]
-        : '';
-      const variants = getTagVariants(primaryTag);
-      item.style.setProperty('--tag-color', variants.soft);
-      item.style.setProperty('--tag-color-strong', variants.strong);
-      item.style.setProperty('--mastery-text-color', variants.text);
-      item.title = text.textContent;
-
-      item.appendChild(num);
-      item.appendChild(text);
-      targetEl.appendChild(item);
-    });
-  }
-
-  function renderMasteryOverview() {
-    if (!listMasteredEl || !listUnmasteredEl) {
-      return;
-    }
-    const masteredSet = mastery.getAll();
-    const activeSet = new Set(getCandidateIndices());
-    const currentSet = new Set(
-      cardSlots
-        .map((slot) => slot.questionIndex)
-        .filter((idx) => typeof idx === 'number'),
-    );
-    const masteredIndices = [];
-    const unmasteredIndices = [];
-    QUESTIONS.forEach((_, idx) => {
-      if (masteredSet.has(idx)) {
-        masteredIndices.push(idx);
-      } else {
-        unmasteredIndices.push(idx);
-      }
-    });
-
-    updateMasteryList(listUnmasteredEl, unmasteredIndices, activeSet, currentSet);
-    updateMasteryList(listMasteredEl, masteredIndices, activeSet, currentSet);
-    const unmasteredGroup = listUnmasteredEl.closest('.mastery-group');
-    if (unmasteredGroup) {
-      listUnmasteredEl.setAttribute(
-        'aria-hidden',
-        unmasteredGroup.dataset.collapsed === 'true' ? 'true' : 'false',
-      );
-    }
-    const masteredGroup = listMasteredEl.closest('.mastery-group');
-    if (masteredGroup) {
-      listMasteredEl.setAttribute(
-        'aria-hidden',
-        masteredGroup.dataset.collapsed === 'true' ? 'true' : 'false',
-      );
-    }
-
-    if (countUnmasteredEl) {
-      countUnmasteredEl.textContent = String(unmasteredIndices.length);
-    }
-    if (countMasteredEl) {
-      countMasteredEl.textContent = String(masteredIndices.length);
-    }
+    const masteredCount = mastery.getAll().size;
     if (navMasteredCountEl) {
-      navMasteredCountEl.textContent = String(masteredIndices.length);
+      navMasteredCountEl.textContent = String(masteredCount);
     }
   }
 
@@ -475,9 +306,22 @@
       const variants = getTagVariants(trimmed);
       pill.style.setProperty('--tag-color', variants.soft);
       pill.style.setProperty('--tag-color-strong', variants.strong);
-      pill.style.setProperty('--tag-color-text', variants.text);
       tagsEl.appendChild(pill);
     });
+  }
+
+  function animateCard(slot) {
+    if (!slot?.cardEl || slot.cardEl.hidden) {
+      return;
+    }
+    slot.cardEl.classList.remove('pop', 'glow');
+    void slot.cardEl.offsetWidth;
+    slot.cardEl.classList.add('pop', 'glow');
+    if (slot.numEl) {
+      slot.numEl.classList.remove('flip');
+      void slot.numEl.offsetWidth;
+      slot.numEl.classList.add('flip');
+    }
   }
 
   function applyQuestionToSlot(slot, questionIndex) {
@@ -490,35 +334,35 @@
       && questionIndex < QUESTIONS.length;
     slot.questionIndex = hasQuestion ? questionIndex : null;
     const entry = hasQuestion ? QUESTIONS[questionIndex] : null;
-    const text = entry && typeof entry.text === 'string' ? entry.text : '';
-    const tags = entry && Array.isArray(entry.tags) ? entry.tags : [];
+    const text = entry?.text || '';
+    const tags = entry?.tags || [];
+
     if (slot.numEl) {
       slot.numEl.textContent = hasQuestion ? String(questionIndex + 1) : '?';
     }
     if (slot.questionEl) {
       slot.questionEl.textContent = text;
     }
-    if (slot.tagsEl) {
-      renderTags(slot.tagsEl, tags);
-    }
+    renderTags(slot.tagsEl, tags);
+
     if (slot.cardEl) {
       if (hasQuestion && tags.length > 0) {
-      const variants = getTagVariants(tags[0]);
-      slot.cardEl.classList.add('card-accented');
-      slot.cardEl.style.setProperty('--card-accent', variants.soft);
-      slot.cardEl.style.setProperty('--card-accent-strong', variants.strong);
-      slot.cardEl.style.setProperty('--card-accent-text', variants.onDark);
-    } else {
+        const variants = getTagVariants(tags[0]);
+        slot.cardEl.classList.add('card-accented');
+        slot.cardEl.style.setProperty('--card-accent', variants.soft);
+        slot.cardEl.style.setProperty('--card-accent-strong', variants.strong);
+        slot.cardEl.style.setProperty('--card-accent-text', variants.onDark);
+      } else {
         slot.cardEl.classList.remove('card-accented');
         slot.cardEl.style.removeProperty('--card-accent');
         slot.cardEl.style.removeProperty('--card-accent-strong');
         slot.cardEl.style.removeProperty('--card-accent-text');
       }
-    }
-    if (hasQuestion) {
-      slot.cardEl.dataset.questionIndex = String(questionIndex);
-    } else {
-      delete slot.cardEl.dataset.questionIndex;
+      if (hasQuestion) {
+        slot.cardEl.dataset.questionIndex = String(questionIndex);
+      } else {
+        delete slot.cardEl.dataset.questionIndex;
+      }
     }
     refreshCardMasteryState(slot);
   }
@@ -545,7 +389,10 @@
     if (timer.isAnswerActive() || timer.isSelectionActive()) {
       return;
     }
-    const available = cardSlots.filter((slot) => typeof slot.questionIndex === 'number');
+    if (isUwr) {
+      return;
+    }
+    const available = cardSlots.filter((slot) => !slot.cardEl.hidden && typeof slot.questionIndex === 'number');
     if (available.length === 0) {
       return;
     }
@@ -557,216 +404,13 @@
     }
   }
 
-  function handleAnswerComplete() {
-    // dodatkowe efekty po zakończeniu odliczania mogą zostać dodane w przyszłości
-  }
-
   cardEls.forEach((cardEl) => {
     cardEl.addEventListener('click', () => {
-      handleAnswerStart(cardEl);
-    });
-  });
-
-  function pickRandomIndex(pool) {
-    if (!Array.isArray(pool) || pool.length === 0) {
-      return null;
-    }
-    const idx = randInt(0, pool.length - 1);
-    return pool[idx] ?? null;
-  }
-
-  function getCandidateIndices() {
-    const state = filterMenu.getState();
-    const includeMastered = Boolean(state.includeMastered);
-    const includeUnmastered = Boolean(state.includeUnmastered);
-    const tagFilter = state.selectedTags instanceof Set ? state.selectedTags : new Set();
-    const hasTagFilter = tagFilter.size > 0;
-    const matches = [];
-    for (let i = 0; i < QUESTIONS.length; i += 1) {
-      const entry = QUESTIONS[i];
-      const isMastered = mastery.isMastered(i);
-      if (isMastered && !includeMastered) {
-        continue;
-      }
-      if (!isMastered && !includeUnmastered) {
-        continue;
-      }
-      if (hasTagFilter) {
-        const questionTags = Array.isArray(entry.tags) ? entry.tags : [];
-        let hasMatch = false;
-        for (let j = 0; j < questionTags.length; j += 1) {
-          const tag = questionTags[j];
-          if (tagFilter.has(tag)) {
-            hasMatch = true;
-            break;
-          }
-        }
-        if (!hasMatch) {
-          continue;
-        }
-      }
-      matches.push(i);
-    }
-    return matches;
-  }
-
-  function selectQuestionPair() {
-    const candidates = getCandidateIndices();
-    if (candidates.length === 0) {
-      return [null, null];
-    }
-    const state = filterMenu.getState();
-    const preferUnmastered = Boolean(state.includeUnmastered);
-    const masteredSet = mastery.getAll();
-    const unmasteredCandidates = candidates.filter((idx) => !masteredSet.has(idx));
-
-    const firstPool = preferUnmastered && unmasteredCandidates.length > 0
-      ? unmasteredCandidates
-      : candidates;
-    const firstIndex = pickRandomIndex(firstPool);
-    if (firstIndex === null) {
-      return [null, null];
-    }
-    const remaining = candidates.filter((idx) => idx !== firstIndex);
-    if (remaining.length === 0) {
-      return [firstIndex, null];
-    }
-    let secondPool = remaining;
-    if (preferUnmastered) {
-      const unmasteredRemaining = remaining.filter((idx) => !masteredSet.has(idx));
-      if (unmasteredRemaining.length > 0) {
-        secondPool = unmasteredRemaining;
-      }
-    }
-    const secondIndex = pickRandomIndex(secondPool);
-    return [firstIndex, secondIndex];
-  }
-
-  function updateDrawAvailability() {
-    const candidates = getCandidateIndices();
-    const hasCandidates = candidates.length > 0;
-    if (drawBtn && !timer.isAnswerActive()) {
-      drawBtn.disabled = !hasCandidates;
-    }
-    if (drawBtn) {
-      drawBtn.classList.toggle('no-candidates', !hasCandidates);
-    }
-    if (!timer.isAnswerActive() && !timer.isSelectionActive()) {
-      timer.setButtonLabel(hasCandidates ? timer.DRAW_LABEL : 'Brak pytań');
-    }
-    return hasCandidates;
-  }
-
-  function draw() {
-    if (timer.isAnswerActive()) {
-      return;
-    }
-    const [firstIndex, secondIndex] = selectQuestionPair();
-    if (firstIndex === null && secondIndex === null) {
-      updateDrawAvailability();
-      renderMasteryOverview();
-      return;
-    }
-    clearSelectionStyles();
-    setCardsIdle(false);
-
-    if (drawBtn) {
-      drawBtn.classList.remove('pulse');
-      void drawBtn.offsetWidth;
-      drawBtn.classList.add('pulse');
-    }
-
-    cardEls.forEach((card) => {
-      card.classList.remove('pop', 'glow');
-      void card.offsetWidth;
-      card.classList.add('pop', 'glow');
-    });
-
-    [numA, numB].forEach((numEl) => {
-      if (!numEl) {
+      if (isUwr) {
         return;
       }
-      numEl.classList.remove('flip');
-      void numEl.offsetWidth;
-      numEl.classList.add('flip');
+      handleAnswerStart(cardEl);
     });
-
-    if (cardSlots[0]) {
-      applyQuestionToSlot(cardSlots[0], firstIndex);
-    }
-    if (cardSlots[1]) {
-      applyQuestionToSlot(cardSlots[1], secondIndex);
-    }
-
-    timer.startSelection();
-    updateDrawAvailability();
-    renderMasteryOverview();
-  }
-
-  function reset() {
-    cardSlots.forEach((slot) => applyQuestionToSlot(slot, null));
-    timer.resetAll();
-    clearSelectionStyles();
-    setCardsIdle(true);
-    updateDrawAvailability();
-    renderMasteryOverview();
-  }
-
-  function addRipple(e) {
-    if (!drawBtn) {
-      return;
-    }
-    try {
-      const rect = drawBtn.getBoundingClientRect();
-      const clientX = e?.clientX ?? (e?.touches && e.touches[0] && e.touches[0].clientX);
-      const clientY = e?.clientY ?? (e?.touches && e.touches[0] && e.touches[0].clientY);
-      const x = (typeof clientX === 'number' ? clientX : (rect.left + rect.width / 2)) - rect.left;
-      const y = (typeof clientY === 'number' ? clientY : (rect.top + rect.height / 2)) - rect.top;
-      const ripple = document.createElement('span');
-      ripple.className = 'ripple';
-      ripple.style.left = `${x}px`;
-      ripple.style.top = `${y}px`;
-      drawBtn.appendChild(ripple);
-      ripple.addEventListener('animationend', () => ripple.remove());
-    } catch (_) {
-      // no-op
-    }
-  }
-
-  function handleDrawButtonClick(event) {
-    if (!drawBtn || drawBtn.disabled) {
-      return;
-    }
-    addRipple(event);
-    draw();
-  }
-
-  if (drawBtn) {
-    drawBtn.addEventListener('click', handleDrawButtonClick);
-    drawBtn.addEventListener(
-      'touchstart',
-      (event) => {
-        if (!drawBtn.disabled) {
-          addRipple(event);
-        }
-      },
-      { passive: true },
-    );
-  }
-  if (resetBtn) {
-    resetBtn.addEventListener('click', reset);
-  }
-
-  document.addEventListener('keydown', (e) => {
-    if (e.code === 'Space') {
-      e.preventDefault();
-      if (!timer.isAnswerActive()) {
-        draw();
-      }
-    }
-    if (e.key && e.key.toLowerCase() === 'r') {
-      reset();
-    }
   });
 
   function randInt(min, max) {
@@ -784,6 +428,307 @@
     } while (value >= limit);
     return min + (value % range);
   }
+
+  function pickRandomIndex(pool) {
+    if (!Array.isArray(pool) || pool.length === 0) {
+      return null;
+    }
+    return pool[randInt(0, pool.length - 1)] ?? null;
+  }
+
+  function getCandidateIndices() {
+    const state = filterMenu.getState();
+    const hideMastered = Boolean(state.hideMastered);
+    const tagFilter = state.selectedTags instanceof Set ? state.selectedTags : new Set();
+    const hasTagFilter = tagFilter.size > 0;
+    const matches = [];
+
+    for (let i = 0; i < QUESTIONS.length; i += 1) {
+      const entry = QUESTIONS[i];
+      const isMastered = mastery.isMastered(i);
+      if (hideMastered && isMastered) {
+        continue;
+      }
+      if (hasTagFilter) {
+        const questionTags = Array.isArray(entry.tags) ? entry.tags : [];
+        if (!questionTags.some((tag) => tagFilter.has(tag))) {
+          continue;
+        }
+      }
+      matches.push(i);
+    }
+    return matches;
+  }
+
+  function selectQuestionPair() {
+    const candidates = getCandidateIndices();
+    if (candidates.length === 0) {
+      return [null, null];
+    }
+    const masteredSet = mastery.getAll();
+    const unmasteredCandidates = candidates.filter((idx) => !masteredSet.has(idx));
+    const firstPool = unmasteredCandidates.length > 0 ? unmasteredCandidates : candidates;
+    const firstIndex = pickRandomIndex(firstPool);
+    if (firstIndex === null) {
+      return [null, null];
+    }
+    const remaining = candidates.filter((idx) => idx !== firstIndex);
+    if (remaining.length === 0) {
+      return [firstIndex, null];
+    }
+    const unmasteredRemaining = remaining.filter((idx) => !masteredSet.has(idx));
+    const secondPool = unmasteredRemaining.length > 0 ? unmasteredRemaining : remaining;
+    return [firstIndex, pickRandomIndex(secondPool)];
+  }
+
+  function selectSingleQuestion() {
+    const candidates = getCandidateIndices();
+    if (candidates.length === 0) {
+      return null;
+    }
+    const masteredSet = mastery.getAll();
+    const unmastered = candidates.filter((idx) => !masteredSet.has(idx));
+    const pool = unmastered.length > 0 ? unmastered : candidates;
+    return pickRandomIndex(pool);
+  }
+
+  function updateDrawAvailability() {
+    const candidates = getCandidateIndices();
+    const hasCandidates = candidates.length > 0;
+    if (drawBtn && !timer.isAnswerActive()) {
+      drawBtn.disabled = !hasCandidates;
+    }
+    if (drawBtn) {
+      drawBtn.classList.toggle('no-candidates', !hasCandidates);
+    }
+    if (!timer.isAnswerActive() && !timer.isSelectionActive()) {
+      timer.setButtonLabel(hasCandidates ? timer.DRAW_LABEL : 'Brak pytań');
+    }
+    return hasCandidates;
+  }
+
+  function showQuestionOnStage(index, { startTimer = false } = {}) {
+    if (typeof index !== 'number' || index < 0 || index >= QUESTIONS.length) {
+      return;
+    }
+    clearSelectionStyles();
+    setCardsIdle(false);
+    timer.resetAll();
+
+    if (isUwr) {
+      applyQuestionToSlot(cardSlots[0], index);
+      animateCard(cardSlots[0]);
+      if (cardSlots[1]) {
+        applyQuestionToSlot(cardSlots[1], null);
+      }
+      if (startTimer) {
+        timer.startAnswer();
+        applySelectionStyles(cardSlots[0].cardEl, { autoPicked: false });
+      }
+    } else {
+      applyQuestionToSlot(cardSlots[0], index);
+      applyQuestionToSlot(cardSlots[1], null);
+      animateCard(cardSlots[0]);
+      if (cardSlots[1]) {
+        cardSlots[1].cardEl.classList.add('idle');
+      }
+    }
+    renderQuestionList();
+    updateDrawAvailability();
+  }
+
+  function draw() {
+    if (timer.isAnswerActive()) {
+      return;
+    }
+
+    if (isUwr) {
+      const index = selectSingleQuestion();
+      if (index === null) {
+        updateDrawAvailability();
+        renderQuestionList();
+        return;
+      }
+      clearSelectionStyles();
+      setCardsIdle(false);
+      if (drawBtn) {
+        drawBtn.classList.remove('pulse');
+        void drawBtn.offsetWidth;
+        drawBtn.classList.add('pulse');
+      }
+      applyQuestionToSlot(cardSlots[0], index);
+      animateCard(cardSlots[0]);
+      if (cardSlots[1]) {
+        applyQuestionToSlot(cardSlots[1], null);
+      }
+      timer.startAnswer();
+      applySelectionStyles(cardSlots[0].cardEl);
+      updateDrawAvailability();
+      renderQuestionList();
+      return;
+    }
+
+    const [firstIndex, secondIndex] = selectQuestionPair();
+    if (firstIndex === null && secondIndex === null) {
+      updateDrawAvailability();
+      renderQuestionList();
+      return;
+    }
+
+    clearSelectionStyles();
+    setCardsIdle(false);
+    if (drawBtn) {
+      drawBtn.classList.remove('pulse');
+      void drawBtn.offsetWidth;
+      drawBtn.classList.add('pulse');
+    }
+
+    applyQuestionToSlot(cardSlots[0], firstIndex);
+    applyQuestionToSlot(cardSlots[1], secondIndex);
+    animateCard(cardSlots[0]);
+    animateCard(cardSlots[1]);
+
+    timer.startSelection();
+    updateDrawAvailability();
+    renderQuestionList();
+  }
+
+  function reset() {
+    cardSlots.forEach((slot) => applyQuestionToSlot(slot, null));
+    timer.resetAll();
+    clearSelectionStyles();
+    setCardsIdle(true);
+    updateDrawAvailability();
+    renderQuestionList();
+  }
+
+  function renderQuestionList() {
+    if (!questionListEl) {
+      return;
+    }
+    const state = filterMenu.getState();
+    const hideMastered = Boolean(state.hideMastered);
+    const tagFilter = state.selectedTags instanceof Set ? state.selectedTags : new Set();
+    const hasTagFilter = tagFilter.size > 0;
+    const currentSet = new Set(
+      cardSlots
+        .map((slot) => slot.questionIndex)
+        .filter((idx) => typeof idx === 'number'),
+    );
+
+    questionListEl.innerHTML = '';
+    let visibleCount = 0;
+
+    QUESTIONS.forEach((entry, idx) => {
+      const isMastered = mastery.isMastered(idx);
+      if (hideMastered && isMastered) {
+        return;
+      }
+      if (hasTagFilter) {
+        const tags = Array.isArray(entry.tags) ? entry.tags : [];
+        if (!tags.some((tag) => tagFilter.has(tag))) {
+          return;
+        }
+      }
+
+      visibleCount += 1;
+      const item = document.createElement('li');
+      item.className = 'question-item';
+      if (isMastered) {
+        item.classList.add('is-mastered');
+      }
+      if (currentSet.has(idx)) {
+        item.classList.add('is-current');
+      }
+
+      const numBtn = document.createElement('button');
+      numBtn.type = 'button';
+      numBtn.className = 'question-item__num';
+      numBtn.textContent = String(idx + 1).padStart(2, '0');
+      numBtn.title = isMastered ? 'Przywróć do puli' : 'Oznacz jako opanowane';
+      numBtn.addEventListener('click', (event) => {
+        event.stopPropagation();
+        mastery.toggleMastered(idx);
+      });
+
+      const textBtn = document.createElement('button');
+      textBtn.type = 'button';
+      textBtn.className = 'question-item__text';
+      textBtn.textContent = entry.text;
+      textBtn.title = 'Pokaż na ekranie';
+      textBtn.addEventListener('click', () => {
+        showQuestionOnStage(idx, { startTimer: false });
+      });
+
+      const primaryTag = Array.isArray(entry.tags) && entry.tags[0] ? entry.tags[0] : '';
+      if (primaryTag) {
+        const variants = getTagVariants(primaryTag);
+        item.style.setProperty('--tag-color-strong', variants.strong);
+        item.style.setProperty('--tag-color', variants.soft);
+      }
+
+      item.appendChild(numBtn);
+      item.appendChild(textBtn);
+      questionListEl.appendChild(item);
+    });
+
+    if (visibleCount === 0) {
+      const empty = document.createElement('li');
+      empty.className = 'question-item question-item--empty';
+      empty.textContent = 'Brak pytań dla filtrów';
+      questionListEl.appendChild(empty);
+    }
+
+    refreshAllMasteryStates();
+  }
+
+  function addRipple(e) {
+    try {
+      const rect = drawBtn.getBoundingClientRect();
+      const clientX = e?.clientX ?? e?.touches?.[0]?.clientX;
+      const clientY = e?.clientY ?? e?.touches?.[0]?.clientY;
+      const x = (typeof clientX === 'number' ? clientX : rect.left + rect.width / 2) - rect.left;
+      const y = (typeof clientY === 'number' ? clientY : rect.top + rect.height / 2) - rect.top;
+      const ripple = document.createElement('span');
+      ripple.className = 'ripple';
+      ripple.style.left = `${x}px`;
+      ripple.style.top = `${y}px`;
+      drawBtn.appendChild(ripple);
+      ripple.addEventListener('animationend', () => ripple.remove());
+    } catch (_) {
+      // no-op
+    }
+  }
+
+  drawBtn.addEventListener('click', (event) => {
+    if (drawBtn.disabled) {
+      return;
+    }
+    addRipple(event);
+    draw();
+  });
+
+  resetBtn.addEventListener('click', reset);
+
+  document.addEventListener('keydown', (e) => {
+    if (e.target && ['INPUT', 'TEXTAREA', 'SELECT', 'BUTTON'].includes(e.target.tagName)) {
+      if (e.target.tagName === 'BUTTON' && e.code !== 'Space') {
+        return;
+      }
+      if (e.target.tagName !== 'BUTTON') {
+        return;
+      }
+    }
+    if (e.code === 'Space') {
+      e.preventDefault();
+      if (!timer.isAnswerActive() && !drawBtn.disabled) {
+        draw();
+      }
+    }
+    if (e.key && e.key.toLowerCase() === 'r' && e.target.tagName !== 'INPUT') {
+      reset();
+    }
+  });
 
   reset();
 })();
