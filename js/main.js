@@ -645,23 +645,24 @@
         item.classList.add('is-current');
       }
 
-      const numBtn = document.createElement('button');
-      numBtn.type = 'button';
-      numBtn.className = 'question-item__num';
-      numBtn.textContent = String(idx + 1).padStart(2, '0');
-      numBtn.title = isMastered ? 'Przywróć do puli' : 'Oznacz jako opanowane';
-      numBtn.addEventListener('click', (event) => {
-        event.stopPropagation();
-        mastery.toggleMastered(idx);
+      const numText = document.createElement('span');
+      numText.className = 'question-item__num';
+      numText.textContent = String(idx + 1).padStart(2, '0');
+
+      // Use div for the tooltip to avoid nesting buttons
+      const tooltip = document.createElement('div');
+      tooltip.className = 'question-item__text';
+      tooltip.textContent = entry.text;
+
+      item.title = 'Pokaż na ekranie i zacznij odpowiadać (Kliknij PPM by oznaczyć jako opanowane)';
+      item.addEventListener('click', () => {
+        showQuestionOnStage(idx, { startTimer: true });
       });
 
-      const textBtn = document.createElement('button');
-      textBtn.type = 'button';
-      textBtn.className = 'question-item__text';
-      textBtn.textContent = entry.text;
-      textBtn.title = 'Pokaż na ekranie i zacznij odpowiadać';
-      textBtn.addEventListener('click', () => {
-        showQuestionOnStage(idx, { startTimer: true });
+      // Right click to toggle mastery since left click is now taking over
+      item.addEventListener('contextmenu', (e) => {
+        e.preventDefault();
+        mastery.toggleMastered(idx);
       });
 
       const primaryTag = Array.isArray(entry.tags) && entry.tags[0] ? entry.tags[0] : '';
@@ -671,8 +672,8 @@
         item.style.setProperty('--tag-color', variants.soft);
       }
 
-      item.appendChild(numBtn);
-      item.appendChild(textBtn);
+      item.appendChild(numText);
+      item.appendChild(tooltip);
       questionListEl.appendChild(item);
     });
 
