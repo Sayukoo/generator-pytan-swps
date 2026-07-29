@@ -117,6 +117,15 @@
     'Praca i organizacja': '#6c5ce7',
     'Psychologia edukacji': '#fdcb6e',
     'Zestaw egzaminacyjny': '#5eead4',
+    'Metodologia i Nauka': '#f1c40f',
+    'Psychologia Ogólna': '#3498db',
+    'Psychopatologia i Zdrowie': '#c0392b',
+    'Etyka i Zawód': '#d35400',
+    'Osobowość': '#9b59b6',
+    'Psychologia Stosowana': '#6c5ce7',
+    'Psychologia Rozwoju': '#16a085',
+    'Diagnoza i psychometria': '#2c3e50',
+    'Psychoterapia i pomoc': '#e84393'
   };
 
   const TAG_ORDER = [
@@ -135,6 +144,15 @@
     'Praca i organizacja',
     'Psychologia edukacji',
     'Zestaw egzaminacyjny',
+    'Metodologia i Nauka',
+    'Psychologia Ogólna',
+    'Psychopatologia i Zdrowie',
+    'Etyka i Zawód',
+    'Osobowość',
+    'Psychologia Stosowana',
+    'Psychologia Rozwoju',
+    'Diagnoza i psychometria',
+    'Psychoterapia i pomoc'
   ];
 
   function normalizeHex(hex) {

@@ -644,10 +644,6 @@ a:hover {
   line-height: 1.4;
   padding: 10px 10px 10px 0;
   color: rgba(255, 255, 255, 0.88);
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
 }
 
 .question-item__text:hover {
