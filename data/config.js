@@ -1,0 +1,46 @@
+window.DEFAULT_TAG_COLOR = '#7f8c8d';
+window.TAG_COLOR_MAP = {
+  'Psychologia społeczna': '#e74c3c',
+  'Emocje i motywacje': '#e67e22',
+  'Psychologia rozwojowa': '#16a085',
+  'Psychopatologia': '#c0392b',
+  'Psychologia osobowości': '#9b59b6',
+  'Psychologia poznawcza': '#2980b9',
+  'Psychologia różnic indywidualnych': '#3498db',
+  'Etyka': '#d35400',
+  'Diagnoza': '#2c3e50',
+  'Metodologia, psychometria, statystyka': '#f1c40f',
+  'Pomoc psychologiczna': '#27ae60',
+  'Metodologia i Nauka': '#f1c40f',
+  'Psychologia Ogólna': '#2980b9',
+  'Psychopatologia i Zdrowie': '#c0392b',
+  'Etyka i Zawód': '#d35400',
+  'Osobowość': '#9b59b6',
+  'Psychologia Stosowana': '#8e44ad',
+  'Psychologia Rozwoju': '#16a085',
+  'Diagnoza i psychometria': '#2c3e50',
+  'Psychoterapia i pomoc': '#27ae60'
+};
+
+window.TAG_ORDER = [
+  'Psychologia społeczna',
+  'Emocje i motywacje',
+  'Psychologia rozwojowa',
+  'Psychopatologia',
+  'Psychologia osobowości',
+  'Psychologia poznawcza',
+  'Psychologia różnic indywidualnych',
+  'Etyka',
+  'Diagnoza',
+  'Metodologia, psychometria, statystyka',
+  'Pomoc psychologiczna',
+  'Metodologia i Nauka',
+  'Psychologia Ogólna',
+  'Psychopatologia i Zdrowie',
+  'Etyka i Zawód',
+  'Osobowość',
+  'Psychologia Stosowana',
+  'Psychologia Rozwoju',
+  'Diagnoza i psychometria',
+  'Psychoterapia i pomoc'
+];
