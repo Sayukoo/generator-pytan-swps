@@ -659,9 +659,9 @@
       textBtn.type = 'button';
       textBtn.className = 'question-item__text';
       textBtn.textContent = entry.text;
-      textBtn.title = 'Pokaż na ekranie';
+      textBtn.title = 'Pokaż na ekranie i zacznij odpowiadać';
       textBtn.addEventListener('click', () => {
-        showQuestionOnStage(idx, { startTimer: false });
+        showQuestionOnStage(idx, { startTimer: true });
       });
 
       const primaryTag = Array.isArray(entry.tags) && entry.tags[0] ? entry.tags[0] : '';
