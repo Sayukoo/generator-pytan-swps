@@ -930,3 +930,218 @@ kbd {
     min-width: 0;
   }
 }
+
+/* ——— Search Box ——— */
+.search-box {
+  width: 100%;
+}
+
+.search-input {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 8px 12px;
+  color: var(--fg);
+  font-size: 13px;
+  font-family: var(--font-sans);
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: rgba(255, 255, 255, 0.35);
+  background: rgba(255, 255, 255, 0.09);
+}
+
+.search-input::placeholder {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+/* ——— Theme Controls ——— */
+.theme-select-wrapper {
+  display: flex;
+  align-items: center;
+}
+
+.theme-select {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 6px 10px;
+  color: var(--fg);
+  font-size: 12px;
+  font-family: var(--font-sans);
+  cursor: pointer;
+  outline: none;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.theme-select option {
+  background: #12141a;
+  color: #fff;
+}
+
+/* ——— Motyw: OLED Black ——— */
+html[data-theme="oled"] {
+  --bg: #000000;
+  --bg-elevated: #050505;
+  --fg: #ffffff;
+  --muted: #777777;
+  --line: rgba(255, 255, 255, 0.25);
+  --accent: #ffffff;
+  --accent-soft: rgba(255, 255, 255, 0.15);
+}
+
+/* ——— Motyw: Sepia Paper ——— */
+html[data-theme="sepia"] {
+  --bg: #f4ecd8;
+  --bg-elevated: #e8dec4;
+  --fg: #3d2b1f;
+  --muted: #7c6853;
+  --line: rgba(61, 43, 31, 0.22);
+  --accent: #3d2b1f;
+  --accent-soft: rgba(61, 43, 31, 0.12);
+}
+
+html[data-theme="sepia"] .topbar {
+  background: rgba(244, 236, 216, 0.95);
+}
+
+html[data-theme="sepia"] .sidebar {
+  background: rgba(232, 222, 196, 0.85);
+}
+
+html[data-theme="sepia"] .primary {
+  background: #3d2b1f;
+  color: #f4ecd8;
+}
+
+html[data-theme="sepia"] .topbar__mark {
+  background: #3d2b1f;
+  color: #f4ecd8;
+}
+
+html[data-theme="sepia"] .question-item__text {
+  background: #3d2b1f;
+  color: #f4ecd8;
+}
+
+html[data-theme="sepia"] .question-item__text::after {
+  border-color: transparent transparent transparent #3d2b1f;
+}
+
+html[data-theme="sepia"] .theme-select option {
+  background: #f4ecd8;
+  color: #3d2b1f;
+}
+
+/* ——— Motyw: Pixel RPG / Retro 8-bit ——— */
+html[data-theme="pixel"] {
+  --bg: #0f0a1c;
+  --bg-elevated: #1a122d;
+  --fg: #00ffcc;
+  --muted: #a372db;
+  --line: #5a3e85;
+  --accent: #ff007f;
+  --font-sans: 'Pixelify Sans', monospace, sans-serif;
+  --font-display: 'Pixelify Sans', monospace, sans-serif;
+  --radius: 4px;
+}
+
+html[data-theme="pixel"] .card,
+html[data-theme="pixel"] .primary,
+html[data-theme="pixel"] .ghost-btn,
+html[data-theme="pixel"] .bank-tab,
+html[data-theme="pixel"] .theme-select {
+  border-width: 2px;
+  border-style: solid;
+}
+
+html[data-theme="pixel"] .topbar__mark {
+  background: #ff007f;
+  color: #ffffff;
+  border-radius: 4px;
+}
+
+html[data-theme="pixel"] .primary {
+  background: #ff007f;
+  color: #ffffff;
+  box-shadow: 4px 4px 0px #5a3e85;
+}
+
+html[data-theme="pixel"] .primary:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0px #5a3e85;
+}
+
+html[data-theme="pixel"] .question-item {
+  border-radius: 4px;
+}
+
+/* ——— Import Modal & Drop Zone ——— */
+.import-desc {
+  font-size: 13px;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+
+.import-code {
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 12px;
+  color: var(--fg);
+  overflow-x: auto;
+  margin-bottom: 16px;
+}
+
+.drop-zone {
+  border: 2px dashed var(--line);
+  border-radius: 12px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  text-align: center;
+  color: var(--muted);
+  font-size: 13px;
+  background: rgba(255, 255, 255, 0.02);
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.drop-zone.drag-over {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.file-label {
+  display: inline-block;
+  cursor: pointer;
+}
+
+.import-status {
+  font-size: 13px;
+  font-weight: 600;
+  margin-top: 12px;
+  min-height: 20px;
+}
+
+.import-status.success {
+  color: #5eead4;
+}
+
+.import-status.error {
+  color: #ff6b6b;
+}
+
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 16px;
+}
+
+

@@ -1,13 +1,13 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pl">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Generator pytań · SWPS / UWr</title>
-  <link rel="stylesheet" href="css/styles.css?v=6" />
+  <link rel="stylesheet" href="css/styles.css?v=8" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=Instrument+Serif:ital@0;1&family=Pixelify+Sans:wght@400..700&display=swap" rel="stylesheet" />
 </head>
 <body>
   <header class="topbar">
@@ -22,16 +22,30 @@
     <div class="bank-tabs" role="tablist" aria-label="Uczelnia">
       <button id="tab-swps" class="bank-tab" type="button" role="tab" aria-selected="false">SWPS</button>
       <button id="tab-uwr" class="bank-tab" type="button" role="tab" aria-selected="false">UWr</button>
+      <button id="tab-custom" class="bank-tab" type="button" role="tab" aria-selected="false">Własna</button>
     </div>
 
     <div class="topbar__actions">
+      <div class="theme-select-wrapper" title="Wybierz motyw wizualny">
+        <label for="themeSelect" class="visually-hidden">Motyw</label>
+        <select id="themeSelect" class="theme-select">
+          <option value="dark">🌙 Ciemny</option>
+          <option value="pixel">👾 Pixel RPG</option>
+          <option value="oled">🖤 OLED Black</option>
+          <option value="sepia">📜 Sepia Paper</option>
+        </select>
+      </div>
+
       <div class="custom-timer-wrapper" title="Ustaw czas na odpowiedź w sekundach (opcjonalne)">
         <label for="customTimerInput" class="visually-hidden">Czas (s)</label>
         <input type="number" id="customTimerInput" class="custom-timer-input" placeholder="120s" min="1" max="999" />
       </div>
+
       <span class="progress-pill" aria-live="polite">
         <span id="navMasteredCount">0</span>/<span id="navTotalCount">0</span>
       </span>
+
+      <button id="importBtn" class="ghost-btn" type="button" title="Importuj własny plik JSON z pytaniami">Import</button>
       <button id="resetBtn" class="ghost-btn" type="button">Reset</button>
       <button id="helpBtn" class="ghost-btn" type="button">Pomoc</button>
     </div>
@@ -79,6 +93,9 @@
           <h2>Pytania</h2>
           <span class="sidebar__hint">Wybierz pytanie z listy</span>
         </div>
+        <div class="search-box">
+          <input type="search" id="questionSearchInput" class="search-input" placeholder="Szukaj pytania... (klawisz F)" aria-label="Wyszukaj pytanie" />
+        </div>
         <ul id="questionList" class="question-list"></ul>
       </section>
     </aside>
@@ -94,19 +111,32 @@
       <li><b>Losuj</b> — SWPS: dwa pytania do wyboru; UWr: jedno pytanie i timer 3 min.</li>
       <li>Kliknij pytanie na liście po prawej, aby wyświetlić je na ekranie.</li>
       <li>Kliknij numer pytania na liście (lub przycisk na karcie), aby oznaczyć jako opanowane.</li>
-      <li>Przełączaj SWPS / UWr w górnym pasku.</li>
+      <li>Przełączaj SWPS / UWr / Własna w górnym pasku.</li>
     </ol>
-    <p><kbd>Spacja</kbd> — losuj · <kbd>R</kbd> — reset</p>
+    <p><kbd>Spacja</kbd> — losuj · <kbd>R</kbd> — reset · <kbd>1</kbd>/<kbd>2</kbd> — wybór karty · <kbd>M</kbd> — opanowane · <kbd>F</kbd> — szukaj</p>
     <button id="closeHelp" type="button">Zamknij</button>
   </dialog>
 
-  <script src="js/mastery.js?v=6"></script>
-  <script src="js/timer.js?v=6"></script>
+  <dialog id="importDialog">
+    <h3>Importuj Własną Bazę Pytań</h3>
+    <p class="import-desc">Wgraj plik <code>.json</code> z własnymi pytaniami w formacie:</p>
+    <pre class="import-code"><code>[
+  { "text": "Treść pytania...", "tags": ["Tag1", "Tag2"] }
+]</code></pre>
+    <div id="dropZone" class="drop-zone">
+      <span>Przeciągnij i upuść plik .json tutaj lub</span>
+      <label for="fileInput" class="ghost-btn file-label">Wybierz plik z dysku</label>
+      <input type="file" id="fileInput" accept=".json" class="visually-hidden" />
+    </div>
+    <div id="importStatus" class="import-status"></div>
+    <div class="dialog-actions">
+      <button id="closeImport" type="button" class="ghost-btn">Zamknij</button>
+    </div>
+  </dialog>
+
   <script src="data/swps.js?v=6"></script>
   <script src="data/uwr.js?v=6"></script>
   <script src="data/questions.js?v=6"></script>
-  <script src="js/filters.js?v=6"></script>
-  <script src="js/tags.js?v=6"></script>
-  <script src="js/main.js?v=6"></script>
+  <script type="module" src="js/main.js?v=8"></script>
 </body>
 </html>
