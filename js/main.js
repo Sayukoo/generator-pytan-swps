@@ -22,6 +22,7 @@ import { setupKeyboardShortcuts } from './modules/keyboard.js';
 import { addRipple, updateTopbarInfo, setupHelpModal } from './modules/uiHelpers.js';
 import { initTheme, setTheme } from './modules/themeManager.js';
 import { parseJsonFile, getCustomBank } from './modules/customBankImporter.js';
+import { setupStudyPlan } from './modules/studyPlan.js';
 
 (function () {
   'use strict';
@@ -194,6 +195,14 @@ import { parseJsonFile, getCustomBank } from './modules/customBankImporter.js';
     hideMasteredEl,
     tags: getUniqueTags(QUESTIONS),
     tagColors: TAG_COLOR_MAP,
+  });
+
+  // Study Plan
+  setupStudyPlan({
+    dateInputId: 'examDateInput',
+    resultContainerId: 'studyPlanResult',
+    totalQuestions: QUESTIONS.length,
+    masteryManager: mastery,
   });
 
   const timer = createTimerManager({

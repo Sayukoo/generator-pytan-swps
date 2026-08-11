@@ -1145,3 +1145,13 @@ html[data-theme="pixel"] .question-item {
 }
 
 
+
+.study-plan-result {
+  margin-top: 10px;
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.4;
+}
+.study-plan-result strong {
+  color: var(--fg);
+}
