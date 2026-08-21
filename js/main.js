@@ -1,6 +1,7 @@
 /**
  * Main Application Entry Point
- * Orchestrates modules: mastery, timer, filters, cards, drawer, questionList, keyboard, uiHelpers, themeManager, customBankImporter.
+ * Orchestrates modules: mastery, timer, filters, cards, drawer, questionList,
+ * keyboard, uiHelpers, themeManager, customBankImporter, studyPlan, motion.
  */
 
 import { masteryManager as mastery } from './modules/mastery.js';
@@ -17,12 +18,19 @@ import {
   animateCard,
   refreshCardMasteryState,
 } from './modules/cards.js';
-import { renderQuestionList as renderList } from './modules/questionList.js';
+import { renderQuestionList as renderList, popListItem } from './modules/questionList.js';
 import { setupKeyboardShortcuts } from './modules/keyboard.js';
-import { addRipple, updateTopbarInfo, setupHelpModal } from './modules/uiHelpers.js';
+import { addRipple, updateTopbarInfo, setupHelpModal, celebrateMastery } from './modules/uiHelpers.js';
 import { initTheme, setTheme } from './modules/themeManager.js';
 import { parseJsonFile, getCustomBank } from './modules/customBankImporter.js';
 import { setupStudyPlan } from './modules/studyPlan.js';
+import {
+  accentBurstColors,
+  burstParticles,
+  elementCenter,
+  prefersReducedMotion,
+  replayClass,
+} from './modules/motion.js';
 
 (function () {
   'use strict';
@@ -178,7 +186,9 @@ import { setupStudyPlan } from './modules/studyPlan.js';
   }
 
   // Card slots & UI helpers
-  const cardSlots = createCardSlots((index) => mastery.toggleMastered(index));
+  const cardSlots = createCardSlots((index) => {
+    mastery.toggleMastered(index);
+  });
   const cardEls = cardSlots.map((slot) => slot.cardEl);
   const slotByCard = new Map(cardSlots.map((slot) => [slot.cardEl, slot]));
 
@@ -205,12 +215,26 @@ import { setupStudyPlan } from './modules/studyPlan.js';
     masteryManager: mastery,
   });
 
+  function applyTimerState(remaining, phase) {
+    if (!drawBtn) {
+      return;
+    }
+    drawBtn.classList.toggle('timer-selection', phase === 'selection');
+    drawBtn.classList.toggle('timer-answer', phase === 'answer');
+    const urgent = phase === 'answer' && typeof remaining === 'number' && remaining <= 10;
+    drawBtn.classList.toggle('timer-urgent', urgent);
+    if (phase === 'answer' && urgent && typeof remaining === 'number') {
+      replayClass(drawBtn, 'timer-tick');
+    }
+  }
+
   const timer = createTimerManager({
     drawBtn,
     selectionDuration: isUwr ? 1 : 40,
     answerDuration: isUwr ? 180 : 120,
     onSelectionTimeout: handleSelectionTimeout,
     onAnswerComplete: () => {},
+    onTick: applyTimerState,
   });
 
   if (isUwr) {
@@ -247,8 +271,19 @@ import { setupStudyPlan } from './modules/studyPlan.js';
     renderQuestionList();
   });
 
-  function refreshAllMasteryStates() {
-    cardSlots.forEach((slot) => refreshCardMasteryState(slot, (idx) => mastery.isMastered(idx)));
+  function refreshAllMasteryStates(changedIndex) {
+    cardSlots.forEach((slot) => {
+      const wasMastered = slot.cardEl.classList.contains('mastered');
+      refreshCardMasteryState(slot, (idx) => mastery.isMastered(idx));
+      const nowMastered = slot.cardEl.classList.contains('mastered');
+      if (!wasMastered && nowMastered) {
+        replayClass(slot.cardEl, 'mastered-pop');
+        celebrateMastery(slot.cardEl, true);
+      }
+    });
+    if (typeof changedIndex === 'number') {
+      popListItem(questionListEl, changedIndex);
+    }
     updateTopbarInfo({
       totalCount: QUESTIONS.length,
       masteredCount: mastery.getAll().size,
@@ -264,7 +299,13 @@ import { setupStudyPlan } from './modules/studyPlan.js';
       isMasteredFn: (idx) => mastery.isMastered(idx),
       activeQuestionIndices: cardSlots.map((s) => s.questionIndex),
       onSelectQuestion: (idx) => showQuestionOnStage(idx, { startTimer: true }),
-      onToggleMastered: (idx) => mastery.toggleMastered(idx),
+      onToggleMastered: (idx) => {
+        const wasMastered = mastery.isMastered(idx);
+        mastery.toggleMastered(idx);
+        if (!wasMastered && !prefersReducedMotion()) {
+          popListItem(questionListEl, idx);
+        }
+      },
       searchQuery,
     });
     refreshAllMasteryStates();
@@ -301,6 +342,14 @@ import { setupStudyPlan } from './modules/studyPlan.js';
     }
     setCardsIdle(cardEls, false);
     applySelectionStyles(cardEls, cardEl, { autoPicked });
+    if (!prefersReducedMotion()) {
+      const { x, y } = elementCenter(cardEl);
+      burstParticles(x, y, {
+        count: 10,
+        spread: 70,
+        colors: accentBurstColors(cardEl),
+      });
+    }
   }
 
   function handleSelectionTimeout() {
@@ -353,6 +402,10 @@ import { setupStudyPlan } from './modules/studyPlan.js';
       if (cardSlots[1]) {
         cardSlots[1].cardEl.classList.add('idle');
       }
+      if (startTimer) {
+        timer.startAnswer();
+        applySelectionStyles(cardEls, cardSlots[0].cardEl);
+      }
     }
     renderQuestionList();
     updateDrawAvailability();
@@ -376,9 +429,7 @@ import { setupStudyPlan } from './modules/studyPlan.js';
       clearSelectionStyles(cardEls);
       setCardsIdle(cardEls, false);
       if (drawBtn) {
-        drawBtn.classList.remove('pulse');
-        void drawBtn.offsetWidth;
-        drawBtn.classList.add('pulse');
+        replayClass(drawBtn, 'pulse');
       }
       applyQuestionToSlot(cardSlots[0], index, QUESTIONS, (idx) => mastery.isMastered(idx));
       animateCard(cardSlots[0]);
@@ -402,9 +453,7 @@ import { setupStudyPlan } from './modules/studyPlan.js';
     clearSelectionStyles(cardEls);
     setCardsIdle(cardEls, false);
     if (drawBtn) {
-      drawBtn.classList.remove('pulse');
-      void drawBtn.offsetWidth;
-      drawBtn.classList.add('pulse');
+      replayClass(drawBtn, 'pulse');
     }
 
     applyQuestionToSlot(cardSlots[0], firstIndex, QUESTIONS, (idx) => mastery.isMastered(idx));

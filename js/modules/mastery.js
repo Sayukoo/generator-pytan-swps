@@ -4,7 +4,12 @@
  */
 
 const activeBank = window.localStorage?.getItem('active_bank') || 'swps';
-const STORAGE_KEY = activeBank === 'uwr' ? 'uwr-mastered-questions.v1' : 'swps-mastered-questions.v3';
+const STORAGE_KEYS = {
+  swps: 'swps-mastered-questions.v3',
+  uwr: 'uwr-mastered-questions.v1',
+  custom: 'custom-mastered-questions.v1',
+};
+const STORAGE_KEY = STORAGE_KEYS[activeBank] || STORAGE_KEYS.swps;
 
 function sanitizeIndex(index) {
   if (typeof index === 'number' && Number.isInteger(index) && index >= 0) {

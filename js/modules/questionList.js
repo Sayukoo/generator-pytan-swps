@@ -1,9 +1,11 @@
 /**
  * Question List Module
- * Renders the sidebar list of questions, live search, hover tooltips, and context menu actions.
+ * Renders the sidebar list of questions, live search, hover tooltips,
+ * staggered entrance animations and context menu actions.
  */
 
 import { getTagVariants } from './tags.js';
+import { prefersReducedMotion, setStaggerIndex } from './motion.js';
 
 export function renderQuestionList({
   containerEl,
@@ -52,11 +54,16 @@ export function renderQuestionList({
     visibleCount += 1;
     const item = document.createElement('li');
     item.className = 'question-item';
+    item.dataset.index = String(idx);
     if (mastered) {
       item.classList.add('is-mastered');
     }
     if (currentSet.has(idx)) {
       item.classList.add('is-current');
+    }
+    if (!prefersReducedMotion()) {
+      // Cap the stagger so long lists do not feel sluggish.
+      setStaggerIndex(item, Math.min(visibleCount - 1, 30));
     }
 
     const numText = document.createElement('span');
@@ -124,5 +131,21 @@ export function renderQuestionList({
     empty.className = 'question-item question-item--empty';
     empty.textContent = 'Brak pytań pasujących do filtrów';
     containerEl.appendChild(empty);
+  }
+}
+
+/**
+ * Plays a short pop animation on a list item that just changed
+ * its mastery state. Safe to call with a missing element.
+ */
+export function popListItem(listEl, questionIndex) {
+  if (!listEl || typeof questionIndex !== 'number' || prefersReducedMotion()) {
+    return;
+  }
+  const target = listEl.querySelector(`.question-item[data-index="${questionIndex}"]`);
+  if (target) {
+    target.classList.remove('mastery-pop');
+    void target.offsetWidth;
+    target.classList.add('mastery-pop');
   }
 }

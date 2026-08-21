@@ -3,6 +3,13 @@
  * Helper functions for UI animations, topbar updates, and dialog interactions.
  */
 
+import {
+  burstParticles,
+  elementCenter,
+  prefersReducedMotion,
+  replayClass,
+} from './motion.js';
+
 export function addRipple(button, e) {
   if (!button) {
     return;
@@ -24,6 +31,33 @@ export function addRipple(button, e) {
   }
 }
 
+function animateNumberTo(el, target) {
+  const next = Number(target);
+  if (!el || !Number.isFinite(next)) {
+    return;
+  }
+  const start = Number.parseInt(el.textContent || '0', 10) || 0;
+  if (start === next) {
+    return;
+  }
+  if (prefersReducedMotion()) {
+    el.textContent = String(next);
+    return;
+  }
+  replayClass(el.parentElement, 'bump');
+  const duration = 420;
+  const startTime = performance.now();
+  const step = (now) => {
+    const t = Math.min(1, (now - startTime) / duration);
+    const eased = 1 - Math.pow(1 - t, 3);
+    el.textContent = String(Math.round(start + (next - start) * eased));
+    if (t < 1) {
+      window.requestAnimationFrame(step);
+    }
+  };
+  window.requestAnimationFrame(step);
+}
+
 export function updateTopbarInfo({ totalCount, masteredCount, isUwr }) {
   const navTotalCountEl = document.getElementById('navTotalCount');
   const navMasteredCountEl = document.getElementById('navMasteredCount');
@@ -33,13 +67,25 @@ export function updateTopbarInfo({ totalCount, masteredCount, isUwr }) {
     navTotalCountEl.textContent = String(totalCount);
   }
   if (navMasteredCountEl) {
-    navMasteredCountEl.textContent = String(masteredCount);
+    animateNumberTo(navMasteredCountEl, masteredCount);
   }
   if (navSubtitleEl) {
     navSubtitleEl.textContent = isUwr
       ? `${totalCount} pytań · timer 3 min`
       : `${totalCount} pytań egzaminacyjnych`;
   }
+}
+
+/**
+ * Celebrates a newly mastered question with a particle burst.
+ * `wasMastered` lets callers skip the effect when un-marking.
+ */
+export function celebrateMastery(cardEl, wasMastered = true) {
+  if (!cardEl || !wasMastered || prefersReducedMotion()) {
+    return;
+  }
+  const { x, y } = elementCenter(cardEl);
+  burstParticles(x, y, { count: 22, spread: 110 });
 }
 
 export function setupHelpModal(helpBtn, helpDialog, closeHelpBtn) {

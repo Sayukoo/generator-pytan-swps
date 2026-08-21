@@ -8,7 +8,8 @@
   } else if (activeBank === 'custom') {
     try {
       const customRaw = global.localStorage?.getItem('custom_questions_bank');
-      RAW_QUESTIONS = customRaw ? JSON.parse(customRaw) : global.SWPS_QUESTIONS;
+      const parsed = customRaw ? JSON.parse(customRaw) : null;
+      RAW_QUESTIONS = Array.isArray(parsed) && parsed.length > 0 ? parsed : global.SWPS_QUESTIONS;
     } catch (_) {
       RAW_QUESTIONS = global.SWPS_QUESTIONS;
     }

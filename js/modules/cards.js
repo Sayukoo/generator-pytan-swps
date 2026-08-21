@@ -1,9 +1,15 @@
 /**
  * Cards Module
- * Handles card slots DOM representation, rendering tags, animations, and selection styles.
+ * Handles card slots DOM representation, rendering tags, animations,
+ * pointer-driven 3D tilt and selection styles.
  */
 
 import { getTagVariants } from './tags.js';
+import {
+  attachPointerTilt,
+  replayClass,
+  setStaggerIndex,
+} from './motion.js';
 
 export function createCardSlots(onMasteryToggle) {
   const cardElements = Array.from(document.querySelectorAll('.card'));
@@ -16,6 +22,7 @@ export function createCardSlots(onMasteryToggle) {
       masteryBtn: cardEl.querySelector('.card-mastery'),
       questionIndex: null,
     };
+    attachPointerTilt(cardEl);
     if (slot.masteryBtn && typeof onMasteryToggle === 'function') {
       slot.masteryBtn.addEventListener('click', (event) => {
         event.stopPropagation();
@@ -52,6 +59,9 @@ export function applySelectionStyles(cardEls, selectedCardEl, { autoPicked = fal
       card.classList.add('selected');
       card.classList.toggle('auto-picked', autoPicked);
       card.classList.remove('dimmed');
+      if (autoPicked) {
+        replayClass(card, 'auto-flash');
+      }
     } else {
       card.classList.remove('selected', 'auto-picked');
       card.classList.add('dimmed');
@@ -84,6 +94,7 @@ export function renderTags(tagsEl, tags) {
     return;
   }
   tagsEl.classList.add('has-tags');
+  let stagger = 0;
   tags.forEach((tag) => {
     const trimmed = typeof tag === 'string' ? tag.trim() : '';
     if (!trimmed) {
@@ -95,6 +106,8 @@ export function renderTags(tagsEl, tags) {
     const variants = getTagVariants(trimmed);
     pill.style.setProperty('--tag-color', variants.soft);
     pill.style.setProperty('--tag-color-strong', variants.strong);
+    setStaggerIndex(pill, stagger);
+    stagger += 1;
     tagsEl.appendChild(pill);
   });
 }
@@ -103,13 +116,18 @@ export function animateCard(slot) {
   if (!slot?.cardEl || slot.cardEl.hidden) {
     return;
   }
-  slot.cardEl.classList.remove('pop', 'glow');
-  void slot.cardEl.offsetWidth;
-  slot.cardEl.classList.add('pop', 'glow');
+  replayClass(slot.cardEl, 'pop');
+  replayClass(slot.cardEl, 'glow');
   if (slot.numEl) {
-    slot.numEl.classList.remove('flip');
-    void slot.numEl.offsetWidth;
-    slot.numEl.classList.add('flip');
+    replayClass(slot.numEl, 'flip');
+  }
+  if (slot.questionEl) {
+    replayClass(slot.questionEl, 'question-reveal');
+  }
+  if (slot.tagsEl) {
+    Array.from(slot.tagsEl.children).forEach((pill) => {
+      replayClass(pill, 'pill-in');
+    });
   }
 }
 

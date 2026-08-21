@@ -21,6 +21,7 @@ export function createTimerManager({
   answerDuration = 120,
   onSelectionTimeout = () => {},
   onAnswerComplete = () => {},
+  onTick = () => {},
 }) {
   let selectionTimerId = null;
   let answerTimerId = null;
@@ -45,8 +46,9 @@ export function createTimerManager({
     }
   }
 
-  function showTimerLabel(seconds) {
+  function showTimerLabel(seconds, phase) {
     setButtonLabel(formatTime(seconds));
+    onTick(seconds, phase);
   }
 
   function scheduleLabelReset() {
@@ -105,18 +107,18 @@ export function createTimerManager({
     isSelectionActive = true;
 
     let remaining = config.selectionDuration;
-    showTimerLabel(remaining);
+    showTimerLabel(remaining, 'selection');
 
     selectionTimerId = setInterval(() => {
       remaining -= 1;
       if (remaining <= 0) {
-        showTimerLabel(0);
+        showTimerLabel(0, 'selection');
         cancelSelection({ resetLabel: false });
         scheduleLabelReset();
         onSelectionTimeout();
         return;
       }
-      showTimerLabel(remaining);
+      showTimerLabel(remaining, 'selection');
     }, 1000);
   }
 
@@ -134,18 +136,18 @@ export function createTimerManager({
     drawBtn.disabled = true;
 
     let remaining = config.answerDuration;
-    showTimerLabel(remaining);
+    showTimerLabel(remaining, 'answer');
 
     answerTimerId = setInterval(() => {
       remaining -= 1;
       if (remaining <= 0) {
-        showTimerLabel(0);
+        showTimerLabel(0, 'answer');
         cancelAnswer({ resetLabel: false });
         scheduleLabelReset();
         onAnswerComplete();
         return;
       }
-      showTimerLabel(remaining);
+      showTimerLabel(remaining, 'answer');
     }, 1000);
 
     return true;
@@ -161,6 +163,7 @@ export function createTimerManager({
       drawBtn.disabled = false;
     }
     setButtonLabel(DRAW_LABEL);
+    onTick(null, 'idle');
   }
 
   function setDurations({ selectionDuration: sel, answerDuration: ans } = {}) {

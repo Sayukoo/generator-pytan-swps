@@ -1,7 +1,10 @@
 /**
  * Study Plan Module
  * Calculates and displays a study plan based on a target date and mastery progress.
+ * Result updates play a soft refresh animation.
  */
+
+import { prefersReducedMotion, replayClass } from './motion.js';
 
 export function setupStudyPlan({ dateInputId, resultContainerId, totalQuestions, masteryManager }) {
   const dateInput = document.getElementById(dateInputId);
@@ -40,7 +43,7 @@ export function setupStudyPlan({ dateInputId, resultContainerId, totalQuestions,
     const daysLeft = Math.ceil(timeDiff / (1000 * 3600 * 24));
 
     if (daysLeft <= 0) {
-      resultContainer.innerHTML = '<strong>Egzamin tuż tuż!</strong>';
+      renderPlan('<strong>Egzamin tuż tuż!</strong>');
       return;
     }
 
@@ -48,13 +51,25 @@ export function setupStudyPlan({ dateInputId, resultContainerId, totalQuestions,
     const questionsLeft = Math.max(0, totalQuestions - masteredCount);
 
     if (questionsLeft === 0) {
-      resultContainer.innerHTML = '<strong>Wszystko opanowane! Gratulacje!</strong>';
+      renderPlan('<strong>Wszystko opanowane! Gratulacje!</strong>');
       return;
     }
 
     const questionsPerDay = Math.ceil(questionsLeft / daysLeft);
 
-    resultContainer.innerHTML = `Do opanowania: ${questionsLeft} pytań.<br>Pozostało: ${daysLeft} dni.<br><strong>Cel: ${questionsPerDay} pytań/dzień.</strong>`;
+    renderPlan(
+      `Do opanowania: ${questionsLeft} pytań.<br>Pozostało: ${daysLeft} dni.<br><strong>Cel: ${questionsPerDay} pytań/dzień.</strong>`,
+    );
+  }
+
+  function renderPlan(html) {
+    if (resultContainer.innerHTML === html) {
+      return;
+    }
+    resultContainer.innerHTML = html;
+    if (!prefersReducedMotion()) {
+      replayClass(resultContainer, 'plan-refresh');
+    }
   }
 
   // Event listener for date input
