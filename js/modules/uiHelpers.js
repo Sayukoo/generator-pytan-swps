@@ -62,12 +62,17 @@ export function updateTopbarInfo({ totalCount, masteredCount, isUwr }) {
   const navTotalCountEl = document.getElementById('navTotalCount');
   const navMasteredCountEl = document.getElementById('navMasteredCount');
   const navSubtitleEl = document.getElementById('navSubtitle');
+  const navProgressEl = document.getElementById('navProgressBar');
 
   if (navTotalCountEl) {
     navTotalCountEl.textContent = String(totalCount);
   }
   if (navMasteredCountEl) {
     animateNumberTo(navMasteredCountEl, masteredCount);
+  }
+  if (navProgressEl && totalCount > 0) {
+    const percent = Math.min(100, Math.round((masteredCount / totalCount) * 100));
+    navProgressEl.style.width = `${percent}%`;
   }
   if (navSubtitleEl) {
     navSubtitleEl.textContent = isUwr

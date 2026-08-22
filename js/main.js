@@ -24,6 +24,7 @@ import { addRipple, updateTopbarInfo, setupHelpModal, celebrateMastery } from '.
 import { initTheme, setTheme } from './modules/themeManager.js';
 import { parseJsonFile, getCustomBank } from './modules/customBankImporter.js';
 import { setupStudyPlan } from './modules/studyPlan.js';
+import { playTimeUpChime } from './modules/sound.js';
 import {
   accentBurstColors,
   burstParticles,
@@ -71,6 +72,18 @@ import {
   const hideMasteredEl = document.getElementById('filterHideMastered');
   const questionListEl = document.getElementById('questionList');
   const searchInputEl = document.getElementById('questionSearchInput');
+
+  const pauseBtn = document.getElementById('pauseBtn');
+  const timerTrackFill = document.getElementById('timerTrackFill');
+  const postActionsEl = document.getElementById('postActions');
+  const postMasteredBtn = document.getElementById('postMasteredBtn');
+  const postRetryBtn = document.getElementById('postRetryBtn');
+  const postDrawBtn = document.getElementById('postDrawBtn');
+
+  const clearProgressBtn = document.getElementById('clearProgressBtn');
+  const clearProgressDialog = document.getElementById('clearProgressDialog');
+  const cancelClearProgressBtn = document.getElementById('cancelClearProgress');
+  const confirmClearProgressBtn = document.getElementById('confirmClearProgress');
 
   const tabSwpsBtn = document.getElementById('tab-swps');
   const tabUwrBtn = document.getElementById('tab-uwr');
@@ -205,6 +218,7 @@ import {
     hideMasteredEl,
     tags: getUniqueTags(QUESTIONS),
     tagColors: TAG_COLOR_MAP,
+    storageKey: `filters_${activeBank}`,
   });
 
   // Study Plan
@@ -215,17 +229,69 @@ import {
     masteryManager: mastery,
   });
 
-  function applyTimerState(remaining, phase) {
+  function setPostActionsVisible(visible) {
+    if (postActionsEl) {
+      postActionsEl.hidden = !visible;
+    }
+  }
+
+  function getSelectedQuestionIndex() {
+    const selectedSlot = cardSlots.find(
+      (s) => typeof s.questionIndex === 'number' && s.cardEl.classList.contains('selected'),
+    );
+    return selectedSlot ? selectedSlot.questionIndex : null;
+  }
+
+  function applyTimerState(remaining, phase, { duration } = {}) {
     if (!drawBtn) {
       return;
     }
     drawBtn.classList.toggle('timer-selection', phase === 'selection');
-    drawBtn.classList.toggle('timer-answer', phase === 'answer');
-    const urgent = phase === 'answer' && typeof remaining === 'number' && remaining <= 10;
+    drawBtn.classList.toggle('timer-answer', phase === 'answer' || phase === 'paused');
+    const urgent = (phase === 'answer' || phase === 'paused') && typeof remaining === 'number' && remaining <= 10;
     drawBtn.classList.toggle('timer-urgent', urgent);
+
+    if (timerTrackFill) {
+      const total = typeof duration === 'number' && duration > 0 ? duration : null;
+      if ((phase === 'answer' || phase === 'paused') && total && typeof remaining === 'number') {
+        timerTrackFill.style.transform = `scaleX(${Math.max(0, Math.min(1, remaining / total))})`;
+        timerTrackFill.classList.toggle('is-urgent', urgent);
+      } else {
+        timerTrackFill.style.transform = 'scaleX(0)';
+        timerTrackFill.classList.remove('is-urgent');
+      }
+    }
+
+    if (pauseBtn) {
+      const showPause = phase === 'answer' || phase === 'paused';
+      pauseBtn.hidden = !showPause;
+      if (showPause) {
+        const paused = timer.isAnswerPaused();
+        pauseBtn.textContent = paused ? '▶ Wznów' : '⏸ Pauza';
+      }
+    }
+
     if (phase === 'answer' && urgent && typeof remaining === 'number') {
       replayClass(drawBtn, 'timer-tick');
     }
+  }
+
+  function handleAnswerComplete() {
+    playTimeUpChime();
+    if (timerTrackFill) {
+      timerTrackFill.style.transform = 'scaleX(0)';
+      timerTrackFill.classList.remove('is-urgent');
+    }
+    if (pauseBtn) {
+      pauseBtn.hidden = true;
+    }
+    if (!prefersReducedMotion()) {
+      const stageEl = document.querySelector('.stage');
+      if (stageEl) {
+        replayClass(stageEl, 'time-up-flash');
+      }
+    }
+    setPostActionsVisible(typeof getSelectedQuestionIndex() === 'number');
   }
 
   const timer = createTimerManager({
@@ -233,7 +299,7 @@ import {
     selectionDuration: isUwr ? 1 : 40,
     answerDuration: isUwr ? 180 : 120,
     onSelectionTimeout: handleSelectionTimeout,
-    onAnswerComplete: () => {},
+    onAnswerComplete: handleAnswerComplete,
     onTick: applyTimerState,
   });
 
@@ -241,13 +307,28 @@ import {
     timer.setDurations({ answerDuration: 180 });
   }
 
+  const defaultAnswerDuration = isUwr ? 180 : 120;
+  const TIMER_STORAGE_KEY = 'custom_timer_s';
+  let savedTimerValue = null;
+  try {
+    savedTimerValue = Number.parseInt(window.localStorage.getItem(TIMER_STORAGE_KEY) || '', 10);
+  } catch (_) {
+    savedTimerValue = null;
+  }
+  if (Number.isInteger(savedTimerValue) && savedTimerValue > 0 && customTimerInput) {
+    customTimerInput.value = String(savedTimerValue);
+    timer.setDurations({ answerDuration: savedTimerValue });
+  }
+
   if (customTimerInput) {
     customTimerInput.addEventListener('change', (e) => {
       const val = parseInt(e.target.value, 10);
       if (!Number.isNaN(val) && val > 0) {
+        window.localStorage.setItem(TIMER_STORAGE_KEY, String(val));
         timer.setDurations({ answerDuration: val });
       } else {
-        timer.setDurations({ answerDuration: isUwr ? 180 : 120 });
+        window.localStorage.removeItem(TIMER_STORAGE_KEY);
+        timer.setDurations({ answerDuration: defaultAnswerDuration });
       }
     });
   }
@@ -375,6 +456,17 @@ import {
       }
       handleAnswerStart(cardEl);
     });
+    // Keyboard accessibility: Enter activates a focused card
+    cardEl.addEventListener('keydown', (e) => {
+      if (e.key !== 'Enter') {
+        return;
+      }
+      e.preventDefault();
+      if (isUwr) {
+        return;
+      }
+      handleAnswerStart(cardEl);
+    });
   });
 
   function showQuestionOnStage(index, { startTimer = false } = {}) {
@@ -384,6 +476,7 @@ import {
     clearSelectionStyles(cardEls);
     setCardsIdle(cardEls, false);
     timer.resetAll();
+    setPostActionsVisible(false);
 
     if (isUwr) {
       applyQuestionToSlot(cardSlots[0], index, QUESTIONS, (idx) => mastery.isMastered(idx));
@@ -415,6 +508,7 @@ import {
     if (timer.isAnswerActive()) {
       return;
     }
+    setPostActionsVisible(false);
 
     const masteredSet = mastery.getAll();
     const filterState = filterMenu.getState();
@@ -471,8 +565,53 @@ import {
     timer.resetAll();
     clearSelectionStyles(cardEls);
     setCardsIdle(cardEls, true);
+    setPostActionsVisible(false);
     updateDrawAvailability();
     renderQuestionList();
+  }
+
+  // Pause / resume of the answer countdown
+  if (pauseBtn) {
+    pauseBtn.addEventListener('click', () => timer.togglePause());
+  }
+
+  // Post-answer quick actions
+  if (postMasteredBtn) {
+    postMasteredBtn.addEventListener('click', () => {
+      const idx = getSelectedQuestionIndex();
+      if (typeof idx === 'number') {
+        mastery.setMastered(idx, true);
+      }
+      setPostActionsVisible(false);
+    });
+  }
+
+  if (postRetryBtn) {
+    postRetryBtn.addEventListener('click', () => {
+      setPostActionsVisible(false);
+      timer.startAnswer();
+    });
+  }
+
+  if (postDrawBtn) {
+    postDrawBtn.addEventListener('click', () => {
+      setPostActionsVisible(false);
+      draw();
+    });
+  }
+
+  // Clear-progress confirmation dialog
+  if (clearProgressBtn && clearProgressDialog) {
+    clearProgressBtn.addEventListener('click', () => clearProgressDialog.showModal());
+  }
+  if (cancelClearProgressBtn && clearProgressDialog) {
+    cancelClearProgressBtn.addEventListener('click', () => clearProgressDialog.close());
+  }
+  if (confirmClearProgressBtn && clearProgressDialog) {
+    confirmClearProgressBtn.addEventListener('click', () => {
+      mastery.clearAll();
+      clearProgressDialog.close();
+    });
   }
 
   drawBtn.addEventListener('click', (event) => {
@@ -500,6 +639,7 @@ import {
       }
     },
     onFocusSearch: () => searchInputEl?.focus(),
+    onTogglePause: () => timer.togglePause(),
     isTimerAnswerActive: () => timer.isAnswerActive(),
     isDrawDisabled: () => drawBtn.disabled,
   });

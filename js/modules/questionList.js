@@ -5,7 +5,48 @@
  */
 
 import { getTagVariants } from './tags.js';
-import { prefersReducedMotion, setStaggerIndex } from './motion.js';
+import { prefersCoarsePointer, prefersReducedMotion, setStaggerIndex } from './motion.js';
+
+function hideGlobalTooltip() {
+  const tooltip = document.getElementById('global-tooltip');
+  if (tooltip) {
+    tooltip.classList.remove('visible');
+  }
+}
+
+// A fixed-position tooltip would linger while the list scrolls underneath.
+if (typeof window !== 'undefined' && !window.__tooltipScrollBound) {
+  window.__tooltipScrollBound = true;
+  window.addEventListener('scroll', hideGlobalTooltip, { passive: true, capture: true });
+}
+
+/**
+ * Positions the shared tooltip to the left of `item`, flipping to the
+ * right side when there is not enough room and clamping to the viewport.
+ */
+function positionTooltip(tooltip, item) {
+  const rect = item.getBoundingClientRect();
+  const tipRect = tooltip.getBoundingClientRect();
+  const margin = 12;
+  const gap = 12;
+  const top = Math.max(8, Math.min(rect.top + rect.height / 2, window.innerHeight - tipRect.height / 2 - 8));
+
+  let placeLeft = rect.left - gap - tipRect.width >= 8;
+  let left;
+  let transform;
+
+  if (placeLeft) {
+    left = rect.left - gap;
+    transform = 'translate(-100%, -50%)';
+  } else {
+    left = Math.min(rect.right + gap, window.innerWidth - tipRect.width - 8);
+    transform = 'translate(0, -50%)';
+  }
+
+  tooltip.style.top = `${top}px`;
+  tooltip.style.left = `${left}px`;
+  tooltip.style.transform = `${transform} scale(1)`;
+}
 
 export function renderQuestionList({
   containerEl,
@@ -72,40 +113,33 @@ export function renderQuestionList({
 
     item.dataset.text = entry.text;
 
-    item.addEventListener('mouseenter', () => {
-      let tooltip = document.getElementById('global-tooltip');
-      if (!tooltip) {
-        tooltip = document.createElement('div');
-        tooltip.id = 'global-tooltip';
-        tooltip.className = 'question-item__text global-tooltip';
-        document.body.appendChild(tooltip);
-      }
-      tooltip.textContent = item.dataset.text;
+    if (!prefersCoarsePointer()) {
+      item.addEventListener('mouseenter', () => {
+        let tooltip = document.getElementById('global-tooltip');
+        if (!tooltip) {
+          tooltip = document.createElement('div');
+          tooltip.id = 'global-tooltip';
+          tooltip.className = 'question-item__text global-tooltip';
+          document.body.appendChild(tooltip);
+        }
+        tooltip.textContent = item.dataset.text;
+        tooltip.classList.remove('flip');
+        positionTooltip(tooltip, item);
+        if (tooltip.style.transform.includes('translate(0,')) {
+          tooltip.classList.add('flip');
+        }
+        tooltip.classList.add('visible');
+      });
 
-      const rect = item.getBoundingClientRect();
-      tooltip.style.top = `${rect.top + rect.height / 2}px`;
-      tooltip.style.left = `${rect.left - 12}px`;
-      tooltip.style.transform = `translate(-100%, -50%) scale(1)`;
-      tooltip.classList.add('visible');
-    });
-
-    item.addEventListener('mouseleave', () => {
-      const tooltip = document.getElementById('global-tooltip');
-      if (tooltip) {
-        tooltip.style.transform = `translate(-100%, -50%) scale(0.95)`;
-        tooltip.classList.remove('visible');
-      }
-    });
+      item.addEventListener('mouseleave', hideGlobalTooltip);
+    }
 
     item.title = 'Pokaż na ekranie i zacznij odpowiadać (PPM = oznacz opanowanie)';
     item.addEventListener('click', () => {
       if (typeof onSelectQuestion === 'function') {
         onSelectQuestion(idx);
       }
-      const tooltip = document.getElementById('global-tooltip');
-      if (tooltip) {
-        tooltip.classList.remove('visible');
-      }
+      hideGlobalTooltip();
     });
 
     item.addEventListener('contextmenu', (e) => {

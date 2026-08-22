@@ -9,6 +9,7 @@ export function setupKeyboardShortcuts({
   onSelectCard,
   onToggleActiveMastered,
   onFocusSearch,
+  onTogglePause,
   isTimerAnswerActive,
   isDrawDisabled,
 }) {
@@ -23,6 +24,16 @@ export function setupKeyboardShortcuts({
     }
 
     if (targetTag === 'BUTTON' && e.code !== 'Space' && e.key !== 'Escape') {
+      return;
+    }
+
+    // Space / P toggles the pause while the answer timer runs
+    const answerRunning = typeof isTimerAnswerActive === 'function' && isTimerAnswerActive();
+    if ((e.code === 'Space' || (e.key && e.key.toLowerCase() === 'p')) && answerRunning) {
+      e.preventDefault();
+      if (typeof onTogglePause === 'function') {
+        onTogglePause();
+      }
       return;
     }
 

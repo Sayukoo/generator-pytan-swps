@@ -1,6 +1,7 @@
 /**
  * Timer Manager Module
- * Handles selection phase and answer phase timers.
+ * Handles selection phase and answer phase timers,
+ * including pause/resume of the answer countdown.
  */
 
 export const DRAW_LABEL = 'Losuj';
@@ -28,6 +29,8 @@ export function createTimerManager({
   let delayedLabelTimeout = null;
   let isSelectionActive = false;
   let isAnswerActive = false;
+  let isAnswerPaused = false;
+  let answerRemaining = 0;
   let config = {
     selectionDuration,
     answerDuration,
@@ -48,7 +51,7 @@ export function createTimerManager({
 
   function showTimerLabel(seconds, phase) {
     setButtonLabel(formatTime(seconds));
-    onTick(seconds, phase);
+    onTick(seconds, phase, { duration: config.answerDuration });
   }
 
   function scheduleLabelReset() {
@@ -73,14 +76,20 @@ export function createTimerManager({
     }
   }
 
-  function cancelAnswer({ resetLabel = true } = {}) {
+  function stopAnswerInterval() {
     if (answerTimerId) {
       clearInterval(answerTimerId);
       answerTimerId = null;
     }
+  }
+
+  function cancelAnswer({ resetLabel = true } = {}) {
+    stopAnswerInterval();
     isAnswerActive = false;
+    isAnswerPaused = false;
     if (drawBtn) {
       drawBtn.disabled = false;
+      drawBtn.classList.remove('timer-paused');
     }
     if (resetLabel) {
       clearDelayedLabel();
@@ -126,6 +135,9 @@ export function createTimerManager({
     if (!drawBtn) {
       return false;
     }
+    if (isAnswerActive && isAnswerPaused) {
+      return resumeAnswer();
+    }
     if (isAnswerActive) {
       return false;
     }
@@ -133,24 +145,70 @@ export function createTimerManager({
     isSelectionActive = false;
     clearDelayedLabel();
     isAnswerActive = true;
+    isAnswerPaused = false;
     drawBtn.disabled = true;
 
-    let remaining = config.answerDuration;
-    showTimerLabel(remaining, 'answer');
+    answerRemaining = config.answerDuration;
+    showTimerLabel(answerRemaining, 'answer');
 
     answerTimerId = setInterval(() => {
-      remaining -= 1;
-      if (remaining <= 0) {
+      answerRemaining -= 1;
+      if (answerRemaining <= 0) {
         showTimerLabel(0, 'answer');
         cancelAnswer({ resetLabel: false });
         scheduleLabelReset();
         onAnswerComplete();
         return;
       }
-      showTimerLabel(remaining, 'answer');
+      showTimerLabel(answerRemaining, 'answer');
     }, 1000);
 
     return true;
+  }
+
+  function pauseAnswer() {
+    if (!isAnswerActive || isAnswerPaused) {
+      return false;
+    }
+    stopAnswerInterval();
+    isAnswerPaused = true;
+    if (drawBtn) {
+      drawBtn.classList.add('timer-paused');
+      drawBtn.textContent = `${formatTime(answerRemaining)} ⏸`;
+    }
+    onTick(answerRemaining, 'paused', { duration: config.answerDuration });
+    return true;
+  }
+
+  function resumeAnswer() {
+    if (!isAnswerActive || !isAnswerPaused) {
+      return false;
+    }
+    isAnswerPaused = false;
+    if (drawBtn) {
+      drawBtn.classList.remove('timer-paused');
+    }
+    showTimerLabel(answerRemaining, 'answer');
+
+    answerTimerId = setInterval(() => {
+      answerRemaining -= 1;
+      if (answerRemaining <= 0) {
+        showTimerLabel(0, 'answer');
+        cancelAnswer({ resetLabel: false });
+        scheduleLabelReset();
+        onAnswerComplete();
+        return;
+      }
+      showTimerLabel(answerRemaining, 'answer');
+    }, 1000);
+    return true;
+  }
+
+  function togglePause() {
+    if (isAnswerPaused) {
+      return resumeAnswer();
+    }
+    return pauseAnswer();
   }
 
   function resetAll() {
@@ -159,11 +217,13 @@ export function createTimerManager({
     clearDelayedLabel();
     isSelectionActive = false;
     isAnswerActive = false;
+    isAnswerPaused = false;
+    answerRemaining = 0;
     if (drawBtn) {
       drawBtn.disabled = false;
     }
     setButtonLabel(DRAW_LABEL);
-    onTick(null, 'idle');
+    onTick(null, 'idle', { duration: config.answerDuration });
   }
 
   function setDurations({ selectionDuration: sel, answerDuration: ans } = {}) {
@@ -178,12 +238,17 @@ export function createTimerManager({
   return {
     startSelection,
     startAnswer,
+    pauseAnswer,
+    resumeAnswer,
+    togglePause,
     resetAll,
     prepareForDraw,
     cancelSelection,
     cancelAnswer,
     isSelectionActive: () => isSelectionActive,
     isAnswerActive: () => isAnswerActive,
+    isAnswerPaused: () => isAnswerPaused,
+    getAnswerRemaining: () => answerRemaining,
     setButtonLabel,
     setDurations,
     DRAW_LABEL,

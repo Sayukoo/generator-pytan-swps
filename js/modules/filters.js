@@ -21,19 +21,67 @@ export function createFilterMenu({
   hideMasteredEl,
   tags = [],
   tagColors = {},
+  storageKey = null,
 } = {}) {
   if (!tagListEl) {
     throw new Error('Brak kontenera tagów.');
   }
+
+  function loadPersisted() {
+    if (!storageKey) {
+      return null;
+    }
+    try {
+      const raw = window.localStorage?.getItem(storageKey);
+      const parsed = raw ? JSON.parse(raw) : null;
+      if (parsed && typeof parsed === 'object') {
+        return {
+          hideMastered: Boolean(parsed.hideMastered),
+          selectedTags: Array.isArray(parsed.selectedTags) ? parsed.selectedTags.filter((t) => typeof t === 'string') : [],
+        };
+      }
+    } catch (_) {
+      // no-op
+    }
+    return null;
+  }
+
+  const persisted = loadPersisted();
 
   const state = {
     hideMastered: hideMasteredEl ? Boolean(hideMasteredEl.checked) : false,
     selectedTags: new Set(),
   };
 
+  if (persisted) {
+    state.hideMastered = persisted.hideMastered;
+    if (hideMasteredEl) {
+      hideMasteredEl.checked = persisted.hideMastered;
+    }
+    persisted.selectedTags.forEach((tag) => state.selectedTags.add(tag));
+  }
+
+  function persistState() {
+    if (!storageKey) {
+      return;
+    }
+    try {
+      window.localStorage?.setItem(
+        storageKey,
+        JSON.stringify({
+          hideMastered: state.hideMastered,
+          selectedTags: Array.from(state.selectedTags),
+        }),
+      );
+    } catch (_) {
+      // no-op
+    }
+  }
+
   const listeners = new Set();
 
   function emit() {
+    persistState();
     const snapshot = {
       hideMastered: state.hideMastered,
       selectedTags: new Set(state.selectedTags),
@@ -55,6 +103,13 @@ export function createFilterMenu({
     ),
   );
 
+  // Drop persisted tags that no longer exist in this bank
+  Array.from(state.selectedTags).forEach((tag) => {
+    if (!uniqueTags.includes(tag)) {
+      state.selectedTags.delete(tag);
+    }
+  });
+
   uniqueTags.forEach((tag, index) => {
     const option = document.createElement('label');
     option.className = 'tag-chip';
@@ -67,6 +122,9 @@ export function createFilterMenu({
     input.type = 'checkbox';
     input.id = `filter-tag-${slugify(tag, `tag-${index}`)}-${index}`;
     input.value = tag;
+    if (state.selectedTags.has(tag)) {
+      input.checked = true;
+    }
     input.addEventListener('change', () => {
       if (input.checked) {
         state.selectedTags.add(tag);

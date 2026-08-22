@@ -9,7 +9,20 @@ const STORAGE_KEYS = {
   uwr: 'uwr-mastered-questions.v1',
   custom: 'custom-mastered-questions.v1',
 };
+const LOG_KEYS = {
+  swps: 'swps-mastery-log.v1',
+  uwr: 'uwr-mastery-log.v1',
+  custom: 'custom-mastery-log.v1',
+};
 const STORAGE_KEY = STORAGE_KEYS[activeBank] || STORAGE_KEYS.swps;
+const LOG_KEY = LOG_KEYS[activeBank] || LOG_KEYS.swps;
+
+function todayStamp() {
+  const now = new Date();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const day = String(now.getDate()).padStart(2, '0');
+  return `${now.getFullYear()}-${month}-${day}`;
+}
 
 function sanitizeIndex(index) {
   if (typeof index === 'number' && Number.isInteger(index) && index >= 0) {
@@ -53,8 +66,33 @@ function persist(set) {
   }
 }
 
+function loadLog() {
+  try {
+    const raw = window.localStorage?.getItem(LOG_KEY);
+    const parsed = raw ? JSON.parse(raw) : null;
+    if (!Array.isArray(parsed)) {
+      return [];
+    }
+    return parsed.filter(
+      (entry) => entry && Number.isInteger(entry.i) && typeof entry.d === 'string',
+    );
+  } catch (error) {
+    console.warn('[masteryManager] Failed to load mastery log:', error);
+    return [];
+  }
+}
+
+function persistLog(log) {
+  try {
+    window.localStorage?.setItem(LOG_KEY, JSON.stringify(log.slice(-2000)));
+  } catch (error) {
+    console.warn('[masteryManager] Failed to persist mastery log:', error);
+  }
+}
+
 const listeners = new Set();
 let masteredSet = loadMastered();
+let masteryLog = loadLog();
 
 function emit() {
   const snapshot = new Set(masteredSet);
@@ -91,8 +129,15 @@ export function setMastered(index, flag) {
   }
   if (nextFlag) {
     masteredSet.add(cleanIndex);
+    masteryLog.push({ i: cleanIndex, d: todayStamp() });
+    persistLog(masteryLog);
   } else {
     masteredSet.delete(cleanIndex);
+    const logIndex = masteryLog.map((entry) => entry.i).lastIndexOf(cleanIndex);
+    if (logIndex !== -1) {
+      masteryLog.splice(logIndex, 1);
+      persistLog(masteryLog);
+    }
   }
   persist(masteredSet);
   emit();
@@ -117,8 +162,15 @@ export function clearAll() {
     return;
   }
   masteredSet = new Set();
+  masteryLog = [];
   persist(masteredSet);
+  persistLog(masteryLog);
   emit();
+}
+
+export function getTodayCount() {
+  const today = todayStamp();
+  return masteryLog.filter((entry) => entry.d === today).length;
 }
 
 export function subscribe(listener) {
@@ -138,5 +190,6 @@ export const masteryManager = {
   toggleMastered,
   getAll,
   clearAll,
+  getTodayCount,
   subscribe,
 };

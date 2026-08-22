@@ -1,7 +1,7 @@
 /**
  * Study Plan Module
- * Calculates and displays a study plan based on a target date and mastery progress.
- * Result updates play a soft refresh animation.
+ * Calculates and displays a study plan based on a target date, mastery progress
+ * and today's completions. Result updates play a soft refresh animation.
  */
 
 import { prefersReducedMotion, replayClass } from './motion.js';
@@ -24,11 +24,23 @@ export function setupStudyPlan({ dateInputId, resultContainerId, totalQuestions,
     dateInput.value = savedDate;
   }
 
+  function progressBar(percent, label) {
+    return `<div class="plan-progress"><div class="plan-progress__bar" style="width:${percent}%"></div></div>`;
+  }
+
   function calculateAndDisplayPlan() {
     const selectedDateStr = dateInput.value;
+    const masteredCount = masteryManager.getAll().size;
+    const doneToday = masteryManager.getTodayCount();
+    const overallPercent = totalQuestions > 0 ? Math.round((masteredCount / totalQuestions) * 100) : 0;
 
     if (!selectedDateStr) {
-      resultContainer.innerHTML = '';
+      renderPlan(
+        `${progressBar(overallPercent)}`
+        + `<div class="plan-line">Opanowane: <strong>${masteredCount}/${totalQuestions}</strong> (${overallPercent}%)</div>`
+        + (doneToday > 0 ? `<div class="plan-goal"><span>Dziś: <strong>${doneToday}</strong> pyt.</span></div>` : '')
+        + `<div class="plan-hint">Wybierz datę egzaminu, aby policzyć tempo nauki.</div>`,
+      );
       return;
     }
 
@@ -43,22 +55,31 @@ export function setupStudyPlan({ dateInputId, resultContainerId, totalQuestions,
     const daysLeft = Math.ceil(timeDiff / (1000 * 3600 * 24));
 
     if (daysLeft <= 0) {
-      renderPlan('<strong>Egzamin tuż tuż!</strong>');
+      renderPlan(
+        `${progressBar(overallPercent)}<div class="plan-line"><strong>Egzamin tuż tuż!</strong></div><div class="plan-line">Opanowane: <strong>${masteredCount}/${totalQuestions}</strong> (${overallPercent}%)</div>`,
+      );
       return;
     }
 
-    const masteredCount = masteryManager.getAll().size;
     const questionsLeft = Math.max(0, totalQuestions - masteredCount);
 
     if (questionsLeft === 0) {
-      renderPlan('<strong>Wszystko opanowane! Gratulacje!</strong>');
+      renderPlan(
+        `${progressBar(100)}<div class="plan-line"><strong>Wszystko opanowane! Gratulacje!</strong></div>`,
+      );
       return;
     }
 
     const questionsPerDay = Math.ceil(questionsLeft / daysLeft);
+    const goalPercent = Math.min(100, Math.round((doneToday / questionsPerDay) * 100));
 
     renderPlan(
-      `Do opanowania: ${questionsLeft} pytań.<br>Pozostało: ${daysLeft} dni.<br><strong>Cel: ${questionsPerDay} pytań/dzień.</strong>`,
+      `${progressBar(overallPercent)}`
+      + `<div class="plan-line">Opanowane: <strong>${masteredCount}/${totalQuestions}</strong> · zostało <strong>${daysLeft}</strong> dni.</div>`
+      + `<div class="plan-goal${goalPercent >= 100 ? ' plan-goal--done' : ''}">`
+      + `<span>Cel na dziś: <strong>${Math.min(doneToday, questionsPerDay)}/${questionsPerDay}</strong></span>`
+      + `<div class="plan-progress plan-progress--goal"><div class="plan-progress__bar" style="width:${goalPercent}%"></div></div>`
+      + `</div>`,
     );
   }
 

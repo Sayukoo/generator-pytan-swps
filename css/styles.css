@@ -178,6 +178,11 @@ a:hover {
 }
 
 .progress-pill {
+  position: relative;
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   font-variant-numeric: tabular-nums;
   font-size: 13px;
   font-weight: 600;
@@ -187,6 +192,23 @@ a:hover {
   border: 1px solid rgba(255, 255, 255, 0.2);
   background: var(--accent-soft);
   color: rgba(255, 255, 255, 0.9);
+}
+
+.progress-pill__track {
+  width: 56px;
+  height: 4px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.14);
+  overflow: hidden;
+}
+
+.progress-pill__bar {
+  display: block;
+  width: 0;
+  height: 100%;
+  border-radius: inherit;
+  background: #5eead4;
+  transition: width 0.5s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .ghost-btn,
@@ -428,7 +450,77 @@ a:hover {
 .primary-actions {
   width: 100%;
   display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.primary-actions__row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.pause-btn {
+  text-transform: none;
+  letter-spacing: 0.02em;
+  font-size: 13px;
+  padding: 11px 16px;
+}
+
+.timer-track {
+  width: min(320px, 80%);
+  height: 4px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+}
+
+.timer-track__fill {
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.9), #ffffff);
+  transform-origin: left center;
+  transform: scaleX(0);
+  transition: transform 0.9s linear, background 0.3s ease;
+}
+
+.timer-track__fill.is-urgent {
+  background: linear-gradient(90deg, #ff5f56, #ff8fb1);
+}
+
+.post-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  animation: fadeSlideUp 0.35s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+.post-actions[hidden] {
+  display: none;
+}
+
+.post-actions__label {
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.post-actions__row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
   justify-content: center;
+}
+
+.post-primary {
+  min-width: 0;
+  padding: 12px 24px;
+  font-size: 15px;
 }
 
 .primary {
@@ -462,6 +554,10 @@ a:hover {
   opacity: 0.45;
   cursor: not-allowed;
   transform: none;
+}
+
+.primary.timer-paused {
+  opacity: 0.75;
 }
 
 .primary.pulse {
@@ -715,6 +811,17 @@ a:hover {
   visibility: visible;
 }
 
+/* Flipped placement (tooltip on the right of the item) */
+.global-tooltip.flip::after {
+  left: auto;
+  right: 100%;
+  border-color: transparent #fff transparent transparent;
+}
+
+html[data-theme="sepia"] .global-tooltip.flip::after {
+  border-color: transparent #3d2b1f transparent transparent;
+}
+
 /* ——— Footer / dialog ——— */
 .site-footer {
   height: 44px;
@@ -734,7 +841,7 @@ dialog {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  background: #12141a;
+  background: var(--bg-elevated, #12141a);
   border: 1px solid var(--line);
   border-radius: 16px;
   color: var(--fg);
@@ -793,6 +900,27 @@ kbd {
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@keyframes planRefresh {
+  0% {
+    opacity: 0.35;
+    transform: translateY(3px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes timeUpFlash {
+  0%,
+  18% {
+    filter: brightness(1.55) saturate(1.15);
+  }
+  100% {
+    filter: brightness(1) saturate(1);
   }
 }
 
@@ -888,6 +1016,18 @@ kbd {
   .topbar__actions {
     width: 100%;
     justify-content: flex-end;
+    flex-wrap: wrap;
+    row-gap: 8px;
+  }
+
+  .topbar__actions .theme-select-wrapper,
+  .topbar__actions .custom-timer-wrapper {
+    order: 1;
+  }
+
+  .topbar__actions .progress-pill,
+  .topbar__actions .ghost-btn {
+    order: 2;
   }
 
   .shell {
@@ -923,6 +1063,15 @@ kbd {
 @media (max-width: 520px) {
   .bank-tabs {
     margin-left: 0;
+  }
+
+  .ghost-btn,
+  .text-btn {
+    padding: 8px 10px;
+  }
+
+  .progress-pill__track {
+    width: 40px;
   }
 
   .primary {
@@ -1035,6 +1184,32 @@ html[data-theme="sepia"] .question-item__text::after {
 html[data-theme="sepia"] .theme-select option {
   background: #f4ecd8;
   color: #3d2b1f;
+}
+
+/* Sepia: poprawa kontrastu elementów z zahardkowaną bielą */
+html[data-theme="sepia"] .progress-pill,
+html[data-theme="sepia"] .sidebar__hint,
+html[data-theme="sepia"] .card .question,
+html[data-theme="sepia"] .question-item__num {
+  color: var(--fg);
+}
+
+html[data-theme="sepia"] .progress-pill__track,
+html[data-theme="sepia"] .timer-track,
+html[data-theme="sepia"] .plan-progress {
+  background: rgba(61, 43, 31, 0.16);
+}
+
+html[data-theme="sepia"] .timer-track__fill {
+  background: linear-gradient(90deg, #3d2b1f, #7c6853);
+}
+
+html[data-theme="sepia"] .timer-track__fill.is-urgent {
+  background: linear-gradient(90deg, #c0392b, #e67e22);
+}
+
+html[data-theme="sepia"] .import-code {
+  background: rgba(61, 43, 31, 0.08);
 }
 
 /* ——— Motyw: Pixel RPG / Retro 8-bit ——— */
@@ -1154,4 +1329,79 @@ html[data-theme="pixel"] .question-item {
 }
 .study-plan-result strong {
   color: var(--fg);
+}
+
+.plan-refresh {
+  animation: planRefresh 0.45s ease;
+}
+
+.plan-progress {
+  height: 5px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.plan-progress__bar {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #5eead4, #3498db);
+  transition: width 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.plan-line {
+  margin-bottom: 6px;
+}
+
+.plan-hint {
+  font-size: 12px;
+  opacity: 0.75;
+}
+
+.plan-goal {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 12.5px;
+}
+
+.plan-goal--done strong {
+  color: #5eead4;
+}
+
+.plan-progress--goal {
+  flex: 1;
+  margin-bottom: 0;
+  min-width: 60px;
+}
+
+.plan-progress--goal .plan-progress__bar {
+  background: linear-gradient(90deg, #ffd76a, #ff8fb1);
+}
+
+.plan-goal--done .plan-progress--goal .plan-progress__bar {
+  background: #5eead4;
+}
+
+/* ——— Danger actions ——— */
+.danger-text-btn:hover {
+  color: #ff6b6b;
+}
+
+.danger-btn {
+  background: rgba(255, 107, 107, 0.14);
+  border-color: rgba(255, 107, 107, 0.45);
+  color: #ff6b6b;
+}
+
+.danger-btn:hover {
+  background: rgba(255, 107, 107, 0.24);
+  border-color: rgba(255, 107, 107, 0.7);
+}
+
+/* ——— Time's up flash ——— */
+.stage.time-up-flash {
+  animation: timeUpFlash 0.9s ease-out;
 }
