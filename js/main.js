@@ -18,7 +18,7 @@ import {
   animateCard,
   refreshCardMasteryState,
 } from './modules/cards.js';
-import { renderQuestionList as renderList, popListItem } from './modules/questionList.js';
+import { renderQuestionList as renderList } from './modules/questionList.js';
 import { setupKeyboardShortcuts } from './modules/keyboard.js';
 import { addRipple, updateTopbarInfo, setupHelpModal, celebrateMastery } from './modules/uiHelpers.js';
 import { initTheme, setTheme } from './modules/themeManager.js';
@@ -42,8 +42,16 @@ import {
     throw new Error('Brak danych pytań.');
   }
 
-  const activeBank = ACTIVE_BANK || 'swps';
+  const activeBank = ACTIVE_BANK || 'swps50';
+  const isSwps50 = activeBank === 'swps50';
   const isUwr = activeBank === 'uwr';
+
+  const BANK_LABELS = {
+    swps50: 'SWPS (50) · Licencjat',
+    swps: 'SWPS (75) · Magisterskie',
+    uwr: 'UWr (31) · Psychologia',
+    custom: 'Własna baza',
+  };
 
   // Initialize Theme
   const currentTheme = initTheme();
@@ -59,6 +67,18 @@ import {
   const helpBtn = document.getElementById('helpBtn');
   const helpDialog = document.getElementById('helpDialog');
   const closeHelpBtn = document.getElementById('closeHelp');
+
+  const menuBtn = document.getElementById('menuBtn');
+  const settingsMenu = document.getElementById('settingsMenu');
+
+  const activeBankBadge = document.getElementById('activeBankBadge');
+  const activeBankBadgeText = document.getElementById('activeBankBadgeText');
+  const examStageIndicator = document.getElementById('examStageIndicator');
+  const stageStep1 = document.getElementById('stageStep1');
+  const stageStep2 = document.getElementById('stageStep2');
+  const nextStageBtn = document.getElementById('nextStageBtn');
+  const postNextStageBtn = document.getElementById('postNextStageBtn');
+  const postActionsLabel = document.getElementById('postActionsLabel');
 
   const importBtn = document.getElementById('importBtn');
   const importDialog = document.getElementById('importDialog');
@@ -80,17 +100,99 @@ import {
   const postRetryBtn = document.getElementById('postRetryBtn');
   const postDrawBtn = document.getElementById('postDrawBtn');
 
+  const timerChipBtn = document.getElementById('timerChipBtn');
+  const timerChipValue = document.getElementById('timerChipValue');
+  const timerPopover = document.getElementById('timerPopover');
+  const timerPresetsEl = document.getElementById('timerPresets');
+  const timerCustomApply = document.getElementById('timerCustomApply');
+  const customTimerInput = document.getElementById('customTimerInput');
+
   const clearProgressBtn = document.getElementById('clearProgressBtn');
   const clearProgressDialog = document.getElementById('clearProgressDialog');
   const cancelClearProgressBtn = document.getElementById('cancelClearProgress');
   const confirmClearProgressBtn = document.getElementById('confirmClearProgress');
 
-  const tabSwpsBtn = document.getElementById('tab-swps');
-  const tabUwrBtn = document.getElementById('tab-uwr');
-  const tabCustomBtn = document.getElementById('tab-custom');
-
   const cardsRoot = document.getElementById('cardsRoot');
-  const customTimerInput = document.getElementById('customTimerInput');
+
+  // Exam stage for SWPS (50): 1 = practical, 2 = theoretical, 0 = idle/done
+  let examStage = isSwps50 ? 1 : 0;
+
+  function updateExamStageUI() {
+    if (!isSwps50) {
+      if (examStageIndicator) examStageIndicator.hidden = true;
+      if (nextStageBtn) nextStageBtn.hidden = true;
+      if (postNextStageBtn) postNextStageBtn.hidden = true;
+      return;
+    }
+    if (examStageIndicator) {
+      examStageIndicator.hidden = false;
+    }
+    if (stageStep1 && stageStep2) {
+      if (examStage === 1) {
+        stageStep1.classList.add('is-active');
+        stageStep1.classList.remove('is-done');
+        stageStep2.classList.remove('is-active', 'is-done');
+      } else if (examStage === 2) {
+        stageStep1.classList.remove('is-active');
+        stageStep1.classList.add('is-done');
+        stageStep2.classList.add('is-active');
+        stageStep2.classList.remove('is-done');
+      } else {
+        stageStep1.classList.remove('is-active', 'is-done');
+        stageStep2.classList.remove('is-active', 'is-done');
+      }
+    }
+  }
+
+  // Settings menu (⚙)
+  function closeSettingsMenu() {
+    if (settingsMenu && !settingsMenu.hidden) {
+      settingsMenu.hidden = true;
+      menuBtn?.setAttribute('aria-expanded', 'false');
+    }
+  }
+
+  if (menuBtn && settingsMenu) {
+    menuBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const willOpen = settingsMenu.hidden;
+      settingsMenu.hidden = !willOpen;
+      menuBtn.setAttribute('aria-expanded', String(willOpen));
+    });
+    settingsMenu.addEventListener('click', (e) => {
+      if (e.target instanceof Element && e.target.closest('button:not(.mode-select-item)')) {
+        closeSettingsMenu();
+      }
+    });
+  }
+
+  if (activeBankBadge && settingsMenu) {
+    activeBankBadge.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const willOpen = settingsMenu.hidden;
+      settingsMenu.hidden = !willOpen;
+      menuBtn?.setAttribute('aria-expanded', String(willOpen));
+    });
+  }
+
+  document.addEventListener('click', (e) => {
+    if (!(e.target instanceof Element)) {
+      return;
+    }
+    if (settingsMenu && !settingsMenu.contains(e.target) && !menuBtn?.contains(e.target) && !activeBankBadge?.contains(e.target)) {
+      closeSettingsMenu();
+    }
+    if (timerPopover && !timerPopover.contains(e.target) && !timerChipBtn?.contains(e.target)) {
+      closeTimerPopover();
+    }
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      closeSettingsMenu();
+      closeTimerPopover();
+    }
+  });
 
   let searchQuery = '';
 
@@ -98,48 +200,52 @@ import {
     throw new Error('Nie udało się zainicjalizować elementów interfejsu.');
   }
 
-  // Set initial mode & tabs
+  // Set initial mode & labels
   if (cardsRoot) {
     cardsRoot.dataset.mode = isUwr ? 'single' : 'pair';
   }
 
-  if (tabSwpsBtn && tabUwrBtn && tabCustomBtn) {
-    tabSwpsBtn.setAttribute('aria-selected', String(activeBank === 'swps'));
-    tabUwrBtn.setAttribute('aria-selected', String(activeBank === 'uwr'));
-    tabCustomBtn.setAttribute('aria-selected', String(activeBank === 'custom'));
-
-    tabSwpsBtn.classList.toggle('is-active', activeBank === 'swps');
-    tabUwrBtn.classList.toggle('is-active', activeBank === 'uwr');
-    tabCustomBtn.classList.toggle('is-active', activeBank === 'custom');
-
-    tabSwpsBtn.addEventListener('click', () => {
-      if (activeBank !== 'swps') {
-        window.localStorage.setItem('active_bank', 'swps');
-        window.location.reload();
-      }
-    });
-
-    tabUwrBtn.addEventListener('click', () => {
-      if (activeBank !== 'uwr') {
-        window.localStorage.setItem('active_bank', 'uwr');
-        window.location.reload();
-      }
-    });
-
-    tabCustomBtn.addEventListener('click', () => {
-      if (activeBank !== 'custom') {
-        const customData = getCustomBank();
-        if (!customData) {
-          if (importDialog) {
-            importDialog.showModal();
-          }
-          return;
-        }
-        window.localStorage.setItem('active_bank', 'custom');
-        window.location.reload();
-      }
-    });
+  if (activeBankBadgeText) {
+    activeBankBadgeText.textContent = BANK_LABELS[activeBank] || 'SWPS (50) · Licencjat';
   }
+
+  function switchBank(bankKey) {
+    if (bankKey === 'custom') {
+      const customData = getCustomBank();
+      if (!customData) {
+        closeSettingsMenu();
+        if (importDialog) {
+          importDialog.showModal();
+        }
+        return;
+      }
+    }
+    window.localStorage.setItem('active_bank', bankKey);
+    window.location.reload();
+  }
+
+  const modeButtons = [
+    { id: 'mode-swps50', key: 'swps50' },
+    { id: 'mode-swps', key: 'swps' },
+    { id: 'mode-uwr', key: 'uwr' },
+    { id: 'mode-custom', key: 'custom' },
+  ];
+
+  modeButtons.forEach(({ id, key }) => {
+    const el = document.getElementById(id);
+    if (el) {
+      const isActive = activeBank === key;
+      el.classList.toggle('is-active', isActive);
+      el.setAttribute('aria-checked', String(isActive));
+      el.addEventListener('click', () => {
+        if (activeBank !== key) {
+          switchBank(key);
+        } else {
+          closeSettingsMenu();
+        }
+      });
+    }
+  });
 
   // Setup Import Modal & File Drag/Drop
   if (importBtn && importDialog && closeImportBtn) {
@@ -262,17 +368,19 @@ import {
       }
     }
 
-    if (pauseBtn) {
-      const showPause = phase === 'answer' || phase === 'paused';
-      pauseBtn.hidden = !showPause;
-      if (showPause) {
-        const paused = timer.isAnswerPaused();
-        pauseBtn.textContent = paused ? '▶ Wznów' : '⏸ Pauza';
+    if (phase === 'answer' || phase === 'paused') {
+      if (timerChipBtn) {
+        timerChipBtn.hidden = true;
       }
-    }
-
-    if (phase === 'answer' && urgent && typeof remaining === 'number') {
-      replayClass(drawBtn, 'timer-tick');
+      if (pauseBtn) {
+        pauseBtn.hidden = false;
+        pauseBtn.textContent = timer.isAnswerPaused() ? '▶ Wznów' : '⏸ Pauza';
+      }
+    } else if (timerChipBtn) {
+      timerChipBtn.hidden = false;
+      if (pauseBtn) {
+        pauseBtn.hidden = true;
+      }
     }
   }
 
@@ -285,13 +393,30 @@ import {
     if (pauseBtn) {
       pauseBtn.hidden = true;
     }
+    if (timerChipBtn) {
+      timerChipBtn.hidden = false;
+    }
     if (!prefersReducedMotion()) {
       const stageEl = document.querySelector('.stage');
       if (stageEl) {
         replayClass(stageEl, 'time-up-flash');
       }
     }
-    setPostActionsVisible(typeof getSelectedQuestionIndex() === 'number');
+    const hasSelected = typeof getSelectedQuestionIndex() === 'number';
+    setPostActionsVisible(hasSelected);
+
+    if (isSwps50) {
+      if (examStage === 1) {
+        if (postNextStageBtn) postNextStageBtn.hidden = false;
+        if (nextStageBtn) nextStageBtn.hidden = false;
+        if (postActionsLabel) postActionsLabel.textContent = 'Krok 1 (praktyka) zakończony — przejdź do pytań teoretycznych:';
+      } else if (examStage === 2) {
+        if (postNextStageBtn) postNextStageBtn.hidden = true;
+        if (nextStageBtn) nextStageBtn.hidden = true;
+        if (stageStep2) stageStep2.classList.add('is-done');
+        if (postActionsLabel) postActionsLabel.textContent = 'Egzamin licencjacki ukończony! Jak poszło?';
+      }
+    }
   }
 
   const timer = createTimerManager({
@@ -309,26 +434,100 @@ import {
 
   const defaultAnswerDuration = isUwr ? 180 : 120;
   const TIMER_STORAGE_KEY = 'custom_timer_s';
-  let savedTimerValue = null;
+  let currentAnswerDuration = defaultAnswerDuration;
   try {
-    savedTimerValue = Number.parseInt(window.localStorage.getItem(TIMER_STORAGE_KEY) || '', 10);
+    const savedTimerValue = Number.parseInt(window.localStorage.getItem(TIMER_STORAGE_KEY) || '', 10);
+    if (Number.isInteger(savedTimerValue) && savedTimerValue > 0) {
+      currentAnswerDuration = savedTimerValue;
+      if (customTimerInput) {
+        customTimerInput.value = String(savedTimerValue);
+      }
+    }
   } catch (_) {
-    savedTimerValue = null;
-  }
-  if (Number.isInteger(savedTimerValue) && savedTimerValue > 0 && customTimerInput) {
-    customTimerInput.value = String(savedTimerValue);
-    timer.setDurations({ answerDuration: savedTimerValue });
+    // no-op
   }
 
+  function formatClock(totalSeconds) {
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
+    return `${minutes}:${String(seconds).padStart(2, '0')}`;
+  }
+
+  function syncTimerChip() {
+    if (timerChipValue) {
+      timerChipValue.textContent = formatClock(currentAnswerDuration);
+    }
+    if (timerPresetsEl) {
+      timerPresetsEl.querySelectorAll('button[data-seconds]').forEach((btn) => {
+        btn.classList.toggle('is-active', Number(btn.dataset.seconds) === currentAnswerDuration);
+      });
+    }
+  }
+
+  function setAnswerDuration(seconds) {
+    if (!Number.isInteger(seconds) || seconds <= 0) {
+      return false;
+    }
+    currentAnswerDuration = seconds;
+    window.localStorage.setItem(TIMER_STORAGE_KEY, String(seconds));
+    if (customTimerInput) {
+      customTimerInput.value = String(seconds);
+    }
+    timer.setDurations({ answerDuration: seconds });
+    syncTimerChip();
+    return true;
+  }
+
+  function closeTimerPopover() {
+    if (timerPopover && !timerPopover.hidden) {
+      timerPopover.hidden = true;
+      timerChipBtn?.setAttribute('aria-expanded', 'false');
+    }
+  }
+
+  function applyCustomTimerValue() {
+    if (!customTimerInput) {
+      return;
+    }
+    const val = Number.parseInt(customTimerInput.value, 10);
+    if (setAnswerDuration(val)) {
+      closeTimerPopover();
+    } else {
+      customTimerInput.value = String(currentAnswerDuration);
+    }
+  }
+
+  timer.setDurations({ answerDuration: currentAnswerDuration });
+  syncTimerChip();
+
+  if (timerChipBtn && timerPopover) {
+    timerChipBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const willOpen = timerPopover.hidden;
+      timerPopover.hidden = !willOpen;
+      timerChipBtn.setAttribute('aria-expanded', String(willOpen));
+    });
+  }
+
+  if (timerPresetsEl) {
+    timerPresetsEl.addEventListener('click', (e) => {
+      const btn = e.target instanceof Element ? e.target.closest('button[data-seconds]') : null;
+      if (!btn) {
+        return;
+      }
+      setAnswerDuration(Number.parseInt(btn.dataset.seconds, 10));
+      closeTimerPopover();
+    });
+  }
+
+  if (timerCustomApply) {
+    timerCustomApply.addEventListener('click', applyCustomTimerValue);
+  }
   if (customTimerInput) {
-    customTimerInput.addEventListener('change', (e) => {
-      const val = parseInt(e.target.value, 10);
-      if (!Number.isNaN(val) && val > 0) {
-        window.localStorage.setItem(TIMER_STORAGE_KEY, String(val));
-        timer.setDurations({ answerDuration: val });
-      } else {
-        window.localStorage.removeItem(TIMER_STORAGE_KEY);
-        timer.setDurations({ answerDuration: defaultAnswerDuration });
+    customTimerInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        applyCustomTimerValue();
       }
     });
   }
@@ -342,9 +541,8 @@ import {
 
   // Subscriptions
   mastery.subscribe(() => {
-    refreshAllMasteryStates();
-    updateDrawAvailability();
     renderQuestionList();
+    updateDrawAvailability();
   });
 
   filterMenu.subscribe(() => {
@@ -352,23 +550,20 @@ import {
     renderQuestionList();
   });
 
-  function refreshAllMasteryStates(changedIndex) {
+  function refreshAllMasteryStates() {
     cardSlots.forEach((slot) => {
       const wasMastered = slot.cardEl.classList.contains('mastered');
       refreshCardMasteryState(slot, (idx) => mastery.isMastered(idx));
       const nowMastered = slot.cardEl.classList.contains('mastered');
       if (!wasMastered && nowMastered) {
-        replayClass(slot.cardEl, 'mastered-pop');
         celebrateMastery(slot.cardEl, true);
       }
     });
-    if (typeof changedIndex === 'number') {
-      popListItem(questionListEl, changedIndex);
-    }
     updateTopbarInfo({
       totalCount: QUESTIONS.length,
       masteredCount: mastery.getAll().size,
       isUwr,
+      bankLabel: BANK_LABELS[activeBank],
     });
   }
 
@@ -381,11 +576,7 @@ import {
       activeQuestionIndices: cardSlots.map((s) => s.questionIndex),
       onSelectQuestion: (idx) => showQuestionOnStage(idx, { startTimer: true }),
       onToggleMastered: (idx) => {
-        const wasMastered = mastery.isMastered(idx);
         mastery.toggleMastered(idx);
-        if (!wasMastered && !prefersReducedMotion()) {
-          popListItem(questionListEl, idx);
-        }
       },
       searchQuery,
     });
@@ -393,7 +584,8 @@ import {
   }
 
   function updateDrawAvailability() {
-    const candidates = getCandidateIndices(QUESTIONS, filterMenu.getState(), (idx) => mastery.isMastered(idx));
+    const poolCategory = isSwps50 ? (examStage === 2 ? 'theoretical' : 'practical') : null;
+    const candidates = getCandidateIndices(QUESTIONS, filterMenu.getState(), (idx) => mastery.isMastered(idx), poolCategory);
     const hasCandidates = candidates.length > 0;
     if (drawBtn && !timer.isAnswerActive()) {
       drawBtn.disabled = !hasCandidates;
@@ -402,12 +594,16 @@ import {
       drawBtn.classList.toggle('no-candidates', !hasCandidates);
     }
     if (!timer.isAnswerActive() && !timer.isSelectionActive()) {
-      timer.setButtonLabel(hasCandidates ? timer.DRAW_LABEL : 'Brak pytań');
+      let label = timer.DRAW_LABEL;
+      if (isSwps50) {
+        label = examStage === 2 ? 'Losuj (Teoria)' : 'Losuj (Praktyka)';
+      }
+      timer.setButtonLabel(hasCandidates ? label : 'Brak pytań');
     }
     return hasCandidates;
   }
 
-  function handleAnswerStart(cardEl, { autoPicked = false, force = false } = {}) {
+  function handleAnswerStart(cardEl, { force = false } = {}) {
     if (!cardEl || timer.isAnswerActive()) {
       return;
     }
@@ -422,15 +618,70 @@ import {
       return;
     }
     setCardsIdle(cardEls, false);
-    applySelectionStyles(cardEls, cardEl, { autoPicked });
+    applySelectionStyles(cardEls, cardEl);
     if (!prefersReducedMotion()) {
       const { x, y } = elementCenter(cardEl);
       burstParticles(x, y, {
-        count: 10,
-        spread: 70,
+        count: 8,
+        spread: 60,
         colors: accentBurstColors(cardEl),
       });
     }
+
+    if (isSwps50 && examStage === 1) {
+      if (nextStageBtn) {
+        nextStageBtn.hidden = false;
+        nextStageBtn.textContent = 'Krok 2: Teoria ➔';
+      }
+    }
+  }
+
+  function advanceToTheoreticalStage() {
+    if (!isSwps50) {
+      return;
+    }
+    examStage = 2;
+    updateExamStageUI();
+    setPostActionsVisible(false);
+    if (nextStageBtn) {
+      nextStageBtn.hidden = true;
+    }
+    if (postNextStageBtn) {
+      postNextStageBtn.hidden = true;
+    }
+    timer.resetAll();
+
+    const masteredSet = mastery.getAll();
+    const filterState = filterMenu.getState();
+
+    const [firstIndex, secondIndex] = selectQuestionPair(QUESTIONS, filterState, masteredSet, 'theoretical');
+    if (firstIndex === null && secondIndex === null) {
+      updateDrawAvailability();
+      renderQuestionList();
+      return;
+    }
+
+    clearSelectionStyles(cardEls);
+    setCardsIdle(cardEls, false);
+    if (drawBtn) {
+      replayClass(drawBtn, 'pulse');
+    }
+
+    applyQuestionToSlot(cardSlots[0], firstIndex, QUESTIONS, (idx) => mastery.isMastered(idx));
+    applyQuestionToSlot(cardSlots[1], secondIndex, QUESTIONS, (idx) => mastery.isMastered(idx));
+    animateCard(cardSlots[0]);
+    animateCard(cardSlots[1]);
+
+    timer.startSelection();
+    updateDrawAvailability();
+    renderQuestionList();
+  }
+
+  if (nextStageBtn) {
+    nextStageBtn.addEventListener('click', advanceToTheoreticalStage);
+  }
+  if (postNextStageBtn) {
+    postNextStageBtn.addEventListener('click', advanceToTheoreticalStage);
   }
 
   function handleSelectionTimeout() {
@@ -445,7 +696,7 @@ import {
     const pool = prioritized.length > 0 ? prioritized : available;
     const choice = pool[Math.floor(Math.random() * pool.length)];
     if (choice) {
-      handleAnswerStart(choice.cardEl, { autoPicked: true, force: true });
+      handleAnswerStart(choice.cardEl, { force: true });
     }
   }
 
@@ -477,6 +728,18 @@ import {
     setCardsIdle(cardEls, false);
     timer.resetAll();
     setPostActionsVisible(false);
+    if (nextStageBtn) {
+      nextStageBtn.hidden = true;
+    }
+    if (postNextStageBtn) {
+      postNextStageBtn.hidden = true;
+    }
+
+    if (isSwps50) {
+      const q = QUESTIONS[index];
+      examStage = q?.category === 'theoretical' ? 2 : 1;
+      updateExamStageUI();
+    }
 
     if (isUwr) {
       applyQuestionToSlot(cardSlots[0], index, QUESTIONS, (idx) => mastery.isMastered(idx));
@@ -486,7 +749,7 @@ import {
       }
       if (startTimer) {
         timer.startAnswer();
-        applySelectionStyles(cardEls, cardSlots[0].cardEl, { autoPicked: false });
+        applySelectionStyles(cardEls, cardSlots[0].cardEl);
       }
     } else {
       applyQuestionToSlot(cardSlots[0], index, QUESTIONS, (idx) => mastery.isMastered(idx));
@@ -537,6 +800,40 @@ import {
       return;
     }
 
+    if (isSwps50) {
+      examStage = 1;
+      updateExamStageUI();
+      if (nextStageBtn) {
+        nextStageBtn.hidden = true;
+      }
+      if (postNextStageBtn) {
+        postNextStageBtn.hidden = true;
+      }
+
+      const [firstIndex, secondIndex] = selectQuestionPair(QUESTIONS, filterState, masteredSet, 'practical');
+      if (firstIndex === null && secondIndex === null) {
+        updateDrawAvailability();
+        renderQuestionList();
+        return;
+      }
+
+      clearSelectionStyles(cardEls);
+      setCardsIdle(cardEls, false);
+      if (drawBtn) {
+        replayClass(drawBtn, 'pulse');
+      }
+
+      applyQuestionToSlot(cardSlots[0], firstIndex, QUESTIONS, (idx) => mastery.isMastered(idx));
+      applyQuestionToSlot(cardSlots[1], secondIndex, QUESTIONS, (idx) => mastery.isMastered(idx));
+      animateCard(cardSlots[0]);
+      animateCard(cardSlots[1]);
+
+      timer.startSelection();
+      updateDrawAvailability();
+      renderQuestionList();
+      return;
+    }
+
     const [firstIndex, secondIndex] = selectQuestionPair(QUESTIONS, filterState, masteredSet);
     if (firstIndex === null && secondIndex === null) {
       updateDrawAvailability();
@@ -561,6 +858,14 @@ import {
   }
 
   function reset() {
+    examStage = isSwps50 ? 1 : 0;
+    updateExamStageUI();
+    if (nextStageBtn) {
+      nextStageBtn.hidden = true;
+    }
+    if (postNextStageBtn) {
+      postNextStageBtn.hidden = true;
+    }
     cardSlots.forEach((slot) => applyQuestionToSlot(slot, null, QUESTIONS, (idx) => mastery.isMastered(idx)));
     timer.resetAll();
     clearSelectionStyles(cardEls);

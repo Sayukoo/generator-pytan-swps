@@ -5,11 +5,7 @@
  */
 
 import { getTagVariants } from './tags.js';
-import {
-  attachPointerTilt,
-  replayClass,
-  setStaggerIndex,
-} from './motion.js';
+import { replayClass, setStaggerIndex } from './motion.js';
 
 export function createCardSlots(onMasteryToggle) {
   const cardElements = Array.from(document.querySelectorAll('.card'));
@@ -22,7 +18,6 @@ export function createCardSlots(onMasteryToggle) {
       masteryBtn: cardEl.querySelector('.card-mastery'),
       questionIndex: null,
     };
-    attachPointerTilt(cardEl);
     if (slot.masteryBtn && typeof onMasteryToggle === 'function') {
       slot.masteryBtn.addEventListener('click', (event) => {
         event.stopPropagation();
@@ -38,7 +33,7 @@ export function createCardSlots(onMasteryToggle) {
 
 export function clearSelectionStyles(cardEls) {
   cardEls.forEach((card) => {
-    card.classList.remove('selected', 'dimmed', 'auto-picked');
+    card.classList.remove('selected', 'dimmed');
   });
 }
 
@@ -50,20 +45,16 @@ export function setCardsIdle(cardEls, isIdle) {
   });
 }
 
-export function applySelectionStyles(cardEls, selectedCardEl, { autoPicked = false } = {}) {
+export function applySelectionStyles(cardEls, selectedCardEl) {
   cardEls.forEach((card) => {
     if (card.hidden) {
       return;
     }
     if (card === selectedCardEl) {
       card.classList.add('selected');
-      card.classList.toggle('auto-picked', autoPicked);
       card.classList.remove('dimmed');
-      if (autoPicked) {
-        replayClass(card, 'auto-flash');
-      }
     } else {
-      card.classList.remove('selected', 'auto-picked');
+      card.classList.remove('selected');
       card.classList.add('dimmed');
     }
   });
@@ -120,14 +111,6 @@ export function animateCard(slot) {
   replayClass(slot.cardEl, 'glow');
   if (slot.numEl) {
     replayClass(slot.numEl, 'flip');
-  }
-  if (slot.questionEl) {
-    replayClass(slot.questionEl, 'question-reveal');
-  }
-  if (slot.tagsEl) {
-    Array.from(slot.tagsEl.children).forEach((pill) => {
-      replayClass(pill, 'pill-in');
-    });
   }
 }
 

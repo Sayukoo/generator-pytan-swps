@@ -6,16 +6,22 @@ Została zaprojektowana bez potrzeby korzystania ze skomplikowanego systemu budo
 
 ## Funkcje
 
-* **Bazy pytań:** Obsługa wielu baz pytań (SWPS, UWr) z możliwością swobodnego przełączania się i zachowania stanu postępów w Local Storage.
+* **Bazy pytań:** Obsługa wielu baz pytań:
+    * **SWPS (50) — Licencjat:** 50 oficjalnych pytań dyplomowych podzielonych równo na część praktyczną (problemową) i teoretyczną.
+    * **SWPS (75) — Magisterskie:** 75 pytań dla jednolitych studiów magisterskich.
+    * **UWr (31) — Psychologia:** 31 pytań z Uniwersytetu Wrocławskiego.
+    * **Własna baza:** Możliwość importu pliku JSON.
+    * Szybkie przełączanie baz bezpośrednio w menu ustawień (⚙) lub kliknięciem w plakietkę na górnym pasku.
 * **Tryby losowania:**
-    * **Tryb SWPS:** Losuje dwa pytania z bazy; masz określony czas na wybranie jednego z nich i udzielenia odpowiedzi.
+    * **Tryb SWPS Licencjat (Dwuetapowy):** Najpierw losowane są 2 pytania praktyczne (wybierasz 1), a po udzieleniu odpowiedzi przechodzisz do losowania 2 pytań teoretycznych (wybierasz 1).
+    * **Tryb SWPS Magisterskie:** Losuje dwa pytania z puli 75; masz określony czas na wybór jednego z nich i odpowiedź.
     * **Tryb UWr:** Losuje jedno pytanie, a timer rozpoczyna się od razu od czasu na odpowiedź.
 * **Timer z pauzą:** Pasek postępu odliczania, pauza/wznowienie (`Spacja` / `P`), subtelny sygnał dźwiękowy po upływie czasu oraz szybkie akcje: *Opanowane*, *Powtórz odpowiedź*, *Nowe losowanie*.
 * **Mastery System (Zarządzanie postępami):** Oznaczanie pytań jako opanowanych, ukrywanie ich z puli losowania za pomocą filtrów oraz możliwość wyczyszczenia wszystkich postępów (z potwierdzeniem).
 * **Plan nauki:** Wprowadź datę egzaminu, a aplikacja policzy tempo nauki — łącznie z **celem dziennym** ("Dziś: X/Y") i paskiem postępu opanowania materiału.
 * **Filtrowanie po Tagach:** Pytania są przypisywane do kategorii, co pozwala na generowanie zestawów testowych ograniczonych do konkretnych zagadnień.
 * **Wyszukiwanie:** Błyskawiczne szukanie po treści, numerze i tagu pytania.
-* **Trwałe ustawienia:** Filtry (ukryte opanowane, wybrane tagi), własny czas timera i motyw zapamiętują się między sesjami.
+* **Trwałe ustawienia:** Wybrana baza, filtry (ukryte opanowane, wybrane tagi), własny czas timera i motyw zapamiętują się między sesjami.
 * **Motywy:** Ciemny, OLED Black, Sepia Paper, Pixel RPG.
 * **Płynne animacje CSS** z poszanowaniem preferencji `prefers-reduced-motion`.
 
@@ -34,7 +40,8 @@ Została zaprojektowana bez potrzeby korzystania ze skomplikowanego systemu budo
 * `index.html` - Główny i jedyny plik strukturalny.
 * `css/styles.css` - Plik stylizujący (zmienne CSS, motywy, animacje).
 * `data/` - Zbiory danych:
-  * `swps.js` i `uwr.js` - tablice JS przechowujące bazy pytań z tagami.
+  * `swps_licencjat.js` - baza 50 pytań licencjackich (25 praktycznych + 25 teoretycznych z tagami).
+  * `swps.js` i `uwr.js` - tablice JS przechowujące bazy pytań SWPS Magisterskie i UWr.
   * `questions.js` - ładuje właściwą bazę do globalnej instancji zależnie od wyboru (localStorage).
 * `js/main.js` - Punkt wejścia; orkiestracja modułów.
 * `js/modules/` - Logika aplikacji podzielona na moduły ES:
@@ -46,7 +53,7 @@ Została zaprojektowana bez potrzeby korzystania ze skomplikowanego systemu budo
   * `drawer.js` - losowanie pytań (crypto RNG).
   * `cards.js`, `questionList.js` - render kart i siatki pytań (tooltipy).
   * `keyboard.js` - skróty klawiszowe.
-  * `motion.js` - animacje, cząsteczki, tilt 3D.
+   * `motion.js` - animacje i cząsteczki.
   * `themeManager.js` - motywy wizualne.
   * `customBankImporter.js` - import własnej bazy JSON.
   * `uiHelpers.js`, `tags.js` - pomocnicze (topbar, kolory tagów).

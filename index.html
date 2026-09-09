@@ -6,7 +6,7 @@
   <title>Generator pytań · SWPS / UWr</title>
   <meta name="theme-color" content="#000000" />
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23000'/%3E%3Ctext x='32' y='46' font-family='Georgia,serif' font-size='40' fill='%23fff' text-anchor='middle'%3EG%3C/text%3E%3C/svg%3E" />
-  <link rel="stylesheet" href="css/styles.css?v=9" />
+  <link rel="stylesheet" href="css/styles.css?v=10" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=Instrument+Serif:ital@0;1&family=Pixelify+Sans:wght@400..700&display=swap" rel="stylesheet" />
@@ -21,42 +21,95 @@
       </div>
     </div>
 
-    <div class="bank-tabs" role="tablist" aria-label="Uczelnia">
-      <button id="tab-swps" class="bank-tab" type="button" role="tab" aria-selected="false">SWPS</button>
-      <button id="tab-uwr" class="bank-tab" type="button" role="tab" aria-selected="false">UWr</button>
-      <button id="tab-custom" class="bank-tab" type="button" role="tab" aria-selected="false">Własna</button>
+    <div class="topbar__mode-badge">
+      <button id="activeBankBadge" class="mode-badge-btn" type="button" title="Zmień bazę pytań / tryb w ustawieniach" aria-haspopup="true">
+        <span class="mode-badge-btn__dot"></span>
+        <span id="activeBankBadgeText">SWPS (50) · Licencjat</span>
+        <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+      </button>
     </div>
 
     <div class="topbar__actions">
-      <div class="theme-select-wrapper" title="Wybierz motyw wizualny">
-        <label for="themeSelect" class="visually-hidden">Motyw</label>
-        <select id="themeSelect" class="theme-select">
-          <option value="dark">🌙 Ciemny</option>
-          <option value="pixel">👾 Pixel RPG</option>
-          <option value="oled">🖤 OLED Black</option>
-          <option value="sepia">📜 Sepia Paper</option>
-        </select>
-      </div>
-
-      <div class="custom-timer-wrapper" title="Ustaw czas na odpowiedź w sekundach (opcjonalne)">
-        <label for="customTimerInput" class="visually-hidden">Czas (s)</label>
-        <input type="number" id="customTimerInput" class="custom-timer-input" placeholder="120s" min="1" max="999" />
-      </div>
-
       <span class="progress-pill" aria-live="polite" title="Postęp opanowania pytań">
         <span id="navMasteredCount">0</span>/<span id="navTotalCount">0</span>
         <span class="progress-pill__track" aria-hidden="true"><span id="navProgressBar" class="progress-pill__bar"></span></span>
       </span>
 
-      <button id="importBtn" class="ghost-btn" type="button" title="Importuj własny plik JSON z pytaniami">Import</button>
-      <button id="resetBtn" class="ghost-btn" type="button">Reset</button>
-      <button id="helpBtn" class="ghost-btn" type="button">Pomoc</button>
+      <div class="menu-wrap">
+        <button id="menuBtn" class="ghost-btn icon-btn" type="button" aria-haspopup="true" aria-expanded="false" title="Ustawienia">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="3" />
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h.01a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h.01a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v.01a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+          </svg>
+        </button>
+        <div id="settingsMenu" class="settings-menu" hidden>
+          <div class="menu-section">
+            <span class="menu-label">Baza pytań / Tryb</span>
+            <div class="mode-select-list" role="radiogroup" aria-label="Wybór bazy pytań">
+              <button id="mode-swps50" class="mode-select-item is-active" type="button" role="radio" aria-checked="true">
+                <div class="mode-select-item__header">
+                  <span class="mode-select-item__title">SWPS (50) — Licencjat</span>
+                  <span class="mode-select-item__pill">Dwuetapowy</span>
+                </div>
+                <span class="mode-select-item__desc">25 praktycznych + 25 teoretycznych</span>
+              </button>
+              <button id="mode-swps" class="mode-select-item" type="button" role="radio" aria-checked="false">
+                <div class="mode-select-item__header">
+                  <span class="mode-select-item__title">SWPS (75) — Magisterskie</span>
+                  <span class="mode-select-item__pill">2 z 75</span>
+                </div>
+                <span class="mode-select-item__desc">Jednolite studia magisterskie</span>
+              </button>
+              <button id="mode-uwr" class="mode-select-item" type="button" role="radio" aria-checked="false">
+                <div class="mode-select-item__header">
+                  <span class="mode-select-item__title">UWr (31) — Psychologia</span>
+                  <span class="mode-select-item__pill">1 pytanie</span>
+                </div>
+                <span class="mode-select-item__desc">Timer 3 minuty</span>
+              </button>
+              <button id="mode-custom" class="mode-select-item" type="button" role="radio" aria-checked="false">
+                <div class="mode-select-item__header">
+                  <span class="mode-select-item__title">Własna baza pytań</span>
+                  <span class="mode-select-item__pill">JSON</span>
+                </div>
+                <span class="mode-select-item__desc">Import z pliku JSON</span>
+              </button>
+            </div>
+          </div>
+          <div class="menu-section">
+            <label for="themeSelect" class="menu-label">Motyw</label>
+            <select id="themeSelect" class="theme-select">
+              <option value="dark">🌙 Ciemny</option>
+              <option value="pixel">👾 Pixel RPG</option>
+              <option value="oled">🖤 OLED Black</option>
+              <option value="sepia">📜 Sepia Paper</option>
+            </select>
+          </div>
+          <div class="menu-section menu-section--actions">
+            <button id="importBtn" class="ghost-btn" type="button" title="Importuj własny plik JSON z pytaniami">Import bazy</button>
+            <button id="resetBtn" class="ghost-btn" type="button">Reset widoku</button>
+            <button id="helpBtn" class="ghost-btn" type="button">Pomoc</button>
+          </div>
+        </div>
+      </div>
     </div>
   </header>
 
   <div class="shell">
     <main class="stage">
       <h1 class="visually-hidden">Generator losowych pytań</h1>
+
+      <div id="examStageIndicator" class="exam-stage-indicator" hidden>
+        <div class="stage-step is-active" id="stageStep1" data-step="1">
+          <span class="stage-step__badge">Krok 1</span>
+          <span class="stage-step__label">Praktyczne (1 z 2)</span>
+        </div>
+        <div class="stage-step__divider" aria-hidden="true">➔</div>
+        <div class="stage-step" id="stageStep2" data-step="2">
+          <span class="stage-step__badge">Krok 2</span>
+          <span class="stage-step__label">Teoretyczne (1 z 2)</span>
+        </div>
+      </div>
 
       <div class="cards" id="cardsRoot" data-mode="pair">
         <article class="card" data-slot="A" tabindex="0">
@@ -76,13 +129,38 @@
       <div class="primary-actions">
         <div class="primary-actions__row">
           <button id="drawBtn" class="primary" type="button">Losuj</button>
+          <button id="nextStageBtn" class="primary next-stage-btn" type="button" hidden>Krok 2: Teoria ➔</button>
           <button id="pauseBtn" class="ghost-btn pause-btn" type="button" hidden title="Pauza (Spacja / P)">⏸ Pauza</button>
+          <div class="timer-chip-wrap">
+            <button id="timerChipBtn" class="timer-chip" type="button" aria-haspopup="true" aria-expanded="false" title="Czas na odpowiedź">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <circle cx="12" cy="13" r="8" />
+                <path d="M12 9v4l2.5 2.5" />
+                <path d="M9 2h6" />
+              </svg>
+              <span id="timerChipValue">2:00</span>
+            </button>
+            <div id="timerPopover" class="timer-popover" hidden>
+              <span class="menu-label">Czas na odpowiedź</span>
+              <div id="timerPresets" class="timer-presets">
+                <button type="button" data-seconds="60">1 min</button>
+                <button type="button" data-seconds="120">2 min</button>
+                <button type="button" data-seconds="180">3 min</button>
+              </div>
+              <div class="timer-custom-row">
+                <input type="number" id="customTimerInput" min="10" max="999" placeholder="np. 90" />
+                <span class="timer-custom-suffix">s</span>
+                <button id="timerCustomApply" class="ghost-btn" type="button">Ustaw</button>
+              </div>
+            </div>
+          </div>
         </div>
         <div class="timer-track" aria-hidden="true"><div id="timerTrackFill" class="timer-track__fill"></div></div>
         <div id="postActions" class="post-actions" hidden>
-          <span class="post-actions__label">Czas minął — jak poszło?</span>
+          <span class="post-actions__label" id="postActionsLabel">Czas minął — jak poszło?</span>
           <div class="post-actions__row">
-            <button id="postMasteredBtn" class="primary post-primary" type="button">✓ Opanowane</button>
+            <button id="postNextStageBtn" class="primary post-primary" type="button" hidden>Krok 2: Teoria ➔</button>
+            <button id="postMasteredBtn" class="ghost-btn" type="button">✓ Opanowane</button>
             <button id="postRetryBtn" class="ghost-btn" type="button" title="Powtórz odpowiedź na to samo pytanie">↻ Powtórz</button>
             <button id="postDrawBtn" class="ghost-btn" type="button" title="Nowe losowanie (Spacja)">🎲 Losuj</button>
           </div>
@@ -91,39 +169,40 @@
     </main>
 
     <aside class="sidebar" aria-label="Lista pytań i filtry">
-      <section class="sidebar__block">
-        <div class="sidebar__head">
-          <h2>Plan nauki</h2>
+      <details class="side-sec">
+        <summary class="side-sec__summary">Plan nauki</summary>
+        <div class="side-sec__body">
+          <div class="search-box">
+            <input type="date" id="examDateInput" class="search-input" aria-label="Data egzaminu" title="Wybierz datę obrony / egzaminu" />
+          </div>
+          <div id="studyPlanResult" class="study-plan-result"></div>
         </div>
-        <div class="search-box">
-          <input type="date" id="examDateInput" class="search-input" aria-label="Data egzaminu" title="Wybierz datę obrony / egzaminu" />
-        </div>
-        <div id="studyPlanResult" class="study-plan-result"></div>
-      </section>
+      </details>
 
-      <section class="sidebar__block">
-        <div class="sidebar__head">
-          <h2>Filtry</h2>
-          <button id="filterClear" class="text-btn" type="button">Wyczyść</button>
+      <details class="side-sec">
+        <summary class="side-sec__summary">Filtry</summary>
+        <div class="side-sec__body">
+          <div class="filters-row">
+            <label class="check-row">
+              <input type="checkbox" id="filterHideMastered" />
+              <span>Ukryj opanowane</span>
+            </label>
+            <button id="filterClear" class="text-btn" type="button">Wyczyść</button>
+          </div>
+          <div id="filterTagList" class="tag-filters" role="group" aria-label="Tagi"></div>
+          <button id="clearProgressBtn" class="text-btn danger-text-btn" type="button" title="Odznacz wszystkie pytania jako opanowane">Wyczyść postępy</button>
         </div>
-        <label class="check-row">
-          <input type="checkbox" id="filterHideMastered" />
-          <span>Ukryj opanowane</span>
-        </label>
-        <div id="filterTagList" class="tag-filters" role="group" aria-label="Tagi"></div>
-        <button id="clearProgressBtn" class="text-btn danger-text-btn" type="button" title="Odznacz wszystkie pytania jako opanowane">Wyczyść postępy</button>
-      </section>
+      </details>
 
-      <section class="sidebar__block sidebar__block--grow">
-        <div class="sidebar__head">
-          <h2>Pytania</h2>
-          <span class="sidebar__hint">Wybierz pytanie z listy</span>
+      <details class="side-sec side-sec--grow" open>
+        <summary class="side-sec__summary">Pytania</summary>
+        <div class="side-sec__body">
+          <div class="search-box">
+            <input type="search" id="questionSearchInput" class="search-input" placeholder="Szukaj pytania... (klawisz F)" aria-label="Wyszukaj pytanie" />
+          </div>
+          <ul id="questionList" class="question-list"></ul>
         </div>
-        <div class="search-box">
-          <input type="search" id="questionSearchInput" class="search-input" placeholder="Szukaj pytania... (klawisz F)" aria-label="Wyszukaj pytanie" />
-        </div>
-        <ul id="questionList" class="question-list"></ul>
-      </section>
+      </details>
     </aside>
   </div>
 
@@ -134,10 +213,11 @@
   <dialog id="helpDialog">
     <h3>Jak korzystać</h3>
     <ol class="help-list">
-      <li><b>Losuj</b> — SWPS: dwa pytania do wyboru; UWr: jedno pytanie i timer 3 min.</li>
-      <li>Kliknij pytanie na liście po prawej, aby wyświetlić je na ekranie.</li>
+      <li><b>SWPS (50) Licencjat</b> — dwuetapowy egzamin: najpierw losowane są 2 pytania praktyczne (wybierasz 1), a po odpowiedzi przechodzisz do 2 pytań teoretycznych (wybierasz 1).</li>
+      <li><b>SWPS (75) Magisterskie</b> — dwa losowe pytania z całej puli magisterskiej.</li>
+      <li><b>UWr</b> — jedno losowe pytanie i timer 3 minuty.</li>
+      <li><b>Zmiana trybu / bazy</b> — kliknij plakietkę na pasku górnym lub przejdź do <b>Ustawień (⚙)</b>.</li>
       <li>Kliknij numer pytania na liście (lub przycisk na karcie), aby oznaczyć jako opanowane.</li>
-      <li>Przełączaj SWPS / UWr / Własna w górnym pasku. Ustawienia i filtry zapamiętują się automatycznie.</li>
     </ol>
     <p><kbd>Spacja</kbd>/<kbd>P</kbd> — losuj · pauza timera · <kbd>R</kbd> — reset · <kbd>1</kbd>/<kbd>2</kbd> — wybór karty · <kbd>M</kbd> — opanowane · <kbd>F</kbd> — szukaj</p>
     <button id="closeHelp" type="button">Zamknij</button>
@@ -169,9 +249,10 @@
     </div>
   </dialog>
 
+  <script src="data/swps_licencjat.js?v=1"></script>
   <script src="data/swps.js?v=7"></script>
   <script src="data/uwr.js?v=7"></script>
-  <script src="data/questions.js?v=7"></script>
-  <script type="module" src="js/main.js?v=9"></script>
+  <script src="data/questions.js?v=8"></script>
+  <script type="module" src="js/main.js?v=11"></script>
 </body>
 </html>

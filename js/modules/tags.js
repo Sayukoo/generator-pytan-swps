@@ -29,10 +29,15 @@ export const TAG_COLOR_MAP = {
   'Psychologia Stosowana': '#6c5ce7',
   'Psychologia Rozwoju': '#16a085',
   'Diagnoza i psychometria': '#2c3e50',
-  'Psychoterapia i pomoc': '#e84393'
+  'Psychoterapia i pomoc': '#e84393',
+  'Biologiczne podstawy zachowania': '#00cec9',
+  'Praktyczne': '#0984e3',
+  'Teoretyczne': '#a29bfe'
 };
 
 export const TAG_ORDER = [
+  'Praktyczne',
+  'Teoretyczne',
   'Psychologia społeczna',
   'Emocje i motywacje',
   'Psychologia rozwojowa',
@@ -40,6 +45,7 @@ export const TAG_ORDER = [
   'Psychologia osobowości',
   'Psychologia poznawcza',
   'Psychologia różnic indywidualnych',
+  'Biologiczne podstawy zachowania',
   'Etyka',
   'Diagnoza',
   'Metodologia, psychometria, statystyka',

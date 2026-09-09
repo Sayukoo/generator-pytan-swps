@@ -1,7 +1,7 @@
 /**
  * Motion Module
- * Central helpers for pointer-driven 3D tilt, particle bursts,
- * class-replayed animations and stagger bookkeeping.
+ * Central helpers for particle bursts, class-replayed animations
+ * and stagger bookkeeping.
  * Every effect respects the user's reduced-motion preference.
  */
 
@@ -35,72 +35,6 @@ export function replayClass(el, className) {
   el.classList.remove(className);
   void el.offsetWidth;
   el.classList.add(className);
-}
-
-/**
- * Attaches a pointer-following 3D tilt effect to an element.
- * Exposes CSS custom properties consumable by the stylesheet:
- *   --rx, --ry  -> rotateX/rotateY angles (deg)
- *   --px, --py  -> pointer position inside the element (%)
- * Returns a detach function.
- */
-export function attachPointerTilt(el, { maxTilt = 6 } = {}) {
-  if (!el || el.dataset.tiltBound === 'true') {
-    return () => {};
-  }
-  if (prefersCoarsePointer()) {
-    return () => {};
-  }
-  el.dataset.tiltBound = 'true';
-
-  let rafId = 0;
-  let px = 50;
-  let py = 50;
-
-  const applyFrame = () => {
-    rafId = 0;
-    el.style.setProperty('--px', `${px.toFixed(2)}%`);
-    el.style.setProperty('--py', `${py.toFixed(2)}%`);
-    const rx = ((py - 50) / 50) * -maxTilt;
-    const ry = ((px - 50) / 50) * maxTilt;
-    el.style.setProperty('--rx', `${rx.toFixed(2)}deg`);
-    el.style.setProperty('--ry', `${ry.toFixed(2)}deg`);
-  };
-
-  const onPointerMove = (event) => {
-    if (prefersReducedMotion()) {
-      return;
-    }
-    const rect = el.getBoundingClientRect();
-    if (rect.width === 0 || rect.height === 0) {
-      return;
-    }
-    px = ((event.clientX - rect.left) / rect.width) * 100;
-    py = ((event.clientY - rect.top) / rect.height) * 100;
-    if (!rafId) {
-      rafId = window.requestAnimationFrame(applyFrame);
-    }
-  };
-
-  const onPointerLeave = () => {
-    if (rafId) {
-      window.cancelAnimationFrame(rafId);
-      rafId = 0;
-    }
-    el.style.setProperty('--rx', '0deg');
-    el.style.setProperty('--ry', '0deg');
-    el.style.setProperty('--px', '50%');
-    el.style.setProperty('--py', '50%');
-  };
-
-  el.addEventListener('pointermove', onPointerMove);
-  el.addEventListener('pointerleave', onPointerLeave);
-
-  return () => {
-    el.removeEventListener('pointermove', onPointerMove);
-    el.removeEventListener('pointerleave', onPointerLeave);
-    delete el.dataset.tiltBound;
-  };
 }
 
 /**
@@ -171,22 +105,6 @@ export function accentBurstColors(el) {
   }
   const base = ['#ffffff', '#ffd76a'];
   return accent ? [accent, ...base, '#7ef0d4'] : base.concat('#7ef0d4', '#ff8fb1');
-}
-
-/**
- * Updates text content and plays a springy "bump" animation,
- * but only when the value actually changed.
- */
-export function bumpIfChanged(el, nextText) {
-  if (!el) {
-    return;
-  }
-  const next = String(nextText);
-  if (el.textContent === next) {
-    return;
-  }
-  el.textContent = next;
-  replayClass(el, 'bump');
 }
 
 /**

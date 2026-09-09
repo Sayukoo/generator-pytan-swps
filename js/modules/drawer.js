@@ -26,7 +26,7 @@ export function pickRandomIndex(pool) {
   return pool[randInt(0, pool.length - 1)] ?? null;
 }
 
-export function getCandidateIndices(questions, filterState, isMasteredFn) {
+export function getCandidateIndices(questions, filterState, isMasteredFn, category = null) {
   if (!Array.isArray(questions)) {
     return [];
   }
@@ -37,6 +37,9 @@ export function getCandidateIndices(questions, filterState, isMasteredFn) {
 
   for (let i = 0; i < questions.length; i += 1) {
     const entry = questions[i];
+    if (category && entry.category !== category) {
+      continue;
+    }
     const mastered = typeof isMasteredFn === 'function' ? isMasteredFn(i) : false;
     if (hideMastered && mastered) {
       continue;
@@ -52,9 +55,15 @@ export function getCandidateIndices(questions, filterState, isMasteredFn) {
   return matches;
 }
 
-export function selectQuestionPair(questions, filterState, masteredSet) {
+export function selectQuestionPair(questions, filterState, masteredSet, category = null) {
   const isMasteredFn = (idx) => masteredSet?.has?.(idx);
-  const candidates = getCandidateIndices(questions, filterState, isMasteredFn);
+  let candidates = getCandidateIndices(questions, filterState, isMasteredFn, category);
+  if (candidates.length === 0 && category) {
+    // If filters emptied the pool, fallback to all category candidates ignoring tag/hideMastered filters
+    candidates = questions
+      .map((q, idx) => (q.category === category ? idx : null))
+      .filter((idx) => idx !== null);
+  }
   if (candidates.length === 0) {
     return [null, null];
   }

@@ -58,7 +58,7 @@ function animateNumberTo(el, target) {
   window.requestAnimationFrame(step);
 }
 
-export function updateTopbarInfo({ totalCount, masteredCount, isUwr }) {
+export function updateTopbarInfo({ totalCount, masteredCount, isUwr, bankLabel }) {
   const navTotalCountEl = document.getElementById('navTotalCount');
   const navMasteredCountEl = document.getElementById('navMasteredCount');
   const navSubtitleEl = document.getElementById('navSubtitle');
@@ -75,9 +75,13 @@ export function updateTopbarInfo({ totalCount, masteredCount, isUwr }) {
     navProgressEl.style.width = `${percent}%`;
   }
   if (navSubtitleEl) {
-    navSubtitleEl.textContent = isUwr
-      ? `${totalCount} pytań · timer 3 min`
-      : `${totalCount} pytań egzaminacyjnych`;
+    if (isUwr) {
+      navSubtitleEl.textContent = `${totalCount} pytań · timer 3 min`;
+    } else if (bankLabel) {
+      navSubtitleEl.textContent = `${bankLabel} · ${totalCount} pytań`;
+    } else {
+      navSubtitleEl.textContent = `${totalCount} pytań`;
+    }
   }
 }
 
@@ -90,7 +94,7 @@ export function celebrateMastery(cardEl, wasMastered = true) {
     return;
   }
   const { x, y } = elementCenter(cardEl);
-  burstParticles(x, y, { count: 22, spread: 110 });
+  burstParticles(x, y, { count: 14, spread: 100 });
 }
 
 export function setupHelpModal(helpBtn, helpDialog, closeHelpBtn) {
