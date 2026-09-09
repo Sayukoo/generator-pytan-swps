@@ -13,7 +13,12 @@ export function randInt(min, max) {
   const buffer = new Uint32Array(1);
   let value;
   do {
-    window.crypto.getRandomValues(buffer);
+    const cryptoObj = typeof globalThis !== 'undefined' ? (globalThis.crypto || (typeof window !== 'undefined' ? window.crypto : null)) : null;
+    if (cryptoObj && typeof cryptoObj.getRandomValues === 'function') {
+      cryptoObj.getRandomValues(buffer);
+    } else {
+      buffer[0] = Math.floor(Math.random() * (maxUint + 1));
+    }
     value = buffer[0];
   } while (value >= limit);
   return min + (value % range);
@@ -37,8 +42,16 @@ export function getCandidateIndices(questions, filterState, isMasteredFn, catego
 
   for (let i = 0; i < questions.length; i += 1) {
     const entry = questions[i];
-    if (category && entry.category !== category) {
-      continue;
+    if (category) {
+      const isProblem = category === 'problem' || category === 'practical';
+      const entryIsProblem = entry.category === 'problem' || entry.category === 'practical';
+      if (isProblem) {
+        if (!entryIsProblem) {
+          continue;
+        }
+      } else if (entry.category !== category) {
+        continue;
+      }
     }
     const mastered = typeof isMasteredFn === 'function' ? isMasteredFn(i) : false;
     if (hideMastered && mastered) {
@@ -59,9 +72,14 @@ export function selectQuestionPair(questions, filterState, masteredSet, category
   const isMasteredFn = (idx) => masteredSet?.has?.(idx);
   let candidates = getCandidateIndices(questions, filterState, isMasteredFn, category);
   if (candidates.length === 0 && category) {
-    // If filters emptied the pool, fallback to all category candidates ignoring tag/hideMastered filters
+    const isProblem = category === 'problem' || category === 'practical';
     candidates = questions
-      .map((q, idx) => (q.category === category ? idx : null))
+      .map((q, idx) => {
+        const matches = isProblem
+          ? q.category === 'problem' || q.category === 'practical'
+          : q.category === category;
+        return matches ? idx : null;
+      })
       .filter((idx) => idx !== null);
   }
   if (candidates.length === 0) {

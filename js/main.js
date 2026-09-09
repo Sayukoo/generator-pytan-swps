@@ -114,8 +114,10 @@ import {
 
   const cardsRoot = document.getElementById('cardsRoot');
 
-  // Exam stage for SWPS (50): 1 = practical, 2 = theoretical, 0 = idle/done
+  // Exam stage for SWPS (50): 1 = problemowe, 2 = teoretyczne, 0 = idle/done
   let examStage = isSwps50 ? 1 : 0;
+  let stage1Picked = false;
+  let stage2Picked = false;
 
   function updateExamStageUI() {
     if (!isSwps50) {
@@ -130,13 +132,13 @@ import {
     if (stageStep1 && stageStep2) {
       if (examStage === 1) {
         stageStep1.classList.add('is-active');
-        stageStep1.classList.remove('is-done');
+        stageStep1.classList.toggle('is-done', stage1Picked);
         stageStep2.classList.remove('is-active', 'is-done');
       } else if (examStage === 2) {
         stageStep1.classList.remove('is-active');
         stageStep1.classList.add('is-done');
         stageStep2.classList.add('is-active');
-        stageStep2.classList.remove('is-done');
+        stageStep2.classList.toggle('is-done', stage2Picked);
       } else {
         stageStep1.classList.remove('is-active', 'is-done');
         stageStep2.classList.remove('is-active', 'is-done');
@@ -407,13 +409,24 @@ import {
 
     if (isSwps50) {
       if (examStage === 1) {
+        stage1Picked = true;
+        updateExamStageUI();
         if (postNextStageBtn) postNextStageBtn.hidden = false;
         if (nextStageBtn) nextStageBtn.hidden = false;
-        if (postActionsLabel) postActionsLabel.textContent = 'Krok 1 (praktyka) zakończony — przejdź do pytań teoretycznych:';
+        if (drawBtn) {
+          drawBtn.disabled = false;
+          drawBtn.textContent = '2. Ruch: Teoretyczne ➔';
+        }
+        if (postActionsLabel) postActionsLabel.textContent = '1. Ruch (problemowe) zakończony — przejdź do pytań teoretycznych:';
       } else if (examStage === 2) {
+        stage2Picked = true;
+        updateExamStageUI();
         if (postNextStageBtn) postNextStageBtn.hidden = true;
         if (nextStageBtn) nextStageBtn.hidden = true;
-        if (stageStep2) stageStep2.classList.add('is-done');
+        if (drawBtn) {
+          drawBtn.disabled = false;
+          drawBtn.textContent = '🎲 Nowy egzamin';
+        }
         if (postActionsLabel) postActionsLabel.textContent = 'Egzamin licencjacki ukończony! Jak poszło?';
       }
     }
@@ -584,7 +597,7 @@ import {
   }
 
   function updateDrawAvailability() {
-    const poolCategory = isSwps50 ? (examStage === 2 ? 'theoretical' : 'practical') : null;
+    const poolCategory = isSwps50 ? (examStage === 2 ? 'theoretical' : 'problem') : null;
     const candidates = getCandidateIndices(QUESTIONS, filterMenu.getState(), (idx) => mastery.isMastered(idx), poolCategory);
     const hasCandidates = candidates.length > 0;
     if (drawBtn && !timer.isAnswerActive()) {
@@ -596,7 +609,11 @@ import {
     if (!timer.isAnswerActive() && !timer.isSelectionActive()) {
       let label = timer.DRAW_LABEL;
       if (isSwps50) {
-        label = examStage === 2 ? 'Losuj (Teoria)' : 'Losuj (Praktyka)';
+        if (examStage === 1) {
+          label = stage1Picked ? '2. Ruch: Teoretyczne ➔' : '1. Ruch: Losuj problemowe';
+        } else if (examStage === 2) {
+          label = stage2Picked ? '🎲 Nowy egzamin' : '2. Ruch: Losuj teoretyczne';
+        }
       }
       timer.setButtonLabel(hasCandidates ? label : 'Brak pytań');
     }
@@ -628,10 +645,20 @@ import {
       });
     }
 
-    if (isSwps50 && examStage === 1) {
-      if (nextStageBtn) {
-        nextStageBtn.hidden = false;
-        nextStageBtn.textContent = 'Krok 2: Teoria ➔';
+    if (isSwps50) {
+      if (examStage === 1) {
+        stage1Picked = true;
+        updateExamStageUI();
+        if (nextStageBtn) {
+          nextStageBtn.hidden = false;
+          nextStageBtn.textContent = '2. Ruch: Teoretyczne ➔';
+        }
+      } else if (examStage === 2) {
+        stage2Picked = true;
+        updateExamStageUI();
+        if (nextStageBtn) {
+          nextStageBtn.hidden = true;
+        }
       }
     }
   }
@@ -737,7 +764,13 @@ import {
 
     if (isSwps50) {
       const q = QUESTIONS[index];
-      examStage = q?.category === 'theoretical' ? 2 : 1;
+      const isTheo = q?.category === 'theoretical';
+      examStage = isTheo ? 2 : 1;
+      if (examStage === 1) {
+        stage1Picked = true;
+      } else {
+        stage2Picked = true;
+      }
       updateExamStageUI();
     }
 
@@ -801,7 +834,17 @@ import {
     }
 
     if (isSwps50) {
-      examStage = 1;
+      if (examStage === 1 && stage1Picked) {
+        advanceToTheoreticalStage();
+        return;
+      }
+      if (examStage === 2 && stage2Picked) {
+        stage1Picked = false;
+        stage2Picked = false;
+        examStage = 1;
+      }
+
+      const categoryToDraw = examStage === 2 ? 'theoretical' : 'problem';
       updateExamStageUI();
       if (nextStageBtn) {
         nextStageBtn.hidden = true;
@@ -810,7 +853,7 @@ import {
         postNextStageBtn.hidden = true;
       }
 
-      const [firstIndex, secondIndex] = selectQuestionPair(QUESTIONS, filterState, masteredSet, 'practical');
+      const [firstIndex, secondIndex] = selectQuestionPair(QUESTIONS, filterState, masteredSet, categoryToDraw);
       if (firstIndex === null && secondIndex === null) {
         updateDrawAvailability();
         renderQuestionList();
@@ -859,6 +902,8 @@ import {
 
   function reset() {
     examStage = isSwps50 ? 1 : 0;
+    stage1Picked = false;
+    stage2Picked = false;
     updateExamStageUI();
     if (nextStageBtn) {
       nextStageBtn.hidden = true;

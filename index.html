@@ -51,7 +51,7 @@
                   <span class="mode-select-item__title">SWPS (50) — Licencjat</span>
                   <span class="mode-select-item__pill">Dwuetapowy</span>
                 </div>
-                <span class="mode-select-item__desc">25 praktycznych + 25 teoretycznych</span>
+                <span class="mode-select-item__desc">25 problemowych + 25 teoretycznych</span>
               </button>
               <button id="mode-swps" class="mode-select-item" type="button" role="radio" aria-checked="false">
                 <div class="mode-select-item__header">
@@ -101,13 +101,13 @@
 
       <div id="examStageIndicator" class="exam-stage-indicator" hidden>
         <div class="stage-step is-active" id="stageStep1" data-step="1">
-          <span class="stage-step__badge">Krok 1</span>
-          <span class="stage-step__label">Praktyczne (1 z 2)</span>
+          <span class="stage-step__badge">1. Ruch</span>
+          <span class="stage-step__label">Pytania problemowe (wybierz 1 z 2)</span>
         </div>
         <div class="stage-step__divider" aria-hidden="true">➔</div>
         <div class="stage-step" id="stageStep2" data-step="2">
-          <span class="stage-step__badge">Krok 2</span>
-          <span class="stage-step__label">Teoretyczne (1 z 2)</span>
+          <span class="stage-step__badge">2. Ruch</span>
+          <span class="stage-step__label">Pytania teoretyczne (wybierz 1 z 2)</span>
         </div>
       </div>
 
@@ -129,7 +129,7 @@
       <div class="primary-actions">
         <div class="primary-actions__row">
           <button id="drawBtn" class="primary" type="button">Losuj</button>
-          <button id="nextStageBtn" class="primary next-stage-btn" type="button" hidden>Krok 2: Teoria ➔</button>
+          <button id="nextStageBtn" class="primary next-stage-btn" type="button" hidden>2. Ruch: Teoretyczne ➔</button>
           <button id="pauseBtn" class="ghost-btn pause-btn" type="button" hidden title="Pauza (Spacja / P)">⏸ Pauza</button>
           <div class="timer-chip-wrap">
             <button id="timerChipBtn" class="timer-chip" type="button" aria-haspopup="true" aria-expanded="false" title="Czas na odpowiedź">
@@ -159,7 +159,7 @@
         <div id="postActions" class="post-actions" hidden>
           <span class="post-actions__label" id="postActionsLabel">Czas minął — jak poszło?</span>
           <div class="post-actions__row">
-            <button id="postNextStageBtn" class="primary post-primary" type="button" hidden>Krok 2: Teoria ➔</button>
+            <button id="postNextStageBtn" class="primary post-primary" type="button" hidden>2. Ruch: Teoretyczne ➔</button>
             <button id="postMasteredBtn" class="ghost-btn" type="button">✓ Opanowane</button>
             <button id="postRetryBtn" class="ghost-btn" type="button" title="Powtórz odpowiedź na to samo pytanie">↻ Powtórz</button>
             <button id="postDrawBtn" class="ghost-btn" type="button" title="Nowe losowanie (Spacja)">🎲 Losuj</button>
