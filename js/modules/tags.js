@@ -31,13 +31,9 @@ export const TAG_COLOR_MAP = {
   'Diagnoza i psychometria': '#2c3e50',
   'Psychoterapia i pomoc': '#e84393',
   'Biologiczne podstawy zachowania': '#00cec9',
-  'Problemowe': '#0984e3',
-  'Teoretyczne': '#a29bfe'
 };
 
 export const TAG_ORDER = [
-  'Problemowe',
-  'Teoretyczne',
   'Psychologia społeczna',
   'Emocje i motywacje',
   'Psychologia rozwojowa',

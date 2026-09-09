@@ -91,6 +91,10 @@ export function renderTags(tagsEl, tags) {
     if (!trimmed) {
       return;
     }
+    const lower = trimmed.toLowerCase();
+    if (lower === 'praktyczne' || lower === 'problemowe' || lower === 'teoretyczne') {
+      return;
+    }
     const pill = document.createElement('span');
     pill.className = 'tag-pill';
     pill.textContent = trimmed;
