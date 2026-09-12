@@ -10,6 +10,8 @@ export function setupKeyboardShortcuts({
   onToggleActiveMastered,
   onFocusSearch,
   onTogglePause,
+  onToggleZen,
+  isZenActive,
   isTimerAnswerActive,
   isDrawDisabled,
 }) {
@@ -19,6 +21,14 @@ export function setupKeyboardShortcuts({
     if (targetTag && ['INPUT', 'TEXTAREA', 'SELECT'].includes(targetTag)) {
       if (e.key === 'Escape') {
         e.target.blur();
+      }
+      return;
+    }
+
+    if (e.key === 'Escape' && typeof isZenActive === 'function' && isZenActive()) {
+      e.preventDefault();
+      if (typeof onToggleZen === 'function') {
+        onToggleZen();
       }
       return;
     }
@@ -64,6 +74,11 @@ export function setupKeyboardShortcuts({
       e.preventDefault();
       if (typeof onFocusSearch === 'function') {
         onFocusSearch();
+      }
+    } else if (e.key && e.key.toLowerCase() === 'z' && !e.ctrlKey && !e.metaKey && !e.altKey) {
+      e.preventDefault();
+      if (typeof onToggleZen === 'function') {
+        onToggleZen();
       }
     }
   });

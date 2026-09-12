@@ -32,6 +32,7 @@ import {
   prefersReducedMotion,
   replayClass,
 } from './modules/motion.js';
+import { createZenManager } from './modules/zenMode.js';
 
 (function () {
   'use strict';
@@ -70,6 +71,8 @@ import {
 
   const menuBtn = document.getElementById('menuBtn');
   const settingsMenu = document.getElementById('settingsMenu');
+  const zenModeBtn = document.getElementById('zenModeBtn');
+  const zenMenuBtn = document.getElementById('zenMenuBtn');
 
   const activeBankBadge = document.getElementById('activeBankBadge');
   const activeBankBadgeText = document.getElementById('activeBankBadgeText');
@@ -118,6 +121,7 @@ import {
   let examStage = isSwps50 ? 1 : 0;
   let stage1Picked = false;
   let stage2Picked = false;
+  let zenManager = null;
 
   function updateExamStageUI() {
     if (!isSwps50) {
@@ -384,10 +388,13 @@ import {
         pauseBtn.hidden = true;
       }
     }
+
+    zenManager?.updateTimer(remaining, phase, { duration });
   }
 
   function handleAnswerComplete() {
     playTimeUpChime();
+    zenManager?.onAnswerComplete();
     if (timerTrackFill) {
       timerTrackFill.style.transform = 'scaleX(0)';
       timerTrackFill.classList.remove('is-urgent');
@@ -636,6 +643,7 @@ import {
     }
     setCardsIdle(cardEls, false);
     applySelectionStyles(cardEls, cardEl);
+    zenManager?.syncQuestion();
     if (!prefersReducedMotion()) {
       const { x, y } = elementCenter(cardEl);
       burstParticles(x, y, {
@@ -702,6 +710,7 @@ import {
     timer.startSelection();
     updateDrawAvailability();
     renderQuestionList();
+    zenManager?.syncQuestion();
   }
 
   if (nextStageBtn) {
@@ -798,6 +807,7 @@ import {
     }
     renderQuestionList();
     updateDrawAvailability();
+    zenManager?.syncQuestion();
   }
 
   function draw() {
@@ -830,6 +840,7 @@ import {
       applySelectionStyles(cardEls, cardSlots[0].cardEl);
       updateDrawAvailability();
       renderQuestionList();
+      zenManager?.syncQuestion();
       return;
     }
 
@@ -857,6 +868,7 @@ import {
       if (firstIndex === null && secondIndex === null) {
         updateDrawAvailability();
         renderQuestionList();
+        zenManager?.syncQuestion();
         return;
       }
 
@@ -874,6 +886,7 @@ import {
       timer.startSelection();
       updateDrawAvailability();
       renderQuestionList();
+      zenManager?.syncQuestion();
       return;
     }
 
@@ -881,6 +894,7 @@ import {
     if (firstIndex === null && secondIndex === null) {
       updateDrawAvailability();
       renderQuestionList();
+      zenManager?.syncQuestion();
       return;
     }
 
@@ -898,6 +912,7 @@ import {
     timer.startSelection();
     updateDrawAvailability();
     renderQuestionList();
+    zenManager?.syncQuestion();
   }
 
   function reset() {
@@ -918,6 +933,7 @@ import {
     setPostActionsVisible(false);
     updateDrawAvailability();
     renderQuestionList();
+    zenManager?.syncQuestion();
   }
 
   // Pause / resume of the answer countdown
@@ -974,6 +990,33 @@ import {
 
   resetBtn.addEventListener('click', reset);
 
+  zenManager = createZenManager({
+    onDraw: draw,
+    onSelectSlot: (slotIndex) => {
+      if (cardSlots[slotIndex]?.cardEl) {
+        handleAnswerStart(cardSlots[slotIndex].cardEl, { force: true });
+      }
+    },
+    onTogglePause: () => timer.togglePause(),
+    isTimerAnswerActive: () => timer.isAnswerActive(),
+    isTimerAnswerPaused: () => timer.isAnswerPaused(),
+    getAnswerRemaining: () => timer.getAnswerRemaining(),
+    getCurrentDuration: () => currentAnswerDuration,
+    getSelectedQuestionIndex: () => getSelectedQuestionIndex(),
+    getCardSlots: () => cardSlots,
+    getQuestions: () => QUESTIONS,
+  });
+
+  if (zenModeBtn) {
+    zenModeBtn.addEventListener('click', () => zenManager.toggle());
+  }
+  if (zenMenuBtn) {
+    zenMenuBtn.addEventListener('click', () => {
+      closeSettingsMenu();
+      zenManager.open();
+    });
+  }
+
   setupKeyboardShortcuts({
     onDraw: draw,
     onReset: reset,
@@ -990,6 +1033,8 @@ import {
     },
     onFocusSearch: () => searchInputEl?.focus(),
     onTogglePause: () => timer.togglePause(),
+    onToggleZen: () => zenManager?.toggle(),
+    isZenActive: () => Boolean(zenManager?.isActive()),
     isTimerAnswerActive: () => timer.isAnswerActive(),
     isDrawDisabled: () => drawBtn.disabled,
   });
