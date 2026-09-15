@@ -388,13 +388,10 @@ import { createZenManager } from './modules/zenMode.js';
         pauseBtn.hidden = true;
       }
     }
-
-    zenManager?.updateTimer(remaining, phase, { duration });
   }
 
   function handleAnswerComplete() {
     playTimeUpChime();
-    zenManager?.onAnswerComplete();
     if (timerTrackFill) {
       timerTrackFill.style.transform = 'scaleX(0)';
       timerTrackFill.classList.remove('is-urgent');
@@ -643,7 +640,6 @@ import { createZenManager } from './modules/zenMode.js';
     }
     setCardsIdle(cardEls, false);
     applySelectionStyles(cardEls, cardEl);
-    zenManager?.syncQuestion();
     if (!prefersReducedMotion()) {
       const { x, y } = elementCenter(cardEl);
       burstParticles(x, y, {
@@ -710,7 +706,6 @@ import { createZenManager } from './modules/zenMode.js';
     timer.startSelection();
     updateDrawAvailability();
     renderQuestionList();
-    zenManager?.syncQuestion();
   }
 
   if (nextStageBtn) {
@@ -807,7 +802,6 @@ import { createZenManager } from './modules/zenMode.js';
     }
     renderQuestionList();
     updateDrawAvailability();
-    zenManager?.syncQuestion();
   }
 
   function draw() {
@@ -840,7 +834,6 @@ import { createZenManager } from './modules/zenMode.js';
       applySelectionStyles(cardEls, cardSlots[0].cardEl);
       updateDrawAvailability();
       renderQuestionList();
-      zenManager?.syncQuestion();
       return;
     }
 
@@ -868,7 +861,6 @@ import { createZenManager } from './modules/zenMode.js';
       if (firstIndex === null && secondIndex === null) {
         updateDrawAvailability();
         renderQuestionList();
-        zenManager?.syncQuestion();
         return;
       }
 
@@ -886,7 +878,6 @@ import { createZenManager } from './modules/zenMode.js';
       timer.startSelection();
       updateDrawAvailability();
       renderQuestionList();
-      zenManager?.syncQuestion();
       return;
     }
 
@@ -894,7 +885,6 @@ import { createZenManager } from './modules/zenMode.js';
     if (firstIndex === null && secondIndex === null) {
       updateDrawAvailability();
       renderQuestionList();
-      zenManager?.syncQuestion();
       return;
     }
 
@@ -912,7 +902,6 @@ import { createZenManager } from './modules/zenMode.js';
     timer.startSelection();
     updateDrawAvailability();
     renderQuestionList();
-    zenManager?.syncQuestion();
   }
 
   function reset() {
@@ -933,7 +922,6 @@ import { createZenManager } from './modules/zenMode.js';
     setPostActionsVisible(false);
     updateDrawAvailability();
     renderQuestionList();
-    zenManager?.syncQuestion();
   }
 
   // Pause / resume of the answer countdown
@@ -990,22 +978,7 @@ import { createZenManager } from './modules/zenMode.js';
 
   resetBtn.addEventListener('click', reset);
 
-  zenManager = createZenManager({
-    onDraw: draw,
-    onSelectSlot: (slotIndex) => {
-      if (cardSlots[slotIndex]?.cardEl) {
-        handleAnswerStart(cardSlots[slotIndex].cardEl, { force: true });
-      }
-    },
-    onTogglePause: () => timer.togglePause(),
-    isTimerAnswerActive: () => timer.isAnswerActive(),
-    isTimerAnswerPaused: () => timer.isAnswerPaused(),
-    getAnswerRemaining: () => timer.getAnswerRemaining(),
-    getCurrentDuration: () => currentAnswerDuration,
-    getSelectedQuestionIndex: () => getSelectedQuestionIndex(),
-    getCardSlots: () => cardSlots,
-    getQuestions: () => QUESTIONS,
-  });
+  zenManager = createZenManager();
 
   if (zenModeBtn) {
     zenModeBtn.addEventListener('click', () => zenManager.toggle());

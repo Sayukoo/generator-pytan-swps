@@ -1835,259 +1835,63 @@ html[data-theme="pixel"] .question-item {
   flex-shrink: 0;
 }
 
+/* W trybie Zen usuwamy górny i boczny pasek oraz stopkę — reszta layoutu bez zmian */
 body.in-zen-mode {
-  overflow: hidden !important;
+  grid-template-rows: 1fr;
 }
 
-.zen-overlay {
-  position: fixed;
-  inset: 0;
-  width: 100vw;
-  height: 100vh;
-  z-index: 1000;
-  background: var(--bg);
-  color: var(--fg);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+body.in-zen-mode .topbar,
+body.in-zen-mode .sidebar,
+body.in-zen-mode .site-footer {
+  display: none !important;
+}
+
+body.in-zen-mode .shell {
+  grid-template-columns: 1fr;
+  min-height: 100vh;
+  max-width: 1200px;
+}
+
+body.in-zen-mode .stage {
+  min-height: 100vh;
   justify-content: center;
-  padding: 48px 28px;
-  box-sizing: border-box;
-  overflow-y: auto;
-  animation: zenFadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
+  padding: 40px 24px;
 }
 
-.zen-overlay[hidden] {
-  display: none !important;
-}
-
-.zen-overlay [hidden] {
-  display: none !important;
-}
-
-@keyframes zenFadeIn {
-  from {
-    opacity: 0;
-    transform: scale(0.99);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
+/* Pływający przycisk wyjścia z trybu Zen */
 .zen-exit-btn {
   position: fixed;
-  top: 24px;
-  right: 28px;
-  z-index: 1010;
+  top: 20px;
+  right: 24px;
+  z-index: 100;
   display: inline-flex;
   align-items: center;
   gap: 8px;
   padding: 8px 14px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.06);
+  background: var(--bg-elevated);
   border: 1px solid var(--line);
   color: var(--muted);
   font: 600 12.5px/1 var(--font-sans);
   cursor: pointer;
-  opacity: 0.55;
-  transition: opacity 0.2s ease, background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+  opacity: 0.6;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  transition: opacity 0.2s ease, background 0.2s ease, color 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
+}
+
+.zen-exit-btn[hidden] {
+  display: none !important;
 }
 
 .zen-exit-btn:hover {
   opacity: 1;
   color: var(--fg);
-  background: rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.12);
   border-color: rgba(255, 255, 255, 0.25);
+  transform: translateY(-1px);
 }
 
-.zen-main {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  max-width: 920px;
-  width: 100%;
-  margin: auto 0;
-  text-align: center;
-  gap: 40px;
-}
-
-.zen-timer-section {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 12px;
-}
-
-.zen-timer-clock {
-  font-size: clamp(60px, 12vw, 108px);
-  font-weight: 700;
-  line-height: 1;
-  letter-spacing: -0.03em;
-  font-variant-numeric: tabular-nums;
-  color: var(--fg);
-  transition: color 0.3s ease, opacity 0.2s ease;
-  user-select: none;
-}
-
-.zen-timer-clock.is-urgent {
-  color: #ff5f56;
-  text-shadow: 0 0 36px rgba(255, 95, 86, 0.45);
-}
-
-.zen-timer-clock.is-paused {
-  opacity: 0.6;
-}
-
-.zen-timer-track {
-  width: min(340px, 75vw);
-  height: 4px;
-  border-radius: 999px;
-  background: var(--line);
-  overflow: hidden;
-}
-
-.zen-timer-bar {
-  width: 100%;
-  height: 100%;
-  border-radius: inherit;
-  background: var(--fg);
-  transform-origin: left center;
-  transform: scaleX(0);
-  transition: transform 0.9s linear, background 0.3s ease;
-}
-
-.zen-timer-bar.is-urgent {
-  background: linear-gradient(90deg, #ff5f56, #ff8fb1);
-}
-
-.zen-timer-status {
-  font-size: 13px;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--muted);
-  min-height: 18px;
-}
-
-.zen-question-section {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 18px;
-  max-width: 860px;
-  width: 100%;
-}
-
-.zen-question-num {
-  font-size: 13px;
-  font-weight: 700;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--muted);
-  padding: 4px 12px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid var(--line);
-}
-
-.zen-question-text {
-  font-size: clamp(22px, 3.8vw, 36px);
-  line-height: 1.55;
-  color: var(--fg);
-  margin: 0;
-  font-weight: 500;
-  text-wrap: balance;
-  word-break: break-word;
-}
-
-.zen-pick-section {
-  width: 100%;
-  max-width: 780px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 16px;
-}
-
-.zen-pick-title {
-  font-size: 14px;
-  color: var(--muted);
-  margin: 0;
-  letter-spacing: 0.04em;
-}
-
-.zen-pick-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 16px;
-  width: 100%;
-}
-
-.zen-pick-card {
-  background: var(--bg-elevated);
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  padding: 24px 20px;
-  cursor: pointer;
-  text-align: left;
-  transition: border-color 0.2s ease, transform 0.2s ease, background 0.2s ease;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  color: var(--fg);
-  font-family: var(--font-sans);
-}
-
-.zen-pick-card:hover {
-  border-color: rgba(255, 255, 255, 0.35);
-  background: rgba(255, 255, 255, 0.08);
-  transform: translateY(-3px);
-}
-
-.zen-pick-num {
-  font-weight: 700;
-  font-size: 18px;
-  color: var(--muted);
-}
-
-.zen-pick-text {
-  font-size: 15px;
-  line-height: 1.5;
-  color: var(--fg);
-}
-
-.zen-empty-section {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 16px;
-}
-
-.zen-empty-text {
-  font-size: 18px;
-  color: var(--muted);
-  margin: 0;
-}
-
-.zen-controls {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  justify-content: center;
-  flex-wrap: wrap;
-}
-
-.zen-ctrl-btn {
-  font-size: 13px;
-  padding: 10px 18px;
-  text-transform: none;
-  letter-spacing: 0.02em;
-}
-
-/* ——— Tryb Zen: Dopasowanie motywów ——— */
+/* Dopasowanie motywów */
 html[data-theme="sepia"] .zen-btn,
 html[data-theme="sepia"] .zen-exit-btn {
   background: rgba(61, 43, 31, 0.08);
@@ -2095,41 +1899,19 @@ html[data-theme="sepia"] .zen-exit-btn {
   color: var(--fg);
 }
 
-html[data-theme="sepia"] .zen-question-num {
-  background: rgba(61, 43, 31, 0.08);
-  color: var(--muted);
-}
-
-html[data-theme="sepia"] .zen-timer-bar {
-  background: var(--fg);
-}
-
 html[data-theme="pixel"] .zen-btn,
-html[data-theme="pixel"] .zen-exit-btn,
-html[data-theme="pixel"] .zen-pick-card,
-html[data-theme="pixel"] .zen-question-num {
+html[data-theme="pixel"] .zen-exit-btn {
   border-width: 2px;
   border-radius: 4px;
   font-family: var(--font-sans);
 }
 
-html[data-theme="pixel"] .zen-timer-clock {
-  font-family: var(--font-sans);
-  text-shadow: 2px 2px 0px #5a3e85;
-}
-
 @media (max-width: 600px) {
-  .zen-overlay {
-    padding: 32px 16px;
-  }
   .zen-exit-btn {
-    top: 16px;
-    right: 16px;
+    top: 14px;
+    right: 14px;
     padding: 6px 12px;
     font-size: 11.5px;
-  }
-  .zen-main {
-    gap: 28px;
   }
   .zen-btn__text {
     display: none;
@@ -2138,4 +1920,5 @@ html[data-theme="pixel"] .zen-timer-clock {
     padding: 8px 10px;
   }
 }
+
 
